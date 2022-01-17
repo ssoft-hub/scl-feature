@@ -1,0 +1,13 @@
+!*msvc*: LIBS *= -lscl-feature
+
+INCLUDEPATH *= \
+    $${PWD}/../../include \
+
+DEPENDPATH *= \
+    $${PWD}/../../include \
+
+CONFIG *= c++11
+
+DEPENDS *= \
+    scl-meta \
+    scl-utility \
