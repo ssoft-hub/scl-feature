@@ -1,12 +1,12 @@
 #pragma once
 
-#include <ModelKit.h>
+#include <ScL/Feature.h>
 #include <string>
 
 struct MyType
 {
-    ScL::Instance< ::std::string > m_first_name;
-    ScL::Instance< ::std::string > m_last_name;
-    ScL::Instance< int > m_age;
-    ScL::Instance< double > m_stature;
+    ScL::Feature::Wrapper< ::std::string > m_first_name;
+    ScL::Feature::Wrapper< ::std::string > m_last_name;
+    ScL::Feature::Wrapper< int > m_age;
+    ScL::Feature::Wrapper< double > m_stature;
 };
