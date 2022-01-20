@@ -214,15 +214,9 @@ SCL_BINARY_OPERATOR_IMPLEMENTAION( ^=, BitwiseXorAssignment )
     { \
     } \
 
+
 #define SCL_CAST_OPERATOR_PROTOTYPE( refer ) \
-    template < typename _OtherValue, \
-        typename = ::std::enable_if_t< \
-            ::std::is_same< ::std::decay_t< _OtherValue >, ::std::decay_t< _Value > >::value \
-            && ::ScL::Feature::isSimilar< _OtherValue, _Value >() > > \
-    operator Wrapper< _OtherValue, _Tool > refer () refer \
-    { \
-        return static_cast< Wrapper< _OtherValue, _Tool > refer >( *this ); \
-    } \
+    /*TODO:*/
 
 #define SCL_CONSTRUCTOR_FOR_THIS_WRAPPER \
     SCL_CONSTRUCTOR_FOR_THIS_WRAPPER_PROTOTYPE( && ) \
