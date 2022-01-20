@@ -2,6 +2,7 @@
 #include "ScL/Utility.h"
 #include <iostream>
 #include <map>
+#include <unordered_map>
 #include <string>
 #include <vector>
 
@@ -420,39 +421,19 @@ void testDiffToolConstructors ()
 
 void testAccess ()
 {
-    //using Key = int;//Wrapper< int >;
     using Key = Wrapper< ::std::string, Implicit::Raw >;
-    using Value = Wrapper< Data< int > >;
-    using Map = Wrapper< ::std::map< Key, Value > >;
+    using Value = Wrapper< ::std::string, Heap::Raw >;
+    //using Value = Wrapper< Data< int > >;
+    //using Map = Wrapper< ::std::map< Key, Value > >;
+    using Map = Wrapper< ::std::unordered_map< Key, Value > >;
 
     Map map;
-    Key key;
-    map[ *&key ] = 10;
-}
+    Key key = "Hello";
+    map[ key ] = "World!";
 
-template < typename _Data >
-void testConstructors ()
-{
-    using TestData = _Data;
-    using CTestData = const TestData;
-    using VTestData = volatile TestData;
-    using CVTestData = const volatile TestData;
-    using ::std::move;
-
-    TestData lvalue;
-    CTestData lvalue_c;
-    VTestData lvalue_v;
-    CVTestData lvalue_cv;
-
-    { TestData data; }
-    { TestData data = lvalue; }
-    { TestData data = lvalue_c; }
-    { TestData data = lvalue_v; }
-    { TestData data = lvalue_cv; }
-    { TestData data = ::std::move( lvalue ); }
-    { TestData data = ::std::move( lvalue_c ); }
-    { TestData data = ::std::move( lvalue_v ); }
-    { TestData data = ::std::move( lvalue_cv ); }
+    std::cout << "Iterate and print keys and values of unordered_map, using auto:\n";
+    for( const auto & n : map )
+        std::cout << "Key:[" << *&(n->first) << "] Value:[" << *&(*&n).second << "]\n";
 }
 
 template < typename _Data, typename _Other >
@@ -775,23 +756,19 @@ void testWrapperBinaryOperators ()
 }
 
 template < typename _Type, typename _Other >
-void testAll ()
+void testAllOperators ()
 {
-    testConstructors< _Type >();
-    //testAssignmentOperator< _Type, _Type >();
     testAssignmentOperator< _Type, _Other >();
     testWrapperUnaryOperators< _Type >();
-    //testWrapperBinaryOperators< _Type, _Type >();
     testWrapperBinaryOperators< _Type, _Other >();
-    //testWrapperBinaryOperators< _Other, _Type >();
 }
 
 void testFeature ()
 {
     using WrapperInt = Wrapper< Data< int > >;
-    using WrapperDaouble = Wrapper< Data< double >, Inplace::Uninitialized >;
+    using WrapperDouble = Wrapper< Data< double >, Inplace::Uninitialized >;
 
-    testAll< WrapperInt, WrapperDaouble >();
+    testAllOperators< WrapperInt, WrapperDouble >();
 }
 
 void testRangeOperators ()
@@ -812,51 +789,4 @@ void testRangeOperators ()
 
     for ( const auto & value : values )
         ::std::cout << *&value << ::std::endl;
-
-    //for ( int & value : container )
-    //    ::std::cout << *&value << ::std::endl;
-    //for ( int value : container )
-    //    value *= 2;
 }
-
-//#include <vector>
-//#include "MyType.h"
-
-//using TenMyTypes = MyType[10];
-
-//struct OtherType
-//{
-//    Wrapper< TenMyTypes > m_my_datas;
-//};
-
-//using OtherTypes = ::std::vector< OtherType >;
-
-//#include <list>
-
-//void testMemberOperators ()
-//{
-//    using MyType = int;
-//    using OtherType = int;
-//    using OtherTypes = ::std::list< int >;
-
-//    Wrapper< MyType > my_data;
-//    Wrapper< OtherType > other_data;
-//    Wrapper< OtherTypes > other_datas;
-
-//    other_datas->push_back( *&other_data );
-//    other_datas->push_back( *&other_data );
-//    other_datas->push_back( *&other_data );
-
-//    my_data->m_age = 10;
-
-//    Wrapper< OtherTypes >()[0];
-
-//    for ( size_t i = 0; i < other_datas->size(); ++i )
-//    {
-//        other_datas[ i ] = other_data;
-//        for ( size_t j = 0; j < 10; ++j )
-//        {
-//            other_datas[ i ][ j ]->m_age = 10;
-//        }
-//    }
-//}
