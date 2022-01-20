@@ -28,7 +28,7 @@ namespace ScL { namespace Feature { namespace ThreadSafe
 
 namespace ScL { namespace Feature { namespace ThreadSafe
 {
-    using MutexTool = ::ScL::Feature::ThreadSafe::Lock< ::std::mutex >;
+    using Mutex = ::ScL::Feature::ThreadSafe::Lock< ::std::mutex >;
 }}}
 
 #endif
