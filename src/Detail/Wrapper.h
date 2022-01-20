@@ -52,7 +52,6 @@ namespace ScL { namespace Feature { namespace Detail
             : m_holder( ::std::forward< ::std::initializer_list< _Type > >( list ) , ::std::forward< _Arguments >( arguments ) ... )
         {}
 
-
         /* All kind of constructors for ThisType */
         SCL_CONSTRUCTOR_FOR_THIS_WRAPPER
         /* All kind of constructors for Wrapper< _OtherValue, _Other > */
@@ -162,5 +161,20 @@ SCL_GLOBAL_BINARY_OPERATOR( ^, BitwiseXor )
 SCL_GLOBAL_BINARY_OPERATOR( |, BitwiseOr )
 SCL_GLOBAL_BINARY_OPERATOR( <<, ShiftLeft )
 SCL_GLOBAL_BINARY_OPERATOR( >>, ShiftRight )
+
+/* HASH */
+namespace std
+{
+    template< typename _Type, typename _Tool >
+    struct hash< ::ScL::Feature::Detail::Wrapper< _Type, _Tool > >
+    {
+        using Key = ::ScL::Feature::Detail::Wrapper< _Type, _Tool >;
+        ::std::size_t operator()( Key const & key ) const noexcept
+        {
+            using Type = ::std::remove_reference_t< decltype( *&::std::declval< Key >() ) >;
+            return ::std::hash< Type >{}( *&key );
+        }
+    };
+}
 
 #endif
