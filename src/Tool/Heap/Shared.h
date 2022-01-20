@@ -87,13 +87,10 @@ namespace ScL { namespace Feature { namespace Heap
              * right is not constant rvalue reference.
              */
             template < typename _LeftHolderRefer, typename _RightHolderRefer,
-            typename = ::std::enable_if_t<
-                   !::std::is_const< ::std::remove_reference_t< _LeftHolderRefer > >::value
-                && !::std::is_const< ::std::remove_reference_t< _RightHolderRefer > >::value
-                && !::std::is_rvalue_reference< _RightHolderRefer && >::value > >
+                typename = ::std::enable_if_t< true /*TODO: isOperatorExists */> >
             static void operatorAssignment ( _LeftHolderRefer && left, _RightHolderRefer && right )
             {
-                ::std::forward< _LeftHolderRefer >( left ).m_pointer = ::std::forward< _RightHolderRefer >( right ).m_pointer;
+                value< _LeftHolderRefer >( ::std::forward< _LeftHolderRefer >( left ) ) = value< _RightHolderRefer >( ::std::forward< _RightHolderRefer >( right ) );
             }
 
             /*!
