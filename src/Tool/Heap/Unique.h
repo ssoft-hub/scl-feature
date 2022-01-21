@@ -76,9 +76,18 @@ namespace ScL { namespace Feature { namespace Heap
             {
             }
 
-            ~Holder ()
+            /*!
+             * Assignment operation between compatible Holders. Specialization
+             * of operation enabled if left is not constant any reference and
+             * right is not constant rvalue reference.
+             */
+            template < typename _LeftHolderRefer, typename _RightHolderRefer,
+            typename = ::std::enable_if_t< !::std::is_const< ::std::remove_reference_t< _LeftHolderRefer > >::value
+                && !::std::is_const< ::std::remove_reference_t< _RightHolderRefer > >::value
+                && ::std::is_rvalue_reference< _RightHolderRefer && >::value > >
+            static void operatorAssignment ( _LeftHolderRefer && left, _RightHolderRefer && right )
             {
-                m_pointer.reset();
+                left.m_pointer.swap( right.m_pointer );
             }
 
             /*!
