@@ -128,18 +128,6 @@ namespace ScL { namespace Feature { namespace Heap
                     delete m_pointer;
             }
 
-            /*!
-             * Assignment operation between compatible Holders. Specialization
-             * of operation enabled if left is not constant any reference and
-             * right is not constant rvalue reference.
-             */
-            template < typename _LeftHolderRefer, typename _RightHolderRefer,
-                typename = ::std::enable_if_t< true /*TODO: isOperatorExists */> >
-            static void operatorAssignment ( _LeftHolderRefer && left, _RightHolderRefer && right )
-            {
-                value< _LeftHolderRefer >( ::std::forward< _LeftHolderRefer >( left ) ) = value< _RightHolderRefer >( ::std::forward< _RightHolderRefer >( right ) );
-            }
-
             //! Access to internal value of Holder for any king of referencies.
             template < typename _HolderRefer >
             static constexpr decltype(auto) value ( _HolderRefer && holder )
