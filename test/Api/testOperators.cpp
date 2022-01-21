@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-#define MAYBE_UNUSED (void)
+#define maybe_unused void
 
 using namespace ::ScL;
 using namespace ::ScL::Feature;
@@ -374,13 +374,13 @@ void testConstructors ()
     TestData() = 10;
     one = 10;
 
-    MAYBE_UNUSED one;
-    MAYBE_UNUSED two;
-    MAYBE_UNUSED three;
-    MAYBE_UNUSED four;
-    MAYBE_UNUSED five;
-    MAYBE_UNUSED six;
-    MAYBE_UNUSED seven;
+    (maybe_unused) one;
+    (maybe_unused) two;
+    (maybe_unused) three;
+    (maybe_unused) four;
+    (maybe_unused) five;
+    (maybe_unused) six;
+    (maybe_unused) seven;
 }
 
 void testSameToolConstructors ()
@@ -394,11 +394,11 @@ void testSameToolConstructors ()
     TestData six( SameData::Value::make() );
     TestData seven( asConst( SameData::Value::make() ) );
 
-    MAYBE_UNUSED one;
-    MAYBE_UNUSED four;
-    MAYBE_UNUSED five;
-    MAYBE_UNUSED six;
-    MAYBE_UNUSED seven;
+    (maybe_unused) one;
+    (maybe_unused) four;
+    (maybe_unused) five;
+    (maybe_unused) six;
+    (maybe_unused) seven;
 }
 
 void testDiffToolConstructors ()
@@ -412,11 +412,11 @@ void testDiffToolConstructors ()
     TestData six( SameData::Value::make() );
     TestData seven( asConst( SameData::Value::make() ) );
 
-    MAYBE_UNUSED one;
-    MAYBE_UNUSED four;
-    MAYBE_UNUSED five;
-    MAYBE_UNUSED six;
-    MAYBE_UNUSED seven;
+    (maybe_unused) one;
+    (maybe_unused) four;
+    (maybe_unused) five;
+    (maybe_unused) six;
+    (maybe_unused) seven;
 }
 
 void testAccess ()
