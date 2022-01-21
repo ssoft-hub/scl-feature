@@ -92,7 +92,7 @@ namespace ScL { namespace Feature { namespace Implicit
              */
             template < typename _LeftHolderRefer, typename _RightHolderRefer,
                 typename = ::std::enable_if_t<
-                        !::std::is_const< ::std::remove_reference_t< _LeftHolderRefer > >::value > >
+                    !::std::is_const< ::std::remove_reference_t< _LeftHolderRefer > >::value > >
             static void operatorAssignment ( _LeftHolderRefer && left, _RightHolderRefer && right )
             {
                 using RightHolderRefer = _RightHolderRefer &&;
@@ -106,7 +106,7 @@ namespace ScL { namespace Feature { namespace Implicit
              */
             template < typename _HolderRefer,
                 typename = ::std::enable_if_t<
-                        !::std::is_const< ::std::remove_reference_t< _HolderRefer > >::value > >
+                    !::std::is_const< ::std::remove_reference_t< _HolderRefer > >::value > >
             static constexpr void guard ( _HolderRefer && holder )
             {
                 if ( !!holder.m_pointer && !holder.m_pointer.unique() )
