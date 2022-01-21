@@ -61,21 +61,22 @@ void testToolByTool ()
 
 void testAllTool ()
 {
-//    testToolByTool< MyType >();
+    testToolByTool< MyType >();
 
-//    testToolByTool< Wrapper< MyType, Heap::Raw > >();
-//    testToolByTool< Wrapper< MyType, Heap::Shared > >();
-//    testToolByTool< Wrapper< MyType, Heap::Unique > >();
+    // Too long compilation
+    //testToolByTool< Wrapper< MyType, Heap::Raw > >();
+    //testToolByTool< Wrapper< MyType, Heap::Shared > >();
+    //testToolByTool< Wrapper< MyType, Heap::Unique > >();
 
-//    testToolByTool< Wrapper< MyType, Implicit::Raw > >();
-//    testToolByTool< Wrapper< MyType, Implicit::Shared > >();
+    //testToolByTool< Wrapper< MyType, Implicit::Raw > >();
+    //testToolByTool< Wrapper< MyType, Implicit::Shared > >();
 
-//    testToolByTool< Wrapper< MyType, Inplace::Debug > >();
-//    testToolByTool< Wrapper< MyType, Inplace::Default > >();
-//    testToolByTool< Wrapper< MyType, Inplace::Uninitialized > >();
+    //testToolByTool< Wrapper< MyType, Inplace::Debug > >();
+    //testToolByTool< Wrapper< MyType, Inplace::Default > >();
+    //testToolByTool< Wrapper< MyType, Inplace::Uninitialized > >();
 
-//    testToolByTool< Wrapper< MyType, ThreadSafe::Atomic > >();
-//    testToolByTool< Wrapper< MyType, ThreadSafe::Mutex > >();
-//    testToolByTool< Wrapper< MyType, ThreadSafe::RecursiveMutex > >();
-//    testToolByTool< Wrapper< MyType, ThreadSafe::SharedMutex > >();
+    //testToolByTool< Wrapper< MyType, ThreadSafe::Atomic > >();
+    //testToolByTool< Wrapper< MyType, ThreadSafe::Mutex > >();
+    //testToolByTool< Wrapper< MyType, ThreadSafe::RecursiveMutex > >();
+    //testToolByTool< Wrapper< MyType, ThreadSafe::SharedMutex > >();
 }

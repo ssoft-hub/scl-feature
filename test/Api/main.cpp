@@ -110,11 +110,19 @@ extern void testDiffToolConstructors ();
 
 extern void testFeature ();
 extern void testRangeOperators ();
-extern void testAllTool ();
-extern void testAccess ();
 
 int main ( int /*argc*/, char ** /*argv*/ )
 {
+    using Test = Wrapper< double, Heap::Unique >;
+    Test one{1};
+    Test two{2};
+
+    one = two;
+    two = Test{};
+    Test{} = Test{};
+    one = 3;
+    two = 4;
+
     testWrapperValue();
     testWrapperContainer();
 
@@ -125,8 +133,6 @@ int main ( int /*argc*/, char ** /*argv*/ )
 
     compileTestWrapperTrancpatancy();
     testFeature();
-    testAllTool();
-    testAccess();
 
     return 0;
 }
