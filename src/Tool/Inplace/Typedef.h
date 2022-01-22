@@ -1,6 +1,6 @@
 #pragma once
-#ifndef SCL_WRAPPER_TOOL_INPLACE_DEFAULT_H
-#define SCL_WRAPPER_TOOL_INPLACE_DEFAULT_H
+#ifndef SCL_WRAPPER_TOOL_INPLACE_TYPEDEF_H
+#define SCL_WRAPPER_TOOL_INPLACE_TYPEDEF_H
 
 #include <utility>
 #include <ScL/Utility/SimilarRefer.h>
@@ -8,11 +8,12 @@
 namespace ScL { namespace Feature { namespace Inplace
 {
     /*!
-     * Инструмент для формирования экземпляра значения "по месту".  Определение "по месту" означает,
-     * что для значения не используется динамическое размещение в "куче и оно является неотъемлемой
-     * частью области видимости, в котором этот экземпляр значения определен.
+     * Инструмент для формирования экземпляра значения "по месту" и реализации механизма Strong Typedef.
+     * Определение "по месту" означает, что для значения не используется динамическое размещение
+     * в "куче и оно является неотъемлемой частью области видимости, в котором этот экземпляр значения определен.
      */
-    struct Default
+    template < typename _Tag >
+    struct Typedef
     {
         template < typename _Value >
         struct Holder

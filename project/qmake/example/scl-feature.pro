@@ -5,3 +5,4 @@ SUBDIRS *= \
     $${PWD}/Inheritance \
     $${PWD}/Syntax \
     $${PWD}/Trait \
+    $${PWD}/Typedef \
