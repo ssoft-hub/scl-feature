@@ -66,7 +66,6 @@ void example ()
     ::std::cout << "Finish" << ::std::endl;
 }
 
-
 int main ( int, char ** )
 {
     // Паралельно, но не атомарно.
