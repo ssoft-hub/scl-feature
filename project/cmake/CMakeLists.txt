@@ -15,6 +15,3 @@ add_library( ${SCL_MODULE} ALIAS ${TARGET} )
 
 target_include_directories( ${TARGET} INTERFACE ${SCL_INCLUDE_DIR} )
 target_link_libraries( ${TARGET} INTERFACE ScL::meta )
-
-add_subdirectory( example )
-add_subdirectory( test )
