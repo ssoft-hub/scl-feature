@@ -3,7 +3,7 @@
 #include <ScL/Utility/Qualifier.h>
 #include "MyType.h"
 
- using namespace ::ScL::Feature;
+using namespace ::ScL::Feature;
 
 template < typename _TestType >
 void testTool ()
@@ -65,7 +65,7 @@ void testAllTool ()
     testToolByTool< MyType >();
 
     // Too long compilation
-    testToolByTool< Wrapper< MyType, Heap::Raw > >();
+    //testToolByTool< Wrapper< MyType, Heap::Raw > >();
     //testToolByTool< Wrapper< MyType, Heap::Shared > >();
     //testToolByTool< Wrapper< MyType, Heap::Unique > >();
 
