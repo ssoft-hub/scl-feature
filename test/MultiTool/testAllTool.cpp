@@ -52,6 +52,7 @@ void testToolByTool ()
     testTool< Wrapper< _Type, Inplace::Debug > >();
     testTool< Wrapper< _Type, Inplace::Default > >();
     testTool< Wrapper< _Type, Inplace::Uninitialized > >();
+    testTool< Wrapper< _Type, Inplace::Optional > >();
 
     testTool< Wrapper< _Type, ThreadSafe::Atomic > >();
     testTool< Wrapper< _Type, ThreadSafe::Mutex > >();
@@ -64,7 +65,7 @@ void testAllTool ()
     testToolByTool< MyType >();
 
     // Too long compilation
-    //testToolByTool< Wrapper< MyType, Heap::Raw > >();
+    testToolByTool< Wrapper< MyType, Heap::Raw > >();
     //testToolByTool< Wrapper< MyType, Heap::Shared > >();
     //testToolByTool< Wrapper< MyType, Heap::Unique > >();
 
