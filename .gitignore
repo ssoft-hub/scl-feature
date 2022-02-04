@@ -36,7 +36,9 @@
 
 # Visual Studio
 /.vs
+/x64
 *.vcxproj*
+*.rc
 *.sdf
 *.opensdf
 *.h.cpp
@@ -72,6 +74,10 @@ Makefile*
 *.qmlproject.user
 *.qmlproject.user.*
 
-# QtCtreator CMake
-CMakeLists.txt.user*
+# QtCtreator
 /.depends.cache.pri
+
+# CMake
+CMakeLists.txt.user*
+CMakeFiles
+cmake_install.cmake
