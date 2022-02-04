@@ -42,6 +42,11 @@ namespace ScL { namespace Feature { namespace Detail
             assert( false ); // Used resrticted constuctor.
         }
 
+        explicit operator bool () const
+        {
+            return ::std::addressof( m_refer );
+        }
+
         constexpr bool operator ! () const
         {
             return !::std::addressof( m_refer );
