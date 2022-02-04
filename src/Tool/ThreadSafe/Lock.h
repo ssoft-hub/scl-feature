@@ -25,9 +25,9 @@ namespace ScL { namespace Feature { namespace ThreadSafe
         {
             using ThisType = Holder< _Value >;
             using Value = _Value;
-            using Lock = _Lock;
+            using LockType = _Lock;
 
-            mutable Lock m_lock;
+            mutable LockType m_lock;
             Value m_value;
 
             template < typename ... _Arguments >
@@ -184,7 +184,7 @@ namespace ScL { namespace Feature { namespace ThreadSafe
             static constexpr void guard ( _HolderRefer && holder )
             {
                 using HolderRefer = _HolderRefer &&;
-                ::ScL::Feature::ThreadSafe::Locking< _Lock, ::std::remove_reference_t< HolderRefer > >::lock( ::std::forward< HolderRefer >( holder ).m_lock );
+                ::ScL::Feature::ThreadSafe::Locking< LockType, ::std::remove_reference_t< HolderRefer > >::lock( ::std::forward< HolderRefer >( holder ).m_lock );
             }
 
             //! Unguard internal value of Holder for any king of referencies.
@@ -192,7 +192,7 @@ namespace ScL { namespace Feature { namespace ThreadSafe
             static constexpr void unguard ( _HolderRefer && holder )
             {
                 using HolderRefer = _HolderRefer &&;
-                ::ScL::Feature::ThreadSafe::Locking< _Lock, ::std::remove_reference_t< HolderRefer > >::unlock( ::std::forward< HolderRefer >( holder ).m_lock );
+                ::ScL::Feature::ThreadSafe::Locking< LockType, ::std::remove_reference_t< HolderRefer > >::unlock( ::std::forward< HolderRefer >( holder ).m_lock );
             }
 
             //! Access to internal value of Holder for any king of referencies.

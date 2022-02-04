@@ -130,10 +130,14 @@ using namespace ::ScL::Feature;
     DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS( SCL_SINGLE_ARG( symbol ), const volatile &, volatile & ) \
     DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS( SCL_SINGLE_ARG( symbol ), const volatile &, const volatile & ) \
 
-#define DATA_GLOBAL_BINARY_OPERATOR_PROTOTYPE( symbol, right_refer ) \
+// Visual Studio limitation
+#define DATA_GLOBAL_BINARY_OPERATOR_PROTOTYPE( symbol, right_refer )
+/*
+ #define DATA_GLOBAL_BINARY_OPERATOR_PROTOTYPE( symbol, right_refer ) \
     template < typename _Left, typename _Right > \
-    void operator symbol ( _Left && /*left*/, Data< _Right> right_refer ) \
+    void operator symbol ( _Left &&, Data< _Right> right_refer ) \
         { ::std::cout << DATA_FUNC_INFO << ::std::endl; } \
+*/
 
 #define DATA_GLOBAL_BINARY_OPERATOR( symbol ) \
     DATA_GLOBAL_BINARY_OPERATOR_PROTOTYPE( SCL_SINGLE_ARG( symbol ), && ) \
