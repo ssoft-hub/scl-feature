@@ -76,6 +76,7 @@ namespace ScL { namespace Feature { namespace Detail
                     { \
                         using WrapperRefer = _Wrapper &&; \
                         using Holder = typename ::std::decay_t< WrapperRefer >::Holder; \
+                        /*return Holder::operator ## Invokable( ::std::forward< WrapperRefer >( wrapper ), ::std::forward< _Arguments >( arguments ) ... );*/ \
                         Holder::operator ## Invokable( ::ScL::Feature::Detail::wrapperHolder( ::std::forward< WrapperRefer >( wrapper ) ), ::std::forward< _Arguments >( arguments ) ... ); \
                         return ::std::forward< WrapperRefer >( wrapper ); \
                     } \
