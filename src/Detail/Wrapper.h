@@ -107,7 +107,7 @@ namespace ScL { namespace Feature { namespace Detail
         SCL_POSTFIX_UNARY_OPERATOR_WITH_INT( ++, UnaryPostfixPlusPlus )
         SCL_POSTFIX_UNARY_OPERATOR_WITH_INT( --, UnaryPostfixMinusMinus )
         /* Relational and comparison operators */
-        SCL_BINARY_OPERATOR_FOR_ANY( ==, IsEqual )
+        SCL_BINARY_OPERATOR_FOR_ANY( ==, Equal )
         SCL_BINARY_OPERATOR_FOR_ANY( !=, NotEqual )
         SCL_BINARY_OPERATOR_FOR_ANY( <, Less )
         SCL_BINARY_OPERATOR_FOR_ANY( <=, LessOrEqual )
@@ -150,7 +150,7 @@ SCL_GLOBAL_BINARY_OPERATOR( &=, BitwiseAndAssignment )
 SCL_GLOBAL_BINARY_OPERATOR( ^=, BitwiseXorAssignment )
 SCL_GLOBAL_BINARY_OPERATOR( |=, BitwiseOrAssignment )
 /* Relational and comparison operators */
-SCL_GLOBAL_BINARY_OPERATOR( ==, IsEqual )
+SCL_GLOBAL_BINARY_OPERATOR( ==, Equal )
 SCL_GLOBAL_BINARY_OPERATOR( !=, NotEqual )
 SCL_GLOBAL_BINARY_OPERATOR( <, Less )
 SCL_GLOBAL_BINARY_OPERATOR( <=, LessOrEqual )
