@@ -420,7 +420,7 @@ static void operator[Name] ( _HolderLeftRefer && left, _HolderRightRefer && righ
 
 где в качестве **[Name]** могут быть использованы:
 
-* **IsEqual** - operator == ( _Argument && );
+* **Equal** - operator == ( _Argument && );
 * **NotEqual** - operator != ( _Argument && );
 * **Less** - operator < ( _Argument && );
 * **LessOrEqual** - operator <= ( _Argument && );

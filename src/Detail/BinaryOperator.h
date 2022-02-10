@@ -2,8 +2,8 @@
 #ifndef SCL_FEATURE_OPERATOR_BINARY_H
 #define SCL_FEATURE_OPERATOR_BINARY_H
 
-#include <ScL/Meta/Trait/IsMethodExists.h>
-#include <ScL/Meta/Trait/IsOperatorExists.h>
+#include <ScL/Meta/Trait/DoesMethodExist.h>
+#include <ScL/Meta/Trait/DoesOperatorExist.h>
 #include <ScL/Utility/SimilarRefer.h>
 #include <ScL/Utility/SingleArgument.h>
 #include "ResultSwitch.h"
@@ -32,30 +32,30 @@ namespace ScL { namespace Feature { namespace Detail
     }
 }}}
 
-#define SCL_IS_BINARY_OPERATOR_EXISTS_TEST_TRAIT( Invokable ) \
+#define SCL_DOES_BINARY_OPERATOR_EXIST_TEST_TRAIT( Invokable ) \
     template < typename _Kind, typename _LeftRefer, typename _RightRefer > \
-    struct Is ## Invokable ## OperatorExistsTestHelper; \
+    struct Does ## Invokable ## OperatorExistTestHelper; \
      \
     template < typename _LeftRefer, typename _RightRefer > \
-    using Is ## Invokable ## OperatorExistsTest = Is ## Invokable ## OperatorExistsTestHelper< ::ScL::Feature::Detail::Operator::WrapperSwitchCase< _LeftRefer, _RightRefer >, _LeftRefer, _RightRefer >; \
+    using Does ## Invokable ## OperatorExistTest = Does ## Invokable ## OperatorExistTestHelper< ::ScL::Feature::Detail::Operator::WrapperSwitchCase< _LeftRefer, _RightRefer >, _LeftRefer, _RightRefer >; \
      \
     template < typename _LeftRefer, typename _RightRefer > \
-    /*inline*/ constexpr bool is_ ## Invokable ## _operator_exists_test = Is ## Invokable ## OperatorExistsTest< _LeftRefer, _RightRefer >::value; \
+    /*inline*/ constexpr bool does_ ## Invokable ## _operator_exist_test = Does ## Invokable ## OperatorExistTest< _LeftRefer, _RightRefer >::value; \
      \
     template < typename _LeftRefer, typename _RightRefer > \
-    inline constexpr bool is ## Invokable ## OperatorExistsTest () { return Is ## Invokable ## OperatorExistsTest< _LeftRefer, _RightRefer >::value; } \
+    inline constexpr bool does ## Invokable ## OperatorExistTest () { return Does ## Invokable ## OperatorExistTest< _LeftRefer, _RightRefer >::value; } \
      \
     template < typename _LeftRefer, typename _RightRefer > \
-    struct Is ## Invokable ## OperatorExistsTestHelper< ::ScL::Feature::Detail::Operator::NoneWrapperCase, _LeftRefer, _RightRefer > \
+    struct Does ## Invokable ## OperatorExistTestHelper< ::ScL::Feature::Detail::Operator::NoneWrapperCase, _LeftRefer, _RightRefer > \
     { \
         static_assert( ::std::is_reference< _LeftRefer >::value, "The template parameter _LeftRefer must to be a reference type." ); \
         static_assert( ::std::is_reference< _RightRefer >::value, "The template parameter _RightRefer must to be a reference type." ); \
      \
-        static const bool value = ::ScL::Feature::Detail::Operator::Binary::is_ ## Invokable ## _operator_exists< _LeftRefer, _RightRefer >; \
+        static const bool value = ::ScL::Feature::Detail::Operator::Binary::does_ ## Invokable ## _operator_exist< _LeftRefer, _RightRefer >; \
     }; \
      \
     template < typename _LeftRefer, typename _RightRefer > \
-    struct Is ## Invokable ## OperatorExistsTestHelper< ::ScL::Feature::Detail::Operator::LeftWrapperCase, _LeftRefer, _RightRefer > \
+    struct Does ## Invokable ## OperatorExistTestHelper< ::ScL::Feature::Detail::Operator::LeftWrapperCase, _LeftRefer, _RightRefer > \
     { \
         static_assert( ::std::is_reference< _LeftRefer >::value, "The template parameter _LeftRefer must to be a reference type." ); \
         static_assert( ::std::is_reference< _RightRefer >::value, "The template parameter _RightRefer must to be a reference type." ); \
@@ -67,12 +67,12 @@ namespace ScL { namespace Feature { namespace Detail
         using LeftValueRefer = ::ScL::SimilarRefer< LeftValue, LeftWrapperRefer >; \
         using RightRefer = _RightRefer; \
      \
-        static const bool value = ::ScL::Feature::Detail::Operator::Binary::is_operator ## Invokable ## Left_method_exists< LeftHolder, void(LeftHolderRefer,RightRefer) > \
-            || ::ScL::Feature::Detail::Operator::Binary::is_ ## Invokable ## _operator_exists< LeftValueRefer, RightRefer >; \
+        static const bool value = ::ScL::Feature::Detail::Operator::Binary::does_operator ## Invokable ## Left_method_exist< LeftHolder, void(LeftHolderRefer,RightRefer) > \
+            || ::ScL::Feature::Detail::Operator::Binary::does_ ## Invokable ## _operator_exist< LeftValueRefer, RightRefer >; \
     }; \
      \
     template < typename _LeftRefer, typename _RightRefer > \
-    struct Is ## Invokable ## OperatorExistsTestHelper< ::ScL::Feature::Detail::Operator::RightWrapperCase, _LeftRefer, _RightRefer > \
+    struct Does ## Invokable ## OperatorExistTestHelper< ::ScL::Feature::Detail::Operator::RightWrapperCase, _LeftRefer, _RightRefer > \
     { \
         static_assert( ::std::is_reference< _LeftRefer >::value, "The template parameter _LeftRefer must to be a reference type." ); \
         static_assert( ::std::is_reference< _RightRefer >::value, "The template parameter _RightRefer must to be a reference type." ); \
@@ -84,12 +84,12 @@ namespace ScL { namespace Feature { namespace Detail
         using RightValue = typename RightWrapper::Value; \
         using RightValueRefer = ::ScL::SimilarRefer< RightValue, RightWrapperRefer >; \
      \
-        static const bool value = ::ScL::Feature::Detail::Operator::Binary::is_operator ## Invokable ## Right_method_exists< RightHolder, void(LeftRefer,RightHolderRefer) > \
-            || ::ScL::Feature::Detail::Operator::Binary::is_ ## Invokable ## _operator_exists< LeftRefer, RightValueRefer >; \
+        static const bool value = ::ScL::Feature::Detail::Operator::Binary::does_operator ## Invokable ## Right_method_exist< RightHolder, void(LeftRefer,RightHolderRefer) > \
+            || ::ScL::Feature::Detail::Operator::Binary::does_ ## Invokable ## _operator_exist< LeftRefer, RightValueRefer >; \
     }; \
      \
     template < typename _LeftRefer, typename _RightRefer > \
-    struct Is ## Invokable ## OperatorExistsTestHelper< ::ScL::Feature::Detail::Operator::BothWrapperCase, _LeftRefer, _RightRefer > \
+    struct Does ## Invokable ## OperatorExistTestHelper< ::ScL::Feature::Detail::Operator::BothWrapperCase, _LeftRefer, _RightRefer > \
     { \
         static_assert( ::std::is_reference< _LeftRefer >::value, "The template parameter _LeftRefer must to be a reference type." ); \
         static_assert( ::std::is_reference< _RightRefer >::value, "The template parameter _RightRefer must to be a reference type." ); \
@@ -107,17 +107,17 @@ namespace ScL { namespace Feature { namespace Detail
         using RightValueRefer = ::ScL::SimilarRefer< RightValue, RightWrapperRefer >; \
      \
         static const bool is_compatible_value = ::ScL::Feature::isCompatible< LeftWrapper, RightWrapper >() \
-            && ( ::ScL::Feature::Detail::Operator::Binary::is_operator ## Invokable ## _method_exists< LeftHolder, void(LeftHolderRefer,RightHolderRefer) > \
-                || ::ScL::Feature::Detail::Operator::Binary::is_ ## Invokable ## _operator_exists_test< LeftValueRefer, LeftValueRefer > ); \
+            && ( ::ScL::Feature::Detail::Operator::Binary::does_operator ## Invokable ## _method_exist< LeftHolder, void(LeftHolderRefer,RightHolderRefer) > \
+                || ::ScL::Feature::Detail::Operator::Binary::does_ ## Invokable ## _operator_exist_test< LeftValueRefer, LeftValueRefer > ); \
      \
         static const bool is_left_path_of_right_value = ::ScL::Feature::isThisPartOfOther< LeftWrapper, RightWrapper >() \
-            && ::ScL::Feature::Detail::Operator::Binary::is_ ## Invokable ## _operator_exists_test< LeftWrapperRefer, RightValueRefer >; \
+            && ::ScL::Feature::Detail::Operator::Binary::does_ ## Invokable ## _operator_exist_test< LeftWrapperRefer, RightValueRefer >; \
      \
         static const bool is_right_path_of_left_value = ::ScL::Feature::isThisPartOfOther< RightWrapper, LeftWrapper >() \
-            && ::ScL::Feature::Detail::Operator::Binary::is_ ## Invokable ## _operator_exists_test< LeftValueRefer, RightWrapperRefer >; \
+            && ::ScL::Feature::Detail::Operator::Binary::does_ ## Invokable ## _operator_exist_test< LeftValueRefer, RightWrapperRefer >; \
      \
         static const bool is_not_compatible_value = !::ScL::Feature::isCompatible< LeftWrapper, RightWrapper >() \
-            && ::ScL::Feature::Detail::Operator::Binary::is_ ## Invokable ## _operator_exists_test< LeftValueRefer, LeftValueRefer >; \
+            && ::ScL::Feature::Detail::Operator::Binary::does_ ## Invokable ## _operator_exist_test< LeftValueRefer, LeftValueRefer >; \
      \
         static const bool value = is_compatible_value \
             || is_left_path_of_right_value \
@@ -132,11 +132,11 @@ namespace ScL { namespace Feature { namespace Detail
         { \
             namespace Binary \
             { \
-                SCL_IS_BINARY_OPERATOR_EXISTS_TRAIT( SCL_SINGLE_ARG( symbol ), Invokable ) \
-                SCL_IS_METHOD_EXISTS_TRAIT( operator ## Invokable ) \
-                SCL_IS_METHOD_EXISTS_TRAIT( operator ## Invokable ## Left ) \
-                SCL_IS_METHOD_EXISTS_TRAIT( operator ## Invokable ## Right ) \
-                SCL_IS_BINARY_OPERATOR_EXISTS_TEST_TRAIT( Invokable ) \
+                SCL_DOES_BINARY_OPERATOR_EXIST_TRAIT( SCL_SINGLE_ARG( symbol ), Invokable ) \
+                SCL_DOES_METHOD_EXIST_TRAIT( operator ## Invokable ) \
+                SCL_DOES_METHOD_EXIST_TRAIT( operator ## Invokable ## Left ) \
+                SCL_DOES_METHOD_EXIST_TRAIT( operator ## Invokable ## Right ) \
+                SCL_DOES_BINARY_OPERATOR_EXIST_TEST_TRAIT( Invokable ) \
             } \
         } \
     }}} \
@@ -358,7 +358,7 @@ namespace ScL { namespace Feature { namespace Detail
                         using LeftHolderRefer = ::ScL::SimilarRefer< LeftHolder, LeftWrapperRefer >; \
                         using RightRefer = _Right &&; \
          \
-                        constexpr bool holder_has_method_for_operator = ::ScL::Feature::Detail::Operator::Binary::is_operator ## Invokable ## Left_method_exists< LeftHolder, void( LeftHolderRefer, RightRefer ) >; \
+                        constexpr bool holder_has_method_for_operator = ::ScL::Feature::Detail::Operator::Binary::does_operator ## Invokable ## Left_method_exist< LeftHolder, void( LeftHolderRefer, RightRefer ) >; \
                         using OperatorSwitchCase = ::std::conditional_t< holder_has_method_for_operator, ::ScL::Feature::Detail::Operator::Binary::HolderHasOperatorCase, ::ScL::Feature::Detail::Operator::Binary::HolderHasNoOperatorCase >; \
                         return ::ScL::Feature::Detail::Operator::Binary::Invokable ## Switch< LeftWrapperCase, OperatorSwitchCase >::invoke( ::std::forward< LeftWrapperRefer >( left ), ::std::forward< RightRefer >( right ) ); \
                     } \
@@ -376,7 +376,7 @@ namespace ScL { namespace Feature { namespace Detail
                         using RightHolderRefer = ::ScL::SimilarRefer< RightHolder, RightWrapperRefer >; \
                         using LeftRefer = _Left &&; \
          \
-                        constexpr bool holder_has_method_for_operator = ::ScL::Feature::Detail::Operator::Binary::is_operator ## Invokable ## Right_method_exists< RightHolder, void( LeftRefer, RightHolderRefer ) >; \
+                        constexpr bool holder_has_method_for_operator = ::ScL::Feature::Detail::Operator::Binary::does_operator ## Invokable ## Right_method_exist< RightHolder, void( LeftRefer, RightHolderRefer ) >; \
                         using OperatorSwitchCase = ::std::conditional_t< holder_has_method_for_operator, ::ScL::Feature::Detail::Operator::Binary::HolderHasOperatorCase, ::ScL::Feature::Detail::Operator::Binary::HolderHasNoOperatorCase >; \
                         return ::ScL::Feature::Detail::Operator::Binary::Invokable ## Switch< RightWrapperCase, OperatorSwitchCase >::invoke( ::std::forward< LeftRefer >( left ), ::std::forward< RightWrapperRefer >( right ) ); \
                     } \
@@ -398,7 +398,7 @@ namespace ScL { namespace Feature { namespace Detail
                         using RightHolderRefer = ::ScL::SimilarRefer< RightHolder, RightWrapperRefer >; \
          \
                         constexpr bool is_left_compatible_to_right = ::ScL::Feature::isCompatible< LeftHolder, RightHolder >(); \
-                        constexpr bool holder_has_method_for_operator = ::ScL::Feature::Detail::Operator::Binary::is_operator ## Invokable ## _method_exists< LeftHolder, void( LeftHolderRefer, RightHolderRefer ) >; \
+                        constexpr bool holder_has_method_for_operator = ::ScL::Feature::Detail::Operator::Binary::does_operator ## Invokable ## _method_exist< LeftHolder, void( LeftHolderRefer, RightHolderRefer ) >; \
                         using OperatorSwitchCase = ::std::conditional_t< is_left_compatible_to_right && holder_has_method_for_operator, ::ScL::Feature::Detail::Operator::Binary::HolderHasOperatorCase, ::ScL::Feature::Detail::Operator::Binary::HolderHasNoOperatorCase >; \
                         return ::ScL::Feature::Detail::Operator::Binary::Invokable ## Switch< BothWrapperCase, OperatorSwitchCase >::invoke( ::std::forward< LeftWrapperRefer >( left ), ::std::forward< RightWrapperRefer >( right ) ); \
                     } \
