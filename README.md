@@ -55,9 +55,9 @@ void example ()
 
     vector< thread > threads( thread::hardware_concurrency() );
     for ( auto & t : threads )
-        thread = thread( func, container );
+        t = thread( func, container );
     for ( auto & t : threads )
-        thread.join();
+        t.join();
 }
 ```
 
@@ -71,7 +71,7 @@ void example ()
 {
     String str{ "Hello Implicit Sharing!" };
     String other = str;                     // sharing "Hello Implicit Sharing!"
-    other += "Bye-Bye Implicit Sharing!";   // copy on write "Bye-Bye Implicit Sharing!"
+    other += " And Bye-Bye!";   // copy on write "Hello Implicit Sharing! And Bye-Bye!"
 }
 ```
 

@@ -102,7 +102,7 @@ namespace ScL { namespace Feature { namespace Detail
         SpecialWrapperGuard ( WrapperRefer refer )
             : m_refer_pointer( ::std::forward< WrapperRefer >( refer ) )
         {
-            static_assert( ::ScL::Feature::Detail::HolderInterface::is_value_method_exists< Holder, HolderRefer >
+            static_assert( ::ScL::Feature::Detail::HolderInterface::does_value_method_exist< Holder, HolderRefer >
                 , "There are no appropriate access methods for Holder." );
             ::ScL::Feature::Detail::HolderInterface::guard< HolderRefer >( ::ScL::Feature::Detail::wrapperHolder< WrapperRefer >( *m_refer_pointer ) );
         }

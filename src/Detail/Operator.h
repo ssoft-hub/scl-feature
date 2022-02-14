@@ -26,7 +26,7 @@ SCL_PREFIX_UNARY_OPERATOR_IMPLEMENTAION( !, UnaryPrefixLogicalNot )
 SCL_POSTFIX_UNARY_OPERATOR_IMPLEMENTAION( ++, UnaryPostfixPlusPlus )
 SCL_POSTFIX_UNARY_OPERATOR_IMPLEMENTAION( --, UnaryPostfixMinusMinus )
 
-SCL_BINARY_OPERATOR_IMPLEMENTAION( ==, IsEqual )
+SCL_BINARY_OPERATOR_IMPLEMENTAION( ==, Equal )
 SCL_BINARY_OPERATOR_IMPLEMENTAION( !=, NotEqual )
 SCL_BINARY_OPERATOR_IMPLEMENTAION( <, Less )
 SCL_BINARY_OPERATOR_IMPLEMENTAION( <=, LessOrEqual )
@@ -64,7 +64,7 @@ SCL_BINARY_OPERATOR_IMPLEMENTAION( ^=, BitwiseXorAssignment )
 #define SCL_GLOBAL_BINARY_OPERATOR_PROTOTYPE( symbol, right_refer, Invokable ) \
     template < typename _Left, typename _RightValue, typename _RightTool, \
         typename = ::std::enable_if_t< !::ScL::Feature::isWrapper< ::std::decay_t< _Left > >() \
-            && ::ScL::Feature::Detail::Operator::Binary::is_ ## Invokable ## _operator_exists_test< _Left &&, ::ScL::Feature::Detail::Wrapper< _RightValue, _RightTool > right_refer > > > \
+            && ::ScL::Feature::Detail::Operator::Binary::does_ ## Invokable ## _operator_exist_test< _Left &&, ::ScL::Feature::Detail::Wrapper< _RightValue, _RightTool > right_refer > > > \
     constexpr decltype(auto) operator symbol ( _Left && left, ::ScL::Feature::Detail::Wrapper< _RightValue, _RightTool > right_refer right ) \
     { \
         using LeftRefer = _Left &&; \
@@ -109,8 +109,8 @@ SCL_BINARY_OPERATOR_IMPLEMENTAION( ^=, BitwiseXorAssignment )
 #define SCL_BINARY_OPERATOR_PROTOTYPE_FOR_THIS( symbol, this_refer, other_refer, Invokable ) \
     /*template < typename ... _Arguments, \
         typename = ::std::enable_if_t< sizeof...( _Arguments ) == 0 \
-            && ::ScL::Feature::Detail::HolderInterface::is_value_method_exists< Holder, Holder this_refer > \
-            && ::ScL::Feature::Detail::Operator::Binary::is_ ## Invokable ## _operator_exists_test< ThisType this_refer, ThisType other_refer > > >*/ \
+            && ::ScL::Feature::Detail::HolderInterface::does_value_method_exist< Holder, Holder this_refer > \
+            && ::ScL::Feature::Detail::Operator::Binary::does_ ## Invokable ## _operator_exist_test< ThisType this_refer, ThisType other_refer > > >*/ \
     constexpr decltype(auto) operator symbol ( ThisType other_refer right ) this_refer \
     { \
         using LeftRefer = ThisType this_refer; \
@@ -120,8 +120,8 @@ SCL_BINARY_OPERATOR_IMPLEMENTAION( ^=, BitwiseXorAssignment )
 
 #define SCL_BINARY_OPERATOR_PROTOTYPE_FOR_ANY( symbol, this_refer, Invokable ) \
     template < typename _Right, \
-        typename = ::std::enable_if_t< ::ScL::Feature::Detail::HolderInterface::is_value_method_exists< Holder, Holder this_refer > \
-            && ::ScL::Feature::Detail::Operator::Binary::is_ ## Invokable ## _operator_exists_test< ThisType this_refer, _Right && > > > \
+        typename = ::std::enable_if_t< ::ScL::Feature::Detail::HolderInterface::does_value_method_exist< Holder, Holder this_refer > \
+            && ::ScL::Feature::Detail::Operator::Binary::does_ ## Invokable ## _operator_exist_test< ThisType this_refer, _Right && > > > \
     constexpr decltype(auto) operator symbol ( _Right && right ) this_refer \
     { \
         using LeftRefer = ThisType this_refer; \
@@ -131,8 +131,8 @@ SCL_BINARY_OPERATOR_IMPLEMENTAION( ^=, BitwiseXorAssignment )
 
 #define SCL_POSTFIX_UNARY_OPERATOR_PROTOTYPE_WITH_ARGUMENT( symbol, this_refer, Invokable ) \
     template < typename _Argument, \
-        typename = ::std::enable_if_t< ::ScL::Feature::Detail::HolderInterface::is_value_method_exists< Holder, Holder this_refer > \
-            && ::ScL::Feature::Detail::Operator::Unary::is_ ## Invokable ## _operator_exists_test< Value this_refer, _Argument && > > > \
+        typename = ::std::enable_if_t< ::ScL::Feature::Detail::HolderInterface::does_value_method_exist< Holder, Holder this_refer > \
+            && ::ScL::Feature::Detail::Operator::Unary::does_ ## Invokable ## _operator_exist_test< Value this_refer, _Argument && > > > \
     constexpr decltype(auto) operator symbol ( _Argument && argument ) this_refer \
     { \
         using ThisRefer = ThisType this_refer; \
@@ -141,8 +141,8 @@ SCL_BINARY_OPERATOR_IMPLEMENTAION( ^=, BitwiseXorAssignment )
 
 #define SCL_POSTFIX_UNARY_OPERATOR_PROTOTYPE_WITH_ARGUMENTS( symbol, this_refer, Invokable ) \
     template < typename ... _Arguments, \
-        typename = ::std::enable_if_t< ::ScL::Feature::Detail::HolderInterface::is_value_method_exists< Holder, Holder this_refer > \
-            && ::ScL::Feature::Detail::Operator::Unary::is_ ## Invokable ## _operator_exists_test< Value this_refer, _Arguments && ... > > > \
+        typename = ::std::enable_if_t< ::ScL::Feature::Detail::HolderInterface::does_value_method_exist< Holder, Holder this_refer > \
+            && ::ScL::Feature::Detail::Operator::Unary::does_ ## Invokable ## _operator_exist_test< Value this_refer, _Arguments && ... > > > \
     constexpr decltype(auto) operator symbol ( _Arguments && ... arguments ) this_refer \
     { \
         using ThisRefer = ThisType this_refer; \
@@ -152,8 +152,8 @@ SCL_BINARY_OPERATOR_IMPLEMENTAION( ^=, BitwiseXorAssignment )
 #define SCL_PREFIX_UNARY_OPERATOR_PROTOTYPE( symbol, this_refer, Invokable ) \
     template < typename ... _Arguments, \
         typename = ::std::enable_if_t< sizeof...( _Arguments ) == 0 \
-            && ::ScL::Feature::Detail::HolderInterface::is_value_method_exists< Holder, Holder this_refer > \
-            && ::ScL::Feature::Detail::Operator::Unary::is_ ## Invokable ## _operator_exists_test< Value this_refer, _Arguments && ... > > > \
+            && ::ScL::Feature::Detail::HolderInterface::does_value_method_exist< Holder, Holder this_refer > \
+            && ::ScL::Feature::Detail::Operator::Unary::does_ ## Invokable ## _operator_exist_test< Value this_refer, _Arguments && ... > > > \
     constexpr decltype(auto) operator symbol () this_refer \
     { \
         using ThisRefer = ThisType this_refer; \
@@ -163,8 +163,8 @@ SCL_BINARY_OPERATOR_IMPLEMENTAION( ^=, BitwiseXorAssignment )
 #define SCL_POSTFIX_UNARY_OPERATOR_PROTOTYPE_WITH_INT( symbol, this_refer, Invokable ) \
     template < typename ... _Arguments, \
         typename = ::std::enable_if_t< sizeof...( _Arguments ) == 0 \
-            && ::ScL::Feature::Detail::HolderInterface::is_value_method_exists< Holder, Holder this_refer > \
-            && ::ScL::Feature::Detail::Operator::Unary::is_ ## Invokable ## _operator_exists_test< Value this_refer, _Arguments && ... > > > \
+            && ::ScL::Feature::Detail::HolderInterface::does_value_method_exist< Holder, Holder this_refer > \
+            && ::ScL::Feature::Detail::Operator::Unary::does_ ## Invokable ## _operator_exist_test< Value this_refer, _Arguments && ... > > > \
     constexpr decltype(auto) operator symbol ( int ) this_refer \
     { \
         using ThisRefer = ThisType this_refer; \
@@ -174,7 +174,7 @@ SCL_BINARY_OPERATOR_IMPLEMENTAION( ^=, BitwiseXorAssignment )
 #define SCL_ADDRESS_OF_OPERATOR_PROTOTYPE( symbol, this_refer ) \
     template < typename ... _Arguments, \
         typename = ::std::enable_if_t< sizeof...( _Arguments ) == 0 \
-            && ::ScL::Feature::Detail::HolderInterface::is_value_method_exists< Holder, Holder this_refer > > > \
+            && ::ScL::Feature::Detail::HolderInterface::does_value_method_exist< Holder, Holder this_refer > > > \
     constexpr ::ScL::Feature::ValuePointer< ThisType this_refer > operator symbol () this_refer \
     { \
         return ::ScL::Feature::ValuePointer< ThisType this_refer >( ::std::forward< ThisType this_refer >( *this ) ); \
@@ -183,7 +183,7 @@ SCL_BINARY_OPERATOR_IMPLEMENTAION( ^=, BitwiseXorAssignment )
 #define SCL_DEREFERENCE_OPERATOR_PROTOTYPE( symbol, this_refer ) \
     template < typename ... _Arguments, \
         typename = ::std::enable_if_t< sizeof...( _Arguments ) == 0 \
-            && ::ScL::Feature::Detail::HolderInterface::is_value_method_exists< Holder, Holder this_refer > > > \
+            && ::ScL::Feature::Detail::HolderInterface::does_value_method_exist< Holder, Holder this_refer > > > \
     constexpr ::ScL::Feature::ValuePointer< ThisType this_refer > operator symbol () this_refer \
     { \
         return ::ScL::Feature::ValuePointer< ThisType this_refer >( ::std::forward< ThisType this_refer >( *this ) ); \
