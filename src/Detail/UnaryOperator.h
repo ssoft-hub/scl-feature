@@ -2,8 +2,8 @@
 #ifndef SCL_UNARY_OPERATOR_H
 #define SCL_UNARY_OPERATOR_H
 
-#include <ScL/Meta/Trait/IsMethodExists.h>
-#include <ScL/Meta/Trait/IsOperatorExists.h>
+#include <ScL/Meta/Trait/DoesMethodExist.h>
+#include <ScL/Meta/Trait/DoesOperatorExist.h>
 #include <ScL/Utility/SingleArgument.h>
 #include <ScL/Utility/SimilarRefer.h>
 #include "ResultSwitch.h"
@@ -21,29 +21,29 @@ namespace ScL { namespace Feature { namespace Detail
     }
 }}}
 
-#define SCL_IS_UNARY_OPERATOR_EXISTS_TEST_TRAIT( Invokable ) \
+#define SCL_DOES_UNARY_OPERATOR_EXIST_TEST_TRAIT( Invokable ) \
     template < typename _Kind, typename _Refer, typename ... _Arguments > \
-    struct Is ## Invokable ## OperatorExistsTestHelper; \
+    struct Does ## Invokable ## OperatorExistTestHelper; \
      \
     template < typename _Refer, typename ... _Arguments > \
-    using Is ## Invokable ## OperatorExistsTest = Is ## Invokable ## OperatorExistsTestHelper< ::ScL::Feature::Detail::Operator::WrapperSwitchCase< _Refer >, _Refer, _Arguments ... >; \
+    using Does ## Invokable ## OperatorExistTest = Does ## Invokable ## OperatorExistTestHelper< ::ScL::Feature::Detail::Operator::WrapperSwitchCase< _Refer >, _Refer, _Arguments ... >; \
      \
     template < typename _Refer, typename ... _Arguments > \
-    /*inline*/ constexpr bool is_ ## Invokable ## _operator_exists_test = Is ## Invokable ## OperatorExistsTest< _Refer, _Arguments ... >::value; \
+    /*inline*/ constexpr bool does_ ## Invokable ## _operator_exist_test = Does ## Invokable ## OperatorExistTest< _Refer, _Arguments ... >::value; \
      \
     template < typename _Refer, typename ... _Arguments > \
-    inline constexpr bool is ## Invokable ## OperatorExistsTest () { return Is ## Invokable ## OperatorExistsTest< _Refer, _Arguments ... >::value; } \
+    inline constexpr bool does ## Invokable ## OperatorExistTest () { return Does ## Invokable ## OperatorExistTest< _Refer, _Arguments ... >::value; } \
      \
     template < typename _Refer, typename ... _Arguments > \
-    struct Is ## Invokable ## OperatorExistsTestHelper< ::ScL::Feature::Detail::Operator::NoneWrapperCase, _Refer, _Arguments ... > \
+    struct Does ## Invokable ## OperatorExistTestHelper< ::ScL::Feature::Detail::Operator::NoneWrapperCase, _Refer, _Arguments ... > \
     { \
         static_assert( ::std::is_reference< _Refer >::value, "The template parameter _Refer must to be a reference type." ); \
      \
-        static const bool value = ::ScL::Feature::Detail::Operator::Unary::is_ ## Invokable ## _operator_exists< _Refer, _Arguments ... >; \
+        static const bool value = ::ScL::Feature::Detail::Operator::Unary::does_ ## Invokable ## _operator_exist< _Refer, _Arguments ... >; \
     }; \
      \
     template < typename _Refer, typename ... _Arguments > \
-    struct Is ## Invokable ## OperatorExistsTestHelper< ::ScL::Feature::Detail::Operator::UnaryWrapperCase, _Refer, _Arguments ...  > \
+    struct Does ## Invokable ## OperatorExistTestHelper< ::ScL::Feature::Detail::Operator::UnaryWrapperCase, _Refer, _Arguments ...  > \
     { \
         static_assert( ::std::is_reference< _Refer >::value, "The template parameter _Refer must to be a reference type." ); \
         using WrapperRefer = _Refer; \
@@ -53,8 +53,8 @@ namespace ScL { namespace Feature { namespace Detail
         using Value = typename Wrapper::Value; \
         using ValueRefer = ::ScL::SimilarRefer< Value, WrapperRefer >; \
      \
-        static const bool value = ::ScL::Feature::Detail::Operator::Unary::is_operator ## Invokable ## _method_exists< Holder, void(HolderRefer, _Arguments ...) > \
-            || ::ScL::Feature::Detail::Operator::Unary::is_ ## Invokable ## _operator_exists< ValueRefer, _Arguments ...  >; \
+        static const bool value = ::ScL::Feature::Detail::Operator::Unary::does_operator ## Invokable ## _method_exist< Holder, void(HolderRefer, _Arguments ...) > \
+            || ::ScL::Feature::Detail::Operator::Unary::does_ ## Invokable ## _operator_exist< ValueRefer, _Arguments ...  >; \
     }; \
      \
 
@@ -119,7 +119,7 @@ namespace ScL { namespace Feature { namespace Detail
                         using Holder = typename Wrapper::Holder; \
                         using HolderRefer = ::ScL::SimilarRefer< Holder, WrapperRefer >; \
          \
-                        constexpr bool holder_has_method_for_operator = ::ScL::Feature::Detail::Operator::Unary::is_operator ## Invokable ## _method_exists< Holder, void( HolderRefer, _Arguments && ... ) >; \
+                        constexpr bool holder_has_method_for_operator = ::ScL::Feature::Detail::Operator::Unary::does_operator ## Invokable ## _method_exist< Holder, void( HolderRefer, _Arguments && ... ) >; \
                         using OperatorSwitchCase = ::std::conditional_t< holder_has_method_for_operator, ::ScL::Feature::Detail::Operator::Unary::HolderHasOperatorCase, ::ScL::Feature::Detail::Operator::Unary::HolderHasNoOperatorCase >; \
                         return ::ScL::Feature::Detail::Operator::Unary::Invokable ## Switch< OperatorSwitchCase >::invoke( ::std::forward< WrapperRefer >( value ), ::std::forward< _Arguments >( arguments ) ... ); \
                     } \
@@ -157,9 +157,9 @@ namespace ScL { namespace Feature { namespace Detail
         { \
             namespace Unary \
             { \
-                SCL_IS_POSTFIX_UNARY_OPERATOR_EXISTS_TRAIT( SCL_SINGLE_ARG( symbol ), Invokable ) \
-                SCL_IS_METHOD_EXISTS_TRAIT( operator ## Invokable ) \
-                SCL_IS_UNARY_OPERATOR_EXISTS_TEST_TRAIT( Invokable ) \
+                SCL_DOES_POSTFIX_UNARY_OPERATOR_EXIST_TRAIT( SCL_SINGLE_ARG( symbol ), Invokable ) \
+                SCL_DOES_METHOD_EXIST_TRAIT( operator ## Invokable ) \
+                SCL_DOES_UNARY_OPERATOR_EXIST_TEST_TRAIT( Invokable ) \
             } \
         } \
     }}} \
@@ -191,9 +191,9 @@ namespace ScL { namespace Feature { namespace Detail
         { \
             namespace Unary \
             { \
-                SCL_IS_PREFIX_UNARY_OPERATOR_EXISTS_TRAIT( SCL_SINGLE_ARG( symbol ), Invokable ) \
-                SCL_IS_METHOD_EXISTS_TRAIT( operator ## Invokable ) \
-                SCL_IS_UNARY_OPERATOR_EXISTS_TEST_TRAIT( Invokable ) \
+                SCL_DOES_PREFIX_UNARY_OPERATOR_EXIST_TRAIT( SCL_SINGLE_ARG( symbol ), Invokable ) \
+                SCL_DOES_METHOD_EXIST_TRAIT( operator ## Invokable ) \
+                SCL_DOES_UNARY_OPERATOR_EXIST_TEST_TRAIT( Invokable ) \
             } \
         } \
     }}} \
@@ -226,9 +226,9 @@ namespace ScL { namespace Feature { namespace Detail
         { \
             namespace Unary \
             { \
-                SCL_IS_POSTFIX_UNARY_OPERATOR_WITH_ARGUMENT_EXISTS_TRAIT( SCL_SINGLE_ARG( symbol ), Invokable ) \
-                SCL_IS_METHOD_EXISTS_TRAIT( operator ## Invokable ) \
-                SCL_IS_UNARY_OPERATOR_EXISTS_TEST_TRAIT( Invokable ) \
+                SCL_DOES_POSTFIX_UNARY_OPERATOR_WITH_ARGUMENT_EXIST_TRAIT( SCL_SINGLE_ARG( symbol ), Invokable ) \
+                SCL_DOES_METHOD_EXIST_TRAIT( operator ## Invokable ) \
+                SCL_DOES_UNARY_OPERATOR_EXIST_TEST_TRAIT( Invokable ) \
             } \
         } \
     }}} \
@@ -260,9 +260,9 @@ namespace ScL { namespace Feature { namespace Detail
         { \
             namespace Unary \
             { \
-                SCL_IS_POSTFIX_UNARY_OPERATOR_WITH_ARGUMENTS_EXISTS_TRAIT( SCL_SINGLE_ARG( symbol ), Invokable ) \
-                SCL_IS_METHOD_EXISTS_TRAIT( operator ## Invokable ) \
-                SCL_IS_UNARY_OPERATOR_EXISTS_TEST_TRAIT( Invokable ) \
+                SCL_DOES_POSTFIX_UNARY_OPERATOR_WITH_ARGUMENTS_EXIST_TRAIT( SCL_SINGLE_ARG( symbol ), Invokable ) \
+                SCL_DOES_METHOD_EXIST_TRAIT( operator ## Invokable ) \
+                SCL_DOES_UNARY_OPERATOR_EXIST_TEST_TRAIT( Invokable ) \
             } \
         } \
     }}} \
