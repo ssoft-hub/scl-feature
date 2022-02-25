@@ -4,7 +4,7 @@
 
 #include <memory>
 #include <ScL/Feature/Trait.h>
-#include <ScL/Meta/Trait/DoesMethodExist.h>
+#include <ScL/Meta/Trait/Detection/Method.h>
 #include <ScL/Utility/SimilarRefer.h>
 
 namespace ScL { namespace Feature { namespace Detail
@@ -91,28 +91,28 @@ namespace ScL { namespace Feature { namespace Detail
 {
     struct HolderInterface
     {
-        SCL_DOES_METHOD_EXIST_TRAIT( guard )
-        SCL_DOES_METHOD_EXIST_TRAIT( unguard )
-        SCL_DOES_METHOD_EXIST_TRAIT( value )
+        SCL_DOES_METHOD_EXIST( guard, Guard )
+        SCL_DOES_METHOD_EXIST( unguard, Unguard )
+        SCL_DOES_METHOD_EXIST( value, Value )
 
         template < typename _HolderRefer,
-            typename = ::std::enable_if_t< does_value_method_exist< ::std::decay_t< _HolderRefer >, _HolderRefer > > >
+            typename = ::std::enable_if_t< doesValueStaticMethodExist< ::std::decay_t< _HolderRefer >, _HolderRefer >() > >
         static constexpr void guard ( _HolderRefer holder )
         {
             using Holder = ::std::decay_t< _HolderRefer >;
-            ::ScL::Feature::Detail::GuardHelper< _HolderRefer, does_guard_method_exist< Holder, void( _HolderRefer ) > >::guard( ::std::forward< _HolderRefer >( holder ) );
+            ::ScL::Feature::Detail::GuardHelper< _HolderRefer, doesGuardStaticMethodExist< Holder, _HolderRefer >() >::guard( ::std::forward< _HolderRefer >( holder ) );
         }
 
         template < typename _HolderRefer,
-            typename = ::std::enable_if_t< does_value_method_exist< ::std::decay_t< _HolderRefer >, _HolderRefer > > >
+            typename = ::std::enable_if_t< doesValueStaticMethodExist< ::std::decay_t< _HolderRefer >, _HolderRefer >() > >
         static constexpr void unguard ( _HolderRefer holder )
         {
             using Holder = ::std::decay_t< _HolderRefer >;
-            ::ScL::Feature::Detail::UnguardHelper< _HolderRefer, does_unguard_method_exist< Holder, void( _HolderRefer ) > >::unguard( ::std::forward< _HolderRefer >( holder ) );
+            ::ScL::Feature::Detail::UnguardHelper< _HolderRefer, doesUnguardStaticMethodExist< Holder, _HolderRefer >() >::unguard( ::std::forward< _HolderRefer >( holder ) );
         }
 
         template < typename _HolderRefer,
-            typename = ::std::enable_if_t< does_value_method_exist< ::std::decay_t< _HolderRefer >, _HolderRefer > > >
+            typename = ::std::enable_if_t< doesValueStaticMethodExist< ::std::decay_t< _HolderRefer >, _HolderRefer >() > >
         static constexpr decltype(auto) value ( _HolderRefer holder )
         {
             using Holder = ::std::decay_t< _HolderRefer >;

@@ -13,15 +13,10 @@ namespace ScL { namespace Feature { namespace Detail
 {
     namespace Operator
     {
-        struct NoneWrapperCase {};
-        struct LeftWrapperCase {};
-        struct RightWrapperCase {};
-        struct BothWrapperCase {};
-        struct BothExposingCase;
-        struct RightExposingCase;
-        struct LeftExposingCase;
-
-        using UnaryWrapperCase = LeftWrapperCase;
+        struct NoneWrapperCase;
+        struct LeftWrapperCase;
+        struct RightWrapperCase;
+        struct BothWrapperCase;
 
         template < typename _Left, typename _Right >
         struct WrapperCaseHelper
@@ -40,16 +35,20 @@ namespace ScL { namespace Feature { namespace Detail
         template < typename _Left, typename _Right = void >
         using WrapperSwitchCase = typename WrapperCaseHelper< _Left, _Right >::Type;
 
+        struct BothExposingCase;
+        struct RightExposingCase;
+        struct LeftExposingCase;
+
         template < typename _Left, typename _Right >
         struct ExposingCaseHelper
         {
             using Left = ::std::decay_t< _Left >;
             using Right = ::std::decay_t< _Right >;
             using Type = ::std::conditional_t< ::ScL::Feature::isThisPartOfOther< Left, Right >(),
-                    RightExposingCase,
+                    RightExposingCase,          // The Right Wrapper should be exposed
                     ::std::conditional_t< ::ScL::Feature::isThisPartOfOther< Right, Left >(),
-                        LeftExposingCase,
-                        BothExposingCase > >;
+                        LeftExposingCase,       // The Left Wrapper should be exposed
+                        BothExposingCase > >;   // The Both Wrappers should be exposed
         };
 
         template < typename _Left, typename _Right >
