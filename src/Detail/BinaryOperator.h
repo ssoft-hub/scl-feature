@@ -51,7 +51,7 @@ namespace ScL { namespace Feature { namespace Detail
     struct Does ## Invokable ## OperatorExistHelper< ::ScL::Feature::Detail::Operator::LeftWrapperCase, _LeftWrapperRefer, _RightRefer > \
     { \
         static_assert( ::std::is_reference< _LeftWrapperRefer >::value, "The template parameter _LeftWrapperRefer must to be a reference type." ); \
-        static_assert( ::std::is_reference< _RightRefer >::value, "The template parameter _RightRefer must to be a reference type." ); \
+        static_assert( ::std::is_reference< _RightRefer >::value || ::std::is_function< _RightRefer >::value, "The template parameter _RightRefer must to be a reference type." ); \
      \
         using LeftWrapperRefer = _LeftWrapperRefer; \
         using LeftWrapper = ::std::decay_t< LeftWrapperRefer >; \
@@ -385,7 +385,7 @@ namespace ScL { namespace Feature { namespace Detail
             struct Invokable ## Helper \
             { \
                 static_assert( ::std::is_reference< _LeftRefer >::value, "The template parameter _LeftRefer must to be a reference type." ); \
-                static_assert( ::std::is_reference< _RightRefer >::value, "The template parameter _RightRefer must to be a reference type." ); \
+                static_assert( ::std::is_reference< _RightRefer >::value || ::std::is_function<  _RightRefer >::value, "The template parameter _RightRefer must to be a reference type." ); \
      \
                 using LeftRefer = _LeftRefer; \
                 using RightRefer = _RightRefer; \

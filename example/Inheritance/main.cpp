@@ -21,8 +21,8 @@ void printBase ( const BaseType & base_value )
 {
     ::std::cout
         << "Base: "
-        << *&base_value.m_int << " "
-        << *&base_value.m_string << ::std::endl;
+        << base_value.m_int << " "
+        << base_value.m_string << "\n";
 }
 
 void testBase ()
@@ -64,8 +64,8 @@ void printDerived ( const DerivedType & derived_value )
     printBase( derived_value );
     ::std::cout
         << "Derived: "
-        << *&derived_value.m_int << " "
-        << *&derived_value.m_string << ::std::endl;
+        << derived_value.m_int << " "
+        << derived_value.m_string << "\n";
 }
 
 void testDerived ()

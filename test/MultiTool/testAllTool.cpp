@@ -30,11 +30,11 @@ void testTool ()
 
     // value
     ::std::cout
-        << "Test tool:" << ::std::endl
-        << *& cvalue_ptr->m_first_name << ::std::endl
-        << *& cvalue_ptr->m_last_name << ::std::endl
-        << *& cvalue_ptr->m_age << ::std::endl
-        << *& cvalue_ptr->m_stature << ::std::endl;
+        << "Test tool:" << "\n"
+        << cvalue_ptr->m_first_name << "\n"
+        << cvalue_ptr->m_last_name << "\n"
+        << cvalue_ptr->m_age << "\n"
+        << cvalue_ptr->m_stature << "\n";
 }
 
 template < typename _Type >

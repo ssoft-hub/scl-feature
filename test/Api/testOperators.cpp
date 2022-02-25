@@ -437,7 +437,7 @@ void testAccess ()
 
     std::cout << "Iterate and print keys and values of unordered_map, using auto:\n";
     for( const auto & n : map )
-        std::cout << "Key:[" << *&(n->first) << "] Value:[" << *&(*&n).second << "]\n";
+        std::cout << "Key:[" << n->first << "] Value:[" << n->second << "]\n";
 }
 
 template < typename _Data, typename _Other >
@@ -783,14 +783,14 @@ void testRangeOperators ()
 
     size_t count = values->size();
     for ( size_t i = 0; i < count; ++i )
-        ::std::cout << *&(values[ i ]) << ::std::endl;
+        ::std::cout << values[ i ] << "\n";
 
     for ( auto iter = ::std::begin( values ); iter != ::std::end( values ); ++iter )
-        ::std::cout << *&(*iter) << ::std::endl;
+        ::std::cout << (*iter) << "\n";
 
     for ( auto iter = ::std::begin( values ), end_iter = ::std::end( values ); iter != end_iter; ++iter )
-        ::std::cout << *&(*iter) << ::std::endl;
+        ::std::cout << (*iter) << "\n";
 
     for ( const auto & value : values )
-        ::std::cout << *&value << ::std::endl;
+        ::std::cout << value << "\n";
 }
