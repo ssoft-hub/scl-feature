@@ -119,7 +119,6 @@ int main ( int /*argc*/, char ** /*argv*/ )
 
     one = two;
     two = Test{};
-    Test{} = Test{};
     one = 3;
     two = 4;
 
