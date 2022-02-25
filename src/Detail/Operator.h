@@ -302,7 +302,7 @@ SCL_BINARY_OPERATOR_IMPLEMENTAION( ^=, BitwiseXorAssignment )
     SCL_BINARY_OPERATOR_PROTOTYPE_FOR_ANY( SCL_SINGLE_ARG( symbol ), const volatile &&, Invokable ) \
     SCL_BINARY_OPERATOR_PROTOTYPE_FOR_ANY( SCL_SINGLE_ARG( symbol ), &, Invokable ) \
     SCL_BINARY_OPERATOR_PROTOTYPE_FOR_ANY( SCL_SINGLE_ARG( symbol ), const &, Invokable ) \
-    /*SCL_BINARY_OPERATOR_PROTOTYPE_FOR_ANY( SCL_SINGLE_ARG( symbol ), volatile &, Invokable )*/ \
+    SCL_BINARY_OPERATOR_PROTOTYPE_FOR_ANY( SCL_SINGLE_ARG( symbol ), volatile &, Invokable ) \
     SCL_BINARY_OPERATOR_PROTOTYPE_FOR_ANY( SCL_SINGLE_ARG( symbol ), const volatile &, Invokable ) \
 
 /*
