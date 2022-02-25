@@ -267,14 +267,14 @@ static void operator[Name] ( _HolderRefer && holder );
 
 * **AddressOf** - operator & ();
 * **Indirection** - operator * ();
-* **UnaryPrefixPlus** - operator + ();
-* **UnaryPrefixMinus** - operator - ();
-* **UnaryPrefixPlusPlus** - operator ++ ();
-* **UnaryPrefixMinusMinus** - operator -- ();
-* **UnaryPostfixPlusPlus** - operator ++ ( int );
-* **UnaryPostfixMinusMinus** - operator -- ( int );
-* **UnaryPrefixBitwiseNot** - operator ~ ();
-* **UnaryPrefixLogicalNot** - operator ! ();
+* **PrefixPlus** - operator + ();
+* **PrefixMinus** - operator - ();
+* **PrefixPlusPlus** - operator ++ ();
+* **PrefixMinusMinus** - operator -- ();
+* **PostfixPlusPlus** - operator ++ ( int );
+* **PostfixMinusMinus** - operator -- ( int );
+* **PrefixBitwiseNot** - operator ~ ();
+* **PrefixLogicalNot** - operator ! ();
 
 Для унарных операторов с одним аргументом интерфейс методов должен выгладеть так:
 
@@ -407,7 +407,7 @@ static void operator[Name]Right ( _Left && left, _HolderRightRefer && right );
 ```cpp
 template < typename _Right >
 static void operator[Name] ( ThisType && left, Holder< _Right > && right );
-// ... и т.д. все возможные сочетания 
+// ... и т.д. все возможные сочетания
 ```
 
 или в виде шаблона:

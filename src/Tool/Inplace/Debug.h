@@ -239,8 +239,8 @@ namespace ScL { namespace Feature { namespace Inplace
             /* Functional forms */
             SCL_DEBUG_POSTFIX_UNARY_OPERATOR_WITH_ARGUMENTS( (), RoundBrackets )
             /* Arithmetic operators */
-            SCL_DEBUG_PREFIX_UNARY_OPERATOR( +, UnaryPrefixPlus )
-            SCL_DEBUG_PREFIX_UNARY_OPERATOR( -, UnaryPrefixMinus )
+            SCL_DEBUG_PREFIX_UNARY_OPERATOR( +, PrefixPlus )
+            SCL_DEBUG_PREFIX_UNARY_OPERATOR( -, PrefixMinus )
             SCL_DEBUG_BINARY_OPERATOR_FOR_ANY( *, Multiply )
             SCL_DEBUG_BINARY_OPERATOR_FOR_ANY( /, Divide )
             SCL_DEBUG_BINARY_OPERATOR_FOR_ANY( %, Modulo )
@@ -258,10 +258,10 @@ namespace ScL { namespace Feature { namespace Inplace
             SCL_DEBUG_BINARY_OPERATOR_FOR_ANY( ^=, BitwiseXorAssignment )
             SCL_DEBUG_BINARY_OPERATOR_FOR_ANY( |=, BitwiseOrAssignment )
             /* Increment and decrement */
-            SCL_DEBUG_PREFIX_UNARY_OPERATOR( ++, UnaryPrefixPlusPlus )
-            SCL_DEBUG_PREFIX_UNARY_OPERATOR( --, UnaryPrefixMinusMinus )
-            SCL_DEBUG_POSTFIX_UNARY_OPERATOR_WITH_INT( ++, UnaryPostfixPlusPlus )
-            SCL_DEBUG_POSTFIX_UNARY_OPERATOR_WITH_INT( --, UnaryPostfixMinusMinus )
+            SCL_DEBUG_PREFIX_UNARY_OPERATOR( ++, PrefixPlusPlus )
+            SCL_DEBUG_PREFIX_UNARY_OPERATOR( --, PrefixMinusMinus )
+            SCL_DEBUG_POSTFIX_UNARY_OPERATOR_WITH_INT( ++, PostfixPlusPlus )
+            SCL_DEBUG_POSTFIX_UNARY_OPERATOR_WITH_INT( --, PostfixMinusMinus )
             /* Relational and comparison operators */
             SCL_DEBUG_BINARY_OPERATOR_FOR_ANY( ==, IsEqual )
             SCL_DEBUG_BINARY_OPERATOR_FOR_ANY( !=, NotEqual )
@@ -270,11 +270,11 @@ namespace ScL { namespace Feature { namespace Inplace
             SCL_DEBUG_BINARY_OPERATOR_FOR_ANY( >, Greater )
             SCL_DEBUG_BINARY_OPERATOR_FOR_ANY( >=, GreaterOrEqual )
             /* Logical operators */
-            SCL_DEBUG_PREFIX_UNARY_OPERATOR( !, UnaryPrefixLogicalNot )
+            SCL_DEBUG_PREFIX_UNARY_OPERATOR( !, PrefixLogicalNot )
             SCL_DEBUG_BINARY_OPERATOR_FOR_ANY( &&, LogicalAnd )
             SCL_DEBUG_BINARY_OPERATOR_FOR_ANY( ||, LogicalOr )
             /* Bitwise operators */
-            SCL_DEBUG_PREFIX_UNARY_OPERATOR( ~, UnaryPrefixBitwiseNot )
+            SCL_DEBUG_PREFIX_UNARY_OPERATOR( ~, PrefixBitwiseNot )
             SCL_DEBUG_BINARY_OPERATOR_FOR_ANY( &, BitwiseAnd )
             SCL_DEBUG_BINARY_OPERATOR_FOR_ANY( ^, BitwiseXor )
             SCL_DEBUG_BINARY_OPERATOR_FOR_ANY( |, BitwiseOr )

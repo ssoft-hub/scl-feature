@@ -90,15 +90,16 @@ namespace ScL { namespace Feature { namespace Implicit
              * of operation enabled if left is not constant reference and any
              * kind of right.
              */
-            template < typename _LeftHolderRefer, typename _RightHolderRefer,
-                typename = ::std::enable_if_t<
-                    !::std::is_const< ::std::remove_reference_t< _LeftHolderRefer > >::value > >
-            static void operatorAssignment ( _LeftHolderRefer && left, _RightHolderRefer && right )
+            template < typename _LeftWrapperRefer, typename _RightWrapperRefer,
+                typename = ::std::enable_if_t< !::std::is_const< ::std::remove_reference_t< _LeftWrapperRefer > >::value
+                    && ( ::std::is_volatile< ::std::remove_reference_t< _LeftWrapperRefer > >::value == ::std::is_volatile< ::std::remove_reference_t< _RightWrapperRefer > >::value ) > >
+            static decltype(auto) operatorAssignment ( _LeftWrapperRefer && left, _RightWrapperRefer && right )
             {
-                using RightHolderRefer = _RightHolderRefer &&;
-                using RightHolder = ::std::decay_t< RightHolderRefer >;
-                using RightPointerRefer = ::ScL::SimilarRefer< typename RightHolder::Pointer, RightHolderRefer >;
-                left.m_pointer = ::std::forward< RightPointerRefer >( right.m_pointer );
+                using RightWrapperRefer = _RightWrapperRefer &&;
+                using RightHolder = typename ::std::decay_t< RightWrapperRefer >::Holder;
+                using RightPointerRefer = ::ScL::SimilarRefer< typename RightHolder::Pointer, RightWrapperRefer >;
+                ::ScL::Feature::Detail::wrapperHolder( left ).m_pointer
+                    = ::std::forward< RightPointerRefer >( ::ScL::Feature::Detail::wrapperHolder( right ).m_pointer );
             }
 
             /*!

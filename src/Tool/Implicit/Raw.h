@@ -213,18 +213,23 @@ namespace ScL { namespace Feature { namespace Implicit
              * of operation enabled if left is not constant reference and any
              * kind of right.
              */
-            template < typename _LeftHolderRefer, typename _RightHolderRefer,
-                typename = ::std::enable_if_t<
-                        !::std::is_const< ::std::remove_reference_t< _LeftHolderRefer > >::value > >
-            static void operatorAssignment ( _LeftHolderRefer && left, _RightHolderRefer && right )
+            template < typename _LeftWrapperRefer, typename _RightWrapperRefer,
+                typename = ::std::enable_if_t< !::std::is_const< ::std::remove_reference_t< _LeftWrapperRefer > >::value
+                    && ( ::std::is_volatile< ::std::remove_reference_t< _LeftWrapperRefer > >::value == ::std::is_volatile< ::std::remove_reference_t< _RightWrapperRefer > >::value ) > >
+            static decltype(auto) operatorAssignment ( _LeftWrapperRefer && left, _RightWrapperRefer && right )
             {
-                if ( left.m_pointer != right.m_pointer )
+                auto & left_holder = ::ScL::Feature::Detail::wrapperHolder( left );
+                auto & right_holder = ::ScL::Feature::Detail::wrapperHolder( right );
+
+                if ( left_holder.m_pointer != right_holder.m_pointer )
                 {
-                    left.decrement();
-                    left.m_pointer = right.m_pointer;
-                    left.m_access = right.m_access;
-                    left.increment();
+                    left_holder.decrement();
+                    left_holder.m_pointer = right_holder.m_pointer;
+                    left_holder.m_access = right_holder.m_access;
+                    left_holder.increment();
                 }
+
+                return left;
             }
 
             /*!

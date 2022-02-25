@@ -83,8 +83,8 @@ namespace ScL { namespace Feature { namespace Detail
         /* Functional forms */
         SCL_POSTFIX_UNARY_OPERATOR_WITH_ARGUMENTS( (), RoundBrackets )
         /* Arithmetic operators */
-        SCL_PREFIX_UNARY_OPERATOR( +, UnaryPrefixPlus )
-        SCL_PREFIX_UNARY_OPERATOR( -, UnaryPrefixMinus )
+        SCL_PREFIX_UNARY_OPERATOR( +, PrefixPlus )
+        SCL_PREFIX_UNARY_OPERATOR( -, PrefixMinus )
         SCL_BINARY_OPERATOR_FOR_ANY( *, Multiply )
         SCL_BINARY_OPERATOR_FOR_ANY( /, Divide )
         SCL_BINARY_OPERATOR_FOR_ANY( %, Modulo )
@@ -102,10 +102,10 @@ namespace ScL { namespace Feature { namespace Detail
         SCL_BINARY_OPERATOR_FOR_ANY( ^=, BitwiseXorAssignment )
         SCL_BINARY_OPERATOR_FOR_ANY( |=, BitwiseOrAssignment )
         /* Increment and decrement */
-        SCL_PREFIX_UNARY_OPERATOR( ++, UnaryPrefixPlusPlus )
-        SCL_PREFIX_UNARY_OPERATOR( --, UnaryPrefixMinusMinus )
-        SCL_POSTFIX_UNARY_OPERATOR_WITH_INT( ++, UnaryPostfixPlusPlus )
-        SCL_POSTFIX_UNARY_OPERATOR_WITH_INT( --, UnaryPostfixMinusMinus )
+        SCL_PREFIX_UNARY_OPERATOR( ++, PrefixPlusPlus )
+        SCL_PREFIX_UNARY_OPERATOR( --, PrefixMinusMinus )
+        SCL_POSTFIX_UNARY_OPERATOR_WITH_INT( ++, PostfixPlusPlus )
+        SCL_POSTFIX_UNARY_OPERATOR_WITH_INT( --, PostfixMinusMinus )
         /* Relational and comparison operators */
         SCL_BINARY_OPERATOR_FOR_ANY( ==, Equal )
         SCL_BINARY_OPERATOR_FOR_ANY( !=, NotEqual )
@@ -114,16 +114,17 @@ namespace ScL { namespace Feature { namespace Detail
         SCL_BINARY_OPERATOR_FOR_ANY( >, Greater )
         SCL_BINARY_OPERATOR_FOR_ANY( >=, GreaterOrEqual )
         /* Logical operators */
-        SCL_PREFIX_UNARY_OPERATOR( !, UnaryPrefixLogicalNot )
+        SCL_PREFIX_UNARY_OPERATOR( !, PrefixLogicalNot )
         SCL_BINARY_OPERATOR_FOR_ANY( &&, LogicalAnd )
         SCL_BINARY_OPERATOR_FOR_ANY( ||, LogicalOr )
         /* Bitwise operators */
-        SCL_PREFIX_UNARY_OPERATOR( ~, UnaryPrefixBitwiseNot )
+        SCL_PREFIX_UNARY_OPERATOR( ~, PrefixBitwiseNot )
         SCL_BINARY_OPERATOR_FOR_ANY( &, BitwiseAnd )
         SCL_BINARY_OPERATOR_FOR_ANY( ^, BitwiseXor )
         SCL_BINARY_OPERATOR_FOR_ANY( |, BitwiseOr )
         SCL_BINARY_OPERATOR_FOR_ANY( <<, ShiftLeft )
         SCL_BINARY_OPERATOR_FOR_ANY( >>, ShiftRight )
+
         /* Type-casting */
         SCL_CAST_OPERATOR
     };
