@@ -13,8 +13,8 @@ public:
 using namespace ::ScL::Feature;
 using namespace ::ScL::Meta;
 
-static_assert( Detector< SquareBracketsUnstrictOperation, Test, int >::isDetected(), "" );
-//static_assert( Detector< SquareBracketsMemberStrictOperation, Test, int >::isDetected(), "" );
+static_assert( isDetected< SquareBracketsUnstrictOperation, Test, int >(), "" );
+static_assert( isDetected< SquareBracketsMemberStrictOperation, Test const, int >(), "" );
 
 
 #include <iomanip>
@@ -29,23 +29,31 @@ static_assert( Detector< SquareBracketsUnstrictOperation, Test, int >::isDetecte
 void wrapper ()
 {
     using Test = ::std::vector< int >;
-    Wrapper< Test > test;
+    Wrapper< Test > test{{0,1,2,3,4,5}};
+    Wrapper< int > i{1};
     auto n = test[ 1.0 ];
     ::std::cout << ::std::setbase( 16 );
-    ::std::cout << n << n << test[ 1 ] << "\n";
 
-    Wrapper< decltype( ::std::cout ) > * stream_ptr = nullptr;
-    auto & stream = *stream_ptr;
-    stream << ::std::setbase( 16 );
+    static_assert( ::ScL::Meta::isDetected< ::ScL::Meta::ShiftLeftMemberStrictOperation, decltype( ::std::cout ), int >(), "" );
+    //static_assert( ::ScL::Feature::Detail::Operator::Binary::DoesShiftLeftOperatorExist< decltype( ::std::cout ) &, Wrapper< int > & >::value, "" );
+
+    ::std::cout << i;
+    ::std::cout << n << n << test[ 1 ] << ::std::flush << ::std::endl;
+
+    //using SStream = Wrapper< std::ostringstream >;
+    using SStream = std::ostringstream;
+
+    SStream sstream;
+    sstream << n << n << test[ 1 ] << ::std::flush << ::std::endl;
 
     using Stream = decltype( ::std::cout );
-    using WStream = Wrapper< decltype( ::std::cout ) >;
     using Endl = decltype( ::std::endl( ::std::declval< Stream & >() ) )(*)( Stream & );
 
-    stream.operator << < Endl >( ::std::endl );
-    stream << Endl( ::std::endl );
+    //sstream.operator << < Endl >( ::std::endl );
+    sstream << Endl( ::std::endl );
+    sstream << ::std::endl;
 
-    static_assert( ::ScL::Meta::Detector< ::ScL::Meta::ShiftLeftUnstrictOperation, WStream, Endl >::isDetected(), "" );
+    static_assert( ::ScL::Meta::isDetected< ::ScL::Meta::ShiftLeftUnstrictOperation, SStream, Endl >(), "" );
 
 }
 
