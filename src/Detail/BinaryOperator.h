@@ -43,7 +43,7 @@ namespace ScL { namespace Feature { namespace Detail
         static_assert( ::std::is_reference< _LeftRefer >::value, "The template parameter _LeftRefer must to be a reference type." ); \
         static_assert( ::std::is_reference< _RightRefer >::value, "The template parameter _RightRefer must to be a reference type." ); \
      \
-        static const bool value = ::ScL::Meta::Detector< ::ScL::Meta::Invokable ## UnstrictOperation, _LeftRefer, _RightRefer >::isDetected(); \
+        static const bool value = ::ScL::Meta::isDetected< ::ScL::Meta::Invokable ## UnstrictOperation, _LeftRefer, _RightRefer >(); \
     }; \
      \
     /* Member of Wrapper case */ \
@@ -60,8 +60,8 @@ namespace ScL { namespace Feature { namespace Detail
         using LeftValueRefer = ::ScL::SimilarRefer< LeftValue, LeftWrapperRefer >; \
         using RightRefer = _RightRefer; \
      \
-        static const bool value = ::ScL::Meta::Detector< ::ScL::Meta::Invokable ## UnstrictOperation, LeftValueRefer, RightRefer >::isDetected() \
-            || ::ScL::Meta::Detector< Operator ## Invokable ## ForLeftWrapperStaticMethodStrictOperation, LeftHolder, LeftWrapperRefer, RightRefer >::isDetected(); \
+        static const bool value = ::ScL::Meta::isDetected< ::ScL::Meta::Invokable ## UnstrictOperation, LeftValueRefer, RightRefer >() \
+            || ::ScL::Meta::isDetected< Operator ## Invokable ## ForLeftWrapperStaticMethodStrictOperation, LeftHolder, LeftWrapperRefer, RightRefer >(); \
     }; \
      \
     /* Global case */ \
@@ -78,8 +78,8 @@ namespace ScL { namespace Feature { namespace Detail
         using RightValue = typename RightWrapper::Value; \
         using RightValueRefer = ::ScL::SimilarRefer< RightValue, RightWrapperRefer >; \
      \
-        static const bool value = ::ScL::Meta::Detector< ::ScL::Meta::Invokable ## UnstrictOperation, LeftRefer, RightValueRefer >::isDetected() \
-            || ::ScL::Meta::Detector< Operator ## Invokable ## ForRightWrapperStaticMethodStrictOperation, RightHolder, LeftRefer, RightWrapperRefer >::isDetected(); \
+        static const bool value = ::ScL::Meta::isDetected< ::ScL::Meta::Invokable ## UnstrictOperation, LeftRefer, RightValueRefer >() \
+            || ::ScL::Meta::isDetected< Operator ## Invokable ## ForRightWrapperStaticMethodStrictOperation, RightHolder, LeftRefer, RightWrapperRefer >(); \
     }; \
      \
     /* Member of Wrapper case */ \
@@ -100,7 +100,7 @@ namespace ScL { namespace Feature { namespace Detail
         using RightValueRefer = ::ScL::SimilarRefer< RightValue, RightWrapperRefer >; \
      \
         static const bool is_compatible_value = ::ScL::Feature::isCompatible< LeftWrapper, RightWrapper >() \
-            && ( ::ScL::Meta::Detector< Operator ## Invokable ## StaticMethodStrictOperation, LeftHolder, LeftWrapperRefer, RightWrapperRefer >::isDetected() \
+            && ( ::ScL::Meta::isDetected< Operator ## Invokable ## StaticMethodStrictOperation, LeftHolder, LeftWrapperRefer, RightWrapperRefer >() \
                 || does ## Invokable ## OperatorExist< LeftValueRefer, RightValueRefer >() ); \
      \
         static const bool is_left_path_of_right_value = ::ScL::Feature::isThisPartOfOther< LeftWrapper, RightWrapper >() \
@@ -123,9 +123,15 @@ namespace ScL { namespace Feature { namespace Detail
     { \
         namespace Operator { namespace Binary \
         { \
-            SCL_DOES_METHOD_EXIST( operator ## Invokable, Operator ## Invokable ) \
-            SCL_DOES_METHOD_EXIST( operator ## Invokable ## ForLeftWrapper, Operator ## Invokable ## ForLeftWrapper ) \
-            SCL_DOES_METHOD_EXIST( operator ## Invokable ## ForRightWrapper, Operator ## Invokable ## ForRightWrapper ) \
+            SCL_META_METHOD_DETECTION( operator ## Invokable, Operator ## Invokable ) \
+            template < typename ... _Arguments > \
+            inline static constexpr bool does ## Operator ## Invokable ## StaticMethodExist () { return ::ScL::Meta::isDetected< Operator ## Invokable ## StaticMethodStrictOperation, _Arguments ... >(); } \
+            SCL_META_METHOD_DETECTION( operator ## Invokable ## ForLeftWrapper, Operator ## Invokable ## ForLeftWrapper ) \
+            template < typename ... _Arguments > \
+            inline static constexpr bool does ## Operator ## Invokable ## ForLeftWrapper ## StaticMethodExist () { return ::ScL::Meta::isDetected< Operator ## Invokable ## ForLeftWrapper ## StaticMethodStrictOperation, _Arguments ... >(); } \
+            SCL_META_METHOD_DETECTION( operator ## Invokable ## ForRightWrapper, Operator ## Invokable ## ForRightWrapper ) \
+            template < typename ... _Arguments > \
+            inline static constexpr bool does ## Operator ## Invokable ## ForRightWrapper ## StaticMethodExist () { return ::ScL::Meta::isDetected< Operator ## Invokable ## ForRightWrapper ## StaticMethodStrictOperation, _Arguments ... >(); } \
             SCL_FEATURE_DOES_BINARY_OPERATOR_EXIST( Invokable ) \
         }} \
     }}} \

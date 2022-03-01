@@ -91,9 +91,20 @@ namespace ScL { namespace Feature { namespace Detail
 {
     struct HolderInterface
     {
-        SCL_DOES_METHOD_EXIST( guard, Guard )
-        SCL_DOES_METHOD_EXIST( unguard, Unguard )
-        SCL_DOES_METHOD_EXIST( value, Value )
+        SCL_META_METHOD_DETECTION( guard, Guard )
+
+        template < typename ... _Arguments >
+        inline static constexpr bool doesGuardStaticMethodExist () { return ::ScL::Meta::isDetected< GuardStaticMethodStrictOperation, _Arguments ... >(); }
+
+        SCL_META_METHOD_DETECTION( unguard, Unguard )
+
+        template < typename ... _Arguments >
+        inline static constexpr bool doesUnguardStaticMethodExist () { return ::ScL::Meta::isDetected< UnguardStaticMethodStrictOperation, _Arguments ... >(); }
+
+        SCL_META_METHOD_DETECTION( value, Value )
+
+        template < typename ... _Arguments >
+        inline static constexpr bool doesValueStaticMethodExist () { return ::ScL::Meta::isDetected< ValueStaticMethodStrictOperation, _Arguments ... >(); }
 
         template < typename _HolderRefer,
             typename = ::std::enable_if_t< doesValueStaticMethodExist< ::std::decay_t< _HolderRefer >, _HolderRefer >() > >

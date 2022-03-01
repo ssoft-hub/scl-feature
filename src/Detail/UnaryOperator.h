@@ -32,7 +32,7 @@ namespace ScL { namespace Feature { namespace Detail
     struct Does ## Invokable ## OperatorExistHelper< ::ScL::Feature::Detail::Operator::NoneWrapperCase, _Refer, _Arguments ... > \
     { \
         static_assert( ::std::is_reference< _Refer >::value, "The template parameter _Refer must to be a reference type." ); \
-        static const bool value = ::ScL::Meta::Detector< ::ScL::Meta::Invokable ## UnstrictOperation, _Refer, _Arguments ... >::isDetected(); \
+        static const bool value = ::ScL::Meta::isDetected< ::ScL::Meta::Invokable ## UnstrictOperation, _Refer, _Arguments ... >(); \
     }; \
      \
     template < typename _Refer, typename ... _Arguments > \
@@ -46,8 +46,8 @@ namespace ScL { namespace Feature { namespace Detail
         using Value = typename Wrapper::Value; \
         using ValueRefer = ::ScL::SimilarRefer< Value, WrapperRefer >; \
      \
-        static const bool value = ::ScL::Meta::Detector< ::ScL::Meta::Invokable ## UnstrictOperation, ValueRefer, _Arguments ... >::isDetected() \
-            || ::ScL::Meta::Detector< ::ScL::Feature::Detail::Operator::Unary::Operator ## Invokable ## StaticMethodStrictOperation, Holder, WrapperRefer, _Arguments ... >::isDetected(); \
+        static const bool value = ::ScL::Meta::isDetected< ::ScL::Meta::Invokable ## UnstrictOperation, ValueRefer, _Arguments ... >() \
+            || ::ScL::Meta::isDetected< ::ScL::Feature::Detail::Operator::Unary::Operator ## Invokable ## StaticMethodStrictOperation, Holder, WrapperRefer, _Arguments ... >(); \
     }; \
      \
 
@@ -138,7 +138,9 @@ namespace ScL { namespace Feature { namespace Detail
     { \
         namespace Operator { namespace Unary \
         { \
-            SCL_DOES_METHOD_EXIST( operator ## Invokable, Operator ## Invokable ) \
+            SCL_META_METHOD_DETECTION( operator ## Invokable, Operator ## Invokable ) \
+            template < typename ... _Arguments > \
+            inline static constexpr bool does ## Operator ## Invokable ## StaticMethodExist () { return ::ScL::Meta::isDetected< Operator ## Invokable ## StaticMethodStrictOperation, _Arguments ... >(); } \
             SCL_FEATURE_DOES_UNARY_OPERATOR_EXIST( Invokable ) \
         }} \
     }}} \
@@ -165,7 +167,9 @@ namespace ScL { namespace Feature { namespace Detail
     { \
         namespace Operator { namespace Unary \
         { \
-            SCL_DOES_METHOD_EXIST( operator ## Invokable, Operator ## Invokable ) \
+            SCL_META_METHOD_DETECTION( operator ## Invokable, Operator ## Invokable ) \
+            template < typename ... _Arguments > \
+            inline static constexpr bool does ## Operator ## Invokable ## StaticMethodExist () { return ::ScL::Meta::isDetected< Operator ## Invokable ## StaticMethodStrictOperation, _Arguments ... >(); } \
             SCL_FEATURE_DOES_UNARY_OPERATOR_EXIST( Invokable ) \
         }} \
     }}} \
@@ -193,7 +197,9 @@ namespace ScL { namespace Feature { namespace Detail
     { \
         namespace Operator { namespace Unary \
         { \
-            SCL_DOES_METHOD_EXIST( operator ## Invokable, Operator ## Invokable ) \
+            SCL_META_METHOD_DETECTION( operator ## Invokable, Operator ## Invokable ) \
+            template < typename ... _Arguments > \
+            inline static constexpr bool does ## Operator ## Invokable ## StaticMethodExist () { return ::ScL::Meta::isDetected< Operator ## Invokable ## StaticMethodStrictOperation, _Arguments ... >(); } \
             SCL_FEATURE_DOES_UNARY_OPERATOR_EXIST( Invokable ) \
         }} \
     }}} \
@@ -220,7 +226,9 @@ namespace ScL { namespace Feature { namespace Detail
     { \
         namespace Operator { namespace Unary \
         { \
-            SCL_DOES_METHOD_EXIST( operator ## Invokable, Operator ## Invokable ) \
+            SCL_META_METHOD_DETECTION( operator ## Invokable, Operator ## Invokable ) \
+            template < typename ... _Arguments > \
+            inline static constexpr bool does ## Operator ## Invokable ## StaticMethodExist () { return ::ScL::Meta::isDetected< Operator ## Invokable ## StaticMethodStrictOperation, _Arguments ... >(); } \
             SCL_FEATURE_DOES_UNARY_OPERATOR_EXIST( Invokable ) \
         }} \
     }}} \
