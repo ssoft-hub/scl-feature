@@ -125,6 +125,17 @@ namespace ScL { namespace Feature { namespace Detail
         SCL_BINARY_OPERATOR_FOR_ANY( <<, ShiftLeft )
         SCL_BINARY_OPERATOR_FOR_ANY( >>, ShiftRight )
 
+        // These overloads are used to implement output I/O manipulators such as std::endl.
+        template < typename ... _Arguments,
+            typename = ::std::enable_if_t< sizeof...( _Arguments ) == 0 && ::ScL::Meta::isDetected< ::ScL::Meta::ShiftLeftMemberStrictOperation, Value, Value & (*)( Value & ) >() > >
+        decltype(auto) operator << ( Value & (*right)( Value & ) )
+        {
+            using Function = Value & (*)( Value & );
+            using LeftRefer = ThisType &;
+            using RightRefer = Function &&;
+            return ::ScL::Feature::Detail::Operator::Binary::ShiftLeftHelper< LeftRefer, RightRefer >::invoke( ::std::forward< LeftRefer >( *this ), ::std::forward< RightRefer >( right ) );
+        }
+
         /* Type-casting */
         SCL_CAST_OPERATOR
     };

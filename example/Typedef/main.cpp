@@ -22,8 +22,8 @@ auto test ()
   auto filename = Filename{ "foobar.txt" };
   auto url = Url{ "http://foobar.com/" };
 
-  cout << "From disk [" << filename << "]: " << read( filename ) << "\n";
-  cout << "From web  [" << url      << "]: " << read( url ) << "\n";
+  cout << "From disk [" << filename << "]: " << read( filename ) << ::std::endl;
+  cout << "From web  [" << url      << "]: " << read( url ) << ::std::endl;
 }
 
 int main ( int, char ** )

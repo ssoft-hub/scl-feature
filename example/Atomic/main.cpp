@@ -37,7 +37,7 @@ void func ()
         << " " << read_ptr->at( "potato" ).second
         << ", apple is " << read_ptr->at( "apple" ).first
         << " " << read_ptr->at( "apple" ).second
-        << "\n";
+        << ::std::endl;
 }
 
 /*
