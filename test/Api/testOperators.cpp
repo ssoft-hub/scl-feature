@@ -783,14 +783,14 @@ void testRangeOperators ()
 
     size_t count = values->size();
     for ( size_t i = 0; i < count; ++i )
-        ::std::cout << values[ i ] << "\n";
+        ::std::cout << values[ i ] << ::std::endl;
 
     for ( auto iter = ::std::begin( values ); iter != ::std::end( values ); ++iter )
-        ::std::cout << (*iter) << "\n";
+        ::std::cout << (*iter) << ::std::endl;
 
     for ( auto iter = ::std::begin( values ), end_iter = ::std::end( values ); iter != end_iter; ++iter )
-        ::std::cout << (*iter) << "\n";
+        ::std::cout << (*iter) << ::std::endl;
 
     for ( const auto & value : values )
-        ::std::cout << value << "\n";
+        ::std::cout << value << ::std::endl;
 }
