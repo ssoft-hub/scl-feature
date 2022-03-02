@@ -89,7 +89,7 @@ namespace ScL { namespace Feature { namespace Heap
             static decltype(auto) operatorAssignment ( _LeftWrapperRefer && left, _RightWrapperRefer && right )
             {
                 ::ScL::Feature::Detail::wrapperHolder( left ).m_pointer.swap( ::ScL::Feature::Detail::wrapperHolder( right ).m_pointer );
-                return left;
+                return ::std::forward< _LeftWrapperRefer >( left );
             }
 
             /*!

@@ -229,7 +229,7 @@ namespace ScL { namespace Feature { namespace Implicit
                     left_holder.increment();
                 }
 
-                return left;
+                return ::std::forward< _LeftWrapperRefer >( left );
             }
 
             /*!
