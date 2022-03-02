@@ -141,7 +141,7 @@ namespace ScL { namespace Feature { namespace Heap
             {
                 ::std::swap( ::ScL::Feature::Detail::wrapperHolder( left ).m_pointer
                     , ::ScL::Feature::Detail::wrapperHolder( right ).m_pointer ) ;
-                return left;
+                return ::std::forward< _LeftWrapperRefer >( left );
             }
 
             //! Access to internal value of Holder for any king of referencies.
