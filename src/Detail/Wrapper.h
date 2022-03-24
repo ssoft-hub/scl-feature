@@ -96,8 +96,8 @@ namespace ScL { namespace Feature { namespace Detail
         SCL_BINARY_OPERATOR_FOR_ANY( %=, ModuloAssignment )
         SCL_BINARY_OPERATOR_FOR_ANY( +=, AdditionAssignment )
         SCL_BINARY_OPERATOR_FOR_ANY( -=, SubtractionAssignment )
-        SCL_BINARY_OPERATOR_FOR_ANY( <<=, ShiftLeftAssignment )
-        SCL_BINARY_OPERATOR_FOR_ANY( >>=, ShiftRightAssignment )
+        SCL_BINARY_OPERATOR_FOR_ANY( <<=, LeftShiftAssignment )
+        SCL_BINARY_OPERATOR_FOR_ANY( >>=, RightShiftAssignment )
         SCL_BINARY_OPERATOR_FOR_ANY( &=, BitwiseAndAssignment )
         SCL_BINARY_OPERATOR_FOR_ANY( ^=, BitwiseXorAssignment )
         SCL_BINARY_OPERATOR_FOR_ANY( |=, BitwiseOrAssignment )
@@ -122,18 +122,18 @@ namespace ScL { namespace Feature { namespace Detail
         SCL_BINARY_OPERATOR_FOR_ANY( &, BitwiseAnd )
         SCL_BINARY_OPERATOR_FOR_ANY( ^, BitwiseXor )
         SCL_BINARY_OPERATOR_FOR_ANY( |, BitwiseOr )
-        SCL_BINARY_OPERATOR_FOR_ANY( <<, ShiftLeft )
-        SCL_BINARY_OPERATOR_FOR_ANY( >>, ShiftRight )
+        SCL_BINARY_OPERATOR_FOR_ANY( <<, LeftShift )
+        SCL_BINARY_OPERATOR_FOR_ANY( >>, RightShift )
 
         // These overloads are used to implement output I/O manipulators such as std::endl.
         template < typename ... _Arguments,
-            typename = ::std::enable_if_t< sizeof...( _Arguments ) == 0 && ::ScL::Meta::isDetected< ::ScL::Meta::ShiftLeftMemberStrictOperation, Value, Value & (*)( Value & ) >() > >
+            typename = ::std::enable_if_t< sizeof...( _Arguments ) == 0 && ::ScL::Meta::isDetected< ::ScL::Meta::LeftShiftMemberStrictOperation, Value, Value & (*)( Value & ) >() > >
         decltype(auto) operator << ( Value & (*right)( Value & ) )
         {
             using Function = Value & (*)( Value & );
             using LeftRefer = ThisType &;
             using RightRefer = Function &&;
-            return ::ScL::Feature::Detail::Operator::Binary::ShiftLeftHelper< LeftRefer, RightRefer >::invoke( ::std::forward< LeftRefer >( *this ), ::std::forward< RightRefer >( right ) );
+            return ::ScL::Feature::Detail::Operator::Binary::LeftShiftHelper< LeftRefer, RightRefer >::invoke( ::std::forward< LeftRefer >( *this ), ::std::forward< RightRefer >( right ) );
         }
 
         /* Type-casting */
@@ -156,8 +156,8 @@ SCL_GLOBAL_BINARY_OPERATOR( /=, DivideAssignment )
 SCL_GLOBAL_BINARY_OPERATOR( %=, ModuloAssignment )
 SCL_GLOBAL_BINARY_OPERATOR( +=, AdditionAssignment )
 SCL_GLOBAL_BINARY_OPERATOR( -=, SubtractionAssignment )
-SCL_GLOBAL_BINARY_OPERATOR( <<=, ShiftLeftAssignment )
-SCL_GLOBAL_BINARY_OPERATOR( >>=, ShiftRightAssignment )
+SCL_GLOBAL_BINARY_OPERATOR( <<=, LeftShiftAssignment )
+SCL_GLOBAL_BINARY_OPERATOR( >>=, RightShiftAssignment )
 SCL_GLOBAL_BINARY_OPERATOR( &=, BitwiseAndAssignment )
 SCL_GLOBAL_BINARY_OPERATOR( ^=, BitwiseXorAssignment )
 SCL_GLOBAL_BINARY_OPERATOR( |=, BitwiseOrAssignment )
@@ -175,8 +175,8 @@ SCL_GLOBAL_BINARY_OPERATOR( ||, LogicalOr )
 SCL_GLOBAL_BINARY_OPERATOR( &, BitwiseAnd )
 SCL_GLOBAL_BINARY_OPERATOR( ^, BitwiseXor )
 SCL_GLOBAL_BINARY_OPERATOR( |, BitwiseOr )
-SCL_GLOBAL_BINARY_OPERATOR( <<, ShiftLeft )
-SCL_GLOBAL_BINARY_OPERATOR( >>, ShiftRight )
+SCL_GLOBAL_BINARY_OPERATOR( <<, LeftShift )
+SCL_GLOBAL_BINARY_OPERATOR( >>, RightShift )
 
 /* HASH */
 namespace std

@@ -252,8 +252,8 @@ namespace ScL { namespace Feature { namespace Inplace
             SCL_DEBUG_BINARY_OPERATOR_FOR_ANY( %=, ModuloAssignment )
             SCL_DEBUG_BINARY_OPERATOR_FOR_ANY( +=, AdditionAssignment )
             SCL_DEBUG_BINARY_OPERATOR_FOR_ANY( -=, SubtractionAssignment )
-            SCL_DEBUG_BINARY_OPERATOR_FOR_ANY( <<=, ShiftLeftAssignment )
-            SCL_DEBUG_BINARY_OPERATOR_FOR_ANY( >>=, ShiftRightAssignment )
+            SCL_DEBUG_BINARY_OPERATOR_FOR_ANY( <<=, LeftShiftAssignment )
+            SCL_DEBUG_BINARY_OPERATOR_FOR_ANY( >>=, RightShiftAssignment )
             SCL_DEBUG_BINARY_OPERATOR_FOR_ANY( &=, BitwiseAndAssignment )
             SCL_DEBUG_BINARY_OPERATOR_FOR_ANY( ^=, BitwiseXorAssignment )
             SCL_DEBUG_BINARY_OPERATOR_FOR_ANY( |=, BitwiseOrAssignment )
@@ -278,8 +278,8 @@ namespace ScL { namespace Feature { namespace Inplace
             SCL_DEBUG_BINARY_OPERATOR_FOR_ANY( &, BitwiseAnd )
             SCL_DEBUG_BINARY_OPERATOR_FOR_ANY( ^, BitwiseXor )
             SCL_DEBUG_BINARY_OPERATOR_FOR_ANY( |, BitwiseOr )
-            SCL_DEBUG_BINARY_OPERATOR_FOR_ANY( <<, ShiftLeft )
-            SCL_DEBUG_BINARY_OPERATOR_FOR_ANY( >>, ShiftRight )
+            SCL_DEBUG_BINARY_OPERATOR_FOR_ANY( <<, LeftShift )
+            SCL_DEBUG_BINARY_OPERATOR_FOR_ANY( >>, RightShift )
         };
     };
 }}}
