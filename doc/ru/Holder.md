@@ -431,8 +431,8 @@ static void operator[Name] ( _HolderLeftRefer && left, _HolderRightRefer && righ
 * **Modulo** - operator % ( _Argument && );
 * **Addition** - operator + ( _Argument && );
 * **Subtraction** - operator - ( _Argument && );
-* **ShiftLeft** - operator << ( _Argument && );
-* **ShiftRight** - operator >> ( _Argument && );
+* **LeftShift** - operator << ( _Argument && );
+* **RightShift** - operator >> ( _Argument && );
 * **BitwiseAnd** - operator & ( _Argument && );
 * **BitwiseOr** - operator | ( _Argument && );
 * **BitwiseXor** - operator ^ ( _Argument && );
@@ -444,8 +444,8 @@ static void operator[Name] ( _HolderLeftRefer && left, _HolderRightRefer && righ
 * **ModuloAssignment** - operator %= ( _Argument && );
 * **AdditionAssignment** - operator += ( _Argument && );
 * **SubtractionAssignment** - operator -= ( _Argument && );
-* **ShiftLeftAssignment** - operator <<= ( _Argument && );
-* **ShiftRightAssignment** - operator >>= ( _Argument && );
+* **LeftShiftAssignment** - operator <<= ( _Argument && );
+* **RightShiftAssignment** - operator >>= ( _Argument && );
 * **BitwiseAndAssignment** - operator &= ( _Argument && );
 * **BitwiseOrAssignment** - operator |= ( _Argument && );
 * **BitwiseXorAssignment** - operator ^= ( _Argument && );

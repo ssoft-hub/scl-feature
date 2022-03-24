@@ -34,8 +34,8 @@ void wrapper ()
     auto n = test[ 1.0 ];
     ::std::cout << ::std::setbase( 16 );
 
-    static_assert( ::ScL::Meta::isDetected< ::ScL::Meta::ShiftLeftMemberStrictOperation, decltype( ::std::cout ), int >(), "" );
-    //static_assert( ::ScL::Feature::Detail::Operator::Binary::DoesShiftLeftOperatorExist< decltype( ::std::cout ) &, Wrapper< int > & >::value, "" );
+    static_assert( ::ScL::Meta::isDetected< ::ScL::Meta::LeftShiftMemberStrictOperation, decltype( ::std::cout ), int >(), "" );
+    //static_assert( ::ScL::Feature::Detail::Operator::Binary::DoesLeftShiftOperatorExist< decltype( ::std::cout ) &, Wrapper< int > & >::value, "" );
 
     ::std::cout << i;
     ::std::cout << n << n << test[ 1 ] << ::std::flush << ::std::endl;
@@ -53,7 +53,7 @@ void wrapper ()
     sstream << Endl( ::std::endl );
     sstream << ::std::endl;
 
-    static_assert( ::ScL::Meta::isDetected< ::ScL::Meta::ShiftLeftUnstrictOperation, SStream, Endl >(), "" );
+    static_assert( ::ScL::Meta::isDetected< ::ScL::Meta::LeftShiftUnstrictOperation, SStream, Endl >(), "" );
 
 }
 
