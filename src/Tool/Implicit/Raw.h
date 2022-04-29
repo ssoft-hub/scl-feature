@@ -73,6 +73,7 @@ namespace ScL { namespace Feature { namespace Implicit
                 , m_access( ::std::forward< Access >( other.m_access ) )
             {
                 other.m_pointer = nullptr;
+                other.m_access = nullptr;
             }
 
             Holder ( const ThisType && other )
@@ -87,6 +88,7 @@ namespace ScL { namespace Feature { namespace Implicit
                 , m_access( ::std::forward< volatile Access >( other.m_access ) )
             {
                 other.m_pointer = nullptr;
+                other.m_access = nullptr;
             }
 
             Holder ( const volatile ThisType && other )
@@ -130,6 +132,7 @@ namespace ScL { namespace Feature { namespace Implicit
                 , m_access( ::std::forward< typename Holder< _OtherValue >::Access >( other.m_access ) )
             {
                 other.m_pointer = nullptr;
+                other.m_access = nullptr;
             }
 
             template < typename _OtherValue >
@@ -146,6 +149,7 @@ namespace ScL { namespace Feature { namespace Implicit
                 , m_access( ::std::forward< volatile typename Holder< _OtherValue >::Access >( other.m_access ) )
             {
                 other.m_pointer = nullptr;
+                other.m_access = nullptr;
             }
 
             template < typename _OtherValue >
@@ -205,6 +209,7 @@ namespace ScL { namespace Feature { namespace Implicit
                 {
                     delete m_pointer;
                     m_pointer = nullptr;
+                    m_access = nullptr;
                 }
             }
 
@@ -246,6 +251,7 @@ namespace ScL { namespace Feature { namespace Implicit
                     holder.decrement();
                     holder.m_pointer = pointer;
                     holder.m_access = ::std::addressof( static_cast< CountedValue * >( holder.m_pointer )->m_value );
+                    holder.increment();
                 }
             }
 
