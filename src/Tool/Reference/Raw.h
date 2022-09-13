@@ -29,22 +29,22 @@ namespace ScL { namespace Feature { namespace Reference
             }
 
             constexpr Holder ( ThisType && other ) noexcept
-                : m_value_ptr( ::std::forward< Value >( other.m_value_ptr ) )
+                : m_value_ptr( ::std::forward< ValuePtr >( other.m_value_ptr ) )
             {
             }
 
             constexpr Holder ( const ThisType && other ) noexcept
-                : m_value_ptr( ::std::forward< const Value >( other.m_value_ptr ) )
+                : m_value_ptr( ::std::forward< const ValuePtr >( other.m_value_ptr ) )
             {
             }
 
             constexpr Holder ( volatile ThisType && other ) noexcept
-                : m_value_ptr( ::std::forward< volatile Value >( other.m_value_ptr ) )
+                : m_value_ptr( ::std::forward< volatile ValuePtr >( other.m_value_ptr ) )
             {
             }
 
             constexpr Holder ( const volatile ThisType && other ) noexcept
-                : m_value_ptr( ::std::forward< const volatile Value >( other.m_value_ptr ) )
+                : m_value_ptr( ::std::forward< const volatile ValuePtr >( other.m_value_ptr ) )
             {
             }
 
@@ -70,25 +70,25 @@ namespace ScL { namespace Feature { namespace Reference
 
             template < typename _OtherValue >
             constexpr Holder ( Holder< _OtherValue > && other ) noexcept
-                : m_value_ptr( ::std::forward< typename Holder< _OtherValue >::Value >( other.m_value_ptr ) )
+                : m_value_ptr( ::std::forward< typename Holder< _OtherValue >::ValuePtr >( other.m_value_ptr ) )
             {
             }
 
             template < typename _OtherValue >
             constexpr Holder ( const Holder< _OtherValue > && other ) noexcept
-                : m_value_ptr( ::std::forward< typename Holder< const _OtherValue >::Value >( other.m_value_ptr ) )
+                : m_value_ptr( ::std::forward< typename Holder< const _OtherValue >::ValuePtr >( other.m_value_ptr ) )
             {
             }
 
             template < typename _OtherValue >
             constexpr Holder ( volatile Holder< _OtherValue > && other ) noexcept
-                : m_value_ptr( ::std::forward< typename Holder< volatile _OtherValue >::Value >( other.m_value_ptr ) )
+                : m_value_ptr( ::std::forward< typename Holder< volatile _OtherValue >::ValuePtr >( other.m_value_ptr ) )
             {
             }
 
             template < typename _OtherValue >
             constexpr Holder ( const volatile Holder< _OtherValue > && other ) noexcept
-                : m_value_ptr( ::std::forward< typename Holder< const volatile _OtherValue >::Value >( other.m_value_ptr ) )
+                : m_value_ptr( ::std::forward< typename Holder< const volatile _OtherValue >::ValuePtr >( other.m_value_ptr ) )
             {
             }
 
@@ -123,7 +123,7 @@ namespace ScL { namespace Feature { namespace Reference
             static constexpr decltype(auto) value ( _HolderRefer && holder ) noexcept
             {
                 using HolderRefer = _HolderRefer &&;
-                using ValueRefer = ::ScL::SimilarRefer< Value, HolderRefer >;
+                using ValueRefer = ::ScL::SimilarRefer< ValuePtr, HolderRefer >;
                 return ::std::forward< ValueRefer >( *holder.m_value_ptr );
             }
         };
