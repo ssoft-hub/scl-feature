@@ -123,7 +123,7 @@ namespace ScL { namespace Feature { namespace Reference
             static constexpr decltype(auto) value ( _HolderRefer && holder ) noexcept
             {
                 using HolderRefer = _HolderRefer &&;
-                using ValueRefer = ::ScL::SimilarRefer< ValuePtr, HolderRefer >;
+                using ValueRefer = ::ScL::SimilarRefer< Value, HolderRefer >;
                 return ::std::forward< ValueRefer >( *holder.m_value_ptr );
             }
         };
