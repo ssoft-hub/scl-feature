@@ -35,7 +35,6 @@ void wrapper ()
     ::std::cout << ::std::setbase( 16 );
 
     static_assert( ::ScL::Meta::isDetected< ::ScL::Meta::LeftShiftMemberStrictOperation, decltype( ::std::cout ), int >(), "" );
-    //static_assert( ::ScL::Feature::Detail::Operator::Binary::DoesLeftShiftOperatorExist< decltype( ::std::cout ) &, Wrapper< int > & >::value, "" );
 
     ::std::cout << i;
     ::std::cout << n << n << test[ 1 ] << ::std::flush << ::std::endl;
@@ -59,7 +58,7 @@ void wrapper ()
 
 void test ()
 {
-    Test test;
+    Test test{};
     auto n = test[ 1.0 ];
     ::std::cout << n << ::std::endl;
 }
