@@ -21,7 +21,7 @@ namespace ScL { namespace Feature { namespace Detail
     class Wrapper
         : public ::ScL::Feature::MixIn< Wrapper< _Value, _Tool > >
     {
-        static_assert( !::std::is_reference< _Tool >::value,
+        static_assert( !::std::is_reference< _Tool >{},
             "The template parameter _Tool must to be not a reference type." );
 
         template < typename >
@@ -43,14 +43,14 @@ namespace ScL { namespace Feature { namespace Detail
     public:
         /// Конструктор инициализации значения по заданным параметрам
         template < typename ... _Arguments,
-            typename = ::std::enable_if_t< ::std::is_constructible< Holder, _Arguments && ... >::value > >
+            typename = ::std::enable_if_t< ::std::is_constructible< Holder, _Arguments && ... >{} > >
         constexpr Wrapper ( _Arguments && ... arguments )
         noexcept( ::std::is_nothrow_constructible< Value, _Arguments && ... >() )
             : m_holder( ::std::forward< _Arguments >( arguments ) ... )
         {}
 
         template < typename _Type, typename ... _Arguments,
-            typename = ::std::enable_if_t< ::std::is_constructible< Holder, ::std::initializer_list< _Type >, _Arguments && ... >::value > >
+            typename = ::std::enable_if_t< ::std::is_constructible< Holder, ::std::initializer_list< _Type >, _Arguments && ... >{} > >
         constexpr Wrapper ( ::std::initializer_list< _Type > list, _Arguments && ... arguments )
         noexcept( ::std::is_nothrow_constructible< Value, ::std::initializer_list< _Type >, _Arguments && ... >() )
             : m_holder( list, ::std::forward< _Arguments >( arguments ) ... )

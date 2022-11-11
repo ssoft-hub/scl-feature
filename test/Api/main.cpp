@@ -31,15 +31,15 @@ void printTypeOf ()
     ::std::cout
         << realname;
 
-    if ( ::std::is_const< _Type >::value )
+    if ( ::std::is_const< _Type >{} )
         ::std::cout
             << " const";
 
-    if ( ::std::is_lvalue_reference< _Type >::value )
+    if ( ::std::is_lvalue_reference< _Type >{} )
         ::std::cout
             << " &";
 
-    if ( ::std::is_rvalue_reference< _Type >::value )
+    if ( ::std::is_rvalue_reference< _Type >{} )
         ::std::cout
             << " &&";
 

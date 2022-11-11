@@ -26,19 +26,20 @@ namespace ScL { namespace Feature { namespace Detail
     using Does ## Invokable ## OperatorExist = Does ## Invokable ## OperatorExistHelper< ::ScL::Feature::Detail::Operator::WrapperSwitchCase< _Refer >, _Refer, _Arguments ... >; \
      \
     template < typename _Refer, typename ... _Arguments > \
-    inline constexpr bool does ## Invokable ## OperatorExist () { return Does ## Invokable ## OperatorExist< _Refer, _Arguments ... >::value; } \
+    inline constexpr bool does ## Invokable ## OperatorExist () { return Does ## Invokable ## OperatorExist< _Refer, _Arguments ... >{}; } \
      \
     template < typename _Refer, typename ... _Arguments > \
     struct Does ## Invokable ## OperatorExistHelper< ::ScL::Feature::Detail::Operator::NoneWrapperCase, _Refer, _Arguments ... > \
     { \
-        static_assert( ::std::is_reference< _Refer >::value, "The template parameter _Refer must to be a reference type." ); \
-        static const bool value = ::ScL::Meta::isDetected< ::ScL::Meta::Invokable ## UnstrictOperation, _Refer, _Arguments ... >(); \
+        static_assert( ::std::is_reference< _Refer >{}, "The template parameter _Refer must to be a reference type." ); \
+        static constexpr bool value = ::ScL::Meta::isDetected< ::ScL::Meta::Invokable ## UnstrictOperation, _Refer, _Arguments ... >(); \
+        constexpr operator bool () const noexcept { return value; } \
     }; \
      \
     template < typename _Refer, typename ... _Arguments > \
     struct Does ## Invokable ## OperatorExistHelper< ::ScL::Feature::Detail::Operator::LeftWrapperCase, _Refer, _Arguments ...  > \
     { \
-        static_assert( ::std::is_reference< _Refer >::value, "The template parameter _Refer must to be a reference type." ); \
+        static_assert( ::std::is_reference< _Refer >{}, "The template parameter _Refer must to be a reference type." ); \
      \
         using WrapperRefer = _Refer; \
         using Wrapper = ::std::decay_t< WrapperRefer >; \
@@ -46,8 +47,9 @@ namespace ScL { namespace Feature { namespace Detail
         using Value = typename Wrapper::Value; \
         using ValueRefer = ::ScL::SimilarRefer< Value, WrapperRefer >; \
      \
-        static const bool value = ::ScL::Meta::isDetected< ::ScL::Meta::Invokable ## UnstrictOperation, ValueRefer, _Arguments ... >() \
+        static constexpr bool value = ::ScL::Meta::isDetected< ::ScL::Meta::Invokable ## UnstrictOperation, ValueRefer, _Arguments ... >() \
             || ::ScL::Meta::isDetected< ::ScL::Feature::Detail::Operator::Unary::Operator ## Invokable ## StaticMethodStrictOperation, Holder, WrapperRefer, _Arguments ... >(); \
+        constexpr operator bool () const noexcept { return value; } \
     }; \
      \
 
@@ -121,7 +123,7 @@ namespace ScL { namespace Feature { namespace Detail
            template < typename _Refer, typename ... _Arguments > \
            struct Invokable ## Helper \
            { \
-               static_assert( ::std::is_reference< _Refer >::value, "The template parameter _Refer must to be a reference type." ); \
+               static_assert( ::std::is_reference< _Refer >{}, "The template parameter _Refer must to be a reference type." ); \
                using Refer = _Refer; \
      \
                 static constexpr decltype(auto) invoke( Refer value, _Arguments && ... arguments ) \

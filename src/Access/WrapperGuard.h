@@ -35,7 +35,7 @@ namespace ScL { namespace Feature { namespace Detail
         using ValueAccess = Refer;
         using PointerAccess = ReferPointer const &;
 
-        static_assert( ::std::is_reference< Refer >::value, "The template parameter _Refer must to be a reference type." );
+        static_assert( ::std::is_reference< Refer >{}, "The template parameter _Refer must to be a reference type." );
         static_assert( !::ScL::Feature::isWrapper< ::std::decay_t< Refer > >(), "The template parameter _Refer must to be a not Wrapper type reference!" );
 
     private:
@@ -87,7 +87,7 @@ namespace ScL { namespace Feature { namespace Detail
         using WrapperAccess = ValueRefer;
         using HolderAccess = HolderRefer;
 
-        static_assert( ::std::is_reference< WrapperRefer >::value, "The template parameter _Refer must to be a reference type." );
+        static_assert( ::std::is_reference< WrapperRefer >{}, "The template parameter _Refer must to be a reference type." );
         static_assert( ::ScL::Feature::isWrapper< Wrapper >(), "The template parameter _Refer must to be a Wrapper type reference!" );
         //static_assert( ::ScL::Feature::isSimilar< ValueRefer, WrapperRefer >(), "The Refer and ValueRefer must to be similar types!" );
         static_assert( ::ScL::Feature::isSimilar< HolderRefer, WrapperRefer >(), "The Refer and HolderRefer must to be similar types!" );
@@ -166,7 +166,7 @@ namespace ScL { namespace Feature { namespace Detail
     template < typename _Refer >
     struct WrapperGuardHelper
     {
-        static_assert( ::std::is_reference< _Refer >::value, "The template parameter _Refer must to be a reference type." );
+        static_assert( ::std::is_reference< _Refer >{}, "The template parameter _Refer must to be a reference type." );
         using Type = typename WrapperSwith< WrapperGuardSwitchCase< _Refer >, _Refer >::Type;
     };
 }}}

@@ -40,8 +40,6 @@ Wrapper< Wrapper< Value, ThreadSafe::RecursiveMutexTool >, Implicit::SharedTool 
 template < typename _Test >
 struct IsWrapper; // ::std::true_type or ::std::false_type
 template < typename _Test >
-inline constexpr bool is_wrapper;
-template < typename _Test >
 inline constexpr bool isWrapper ();
 ```
 которое равно ```true```, если тип **_Test** является **Wrapper**, и ```false``` в остальных случаях.
@@ -50,11 +48,9 @@ inline constexpr bool isWrapper ();
 
 ```cpp
 template < _Test, _Other >
-struct IsCompatible; // ::std::true_type or ::std::false_type
+struct IsThisCompatibleWithOther; // ::std::true_type or ::std::false_type
 template < _Test, _Other >
-inline constexpr bool is_compatible;
-template < _Test, _Other >
-inline constexpr bool isCompatible ();
+inline constexpr bool isThisCompatibleWithOther ();
 ```
 
 Для произвольных типов значение этого отношение равно ```true```, если тип **_Other** является базовым или идентичным типу **_Test** с учетом const/volatile модификаторов. Для типов **Wrapper** значение отношения совместимости равно ```true```, если для них задан одинаковый инструментарий **_Tool** и типы внутренних значений **_Value** являются совместимыми. В остальных случаях значение отношения совместимости равно ```false```.
@@ -64,8 +60,6 @@ inline constexpr bool isCompatible ();
 ```cpp
 template < _Test, _Other >
 struct IsThisPartOfOther; // ::std::true_type or ::std::false_type
-template < _Test, _Other >
-inline constexpr bool is_this_part_of_other;
 template < _Test, _Other >
 inline constexpr bool isThisPartOfOther ();
 ```

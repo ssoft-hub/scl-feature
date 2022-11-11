@@ -13,7 +13,7 @@ namespace ScL { namespace Feature { namespace Detail { namespace Guard
     struct RangeTool
     {
         using RangeRefer = _RangeRefer;
-        static_assert( ::std::is_reference< RangeRefer >::value,
+        static_assert( ::std::is_reference< RangeRefer >{},
             "The template parameter _RangeRefer must to be a reference type." );
 
         template < typename _Iterator >

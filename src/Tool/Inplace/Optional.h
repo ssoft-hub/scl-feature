@@ -250,7 +250,7 @@ namespace ScL { namespace Feature
         }
 
         template< typename _Type,
-            typename = ::std::enable_if_t< ::std::is_constructible< MixInValue, _Type && >::value > >
+            typename = ::std::enable_if_t< ::std::is_constructible< MixInValue, _Type && >{} > >
         constexpr MixInValue valueOr ( _Type && value ) const &
         noexcept
         {
@@ -261,7 +261,7 @@ namespace ScL { namespace Feature
         }
 
         template< typename _Type,
-            typename = ::std::enable_if_t< ::std::is_constructible< MixInValue, _Type && >::value > >
+            typename = ::std::enable_if_t< ::std::is_constructible< MixInValue, _Type && >{} > >
         MixInValue valueOr ( _Type && value ) &&
         noexcept
         {
@@ -295,7 +295,7 @@ namespace ScL { namespace Feature
         }
 
         template < typename ... _Arguments >
-        constexpr ::std::enable_if_t< ::std::is_constructible< _Value, _Arguments && ... >::value, MixInValue & >
+        constexpr ::std::enable_if_t< ::std::is_constructible< _Value, _Arguments && ... >{}, MixInValue & >
         emplace ( _Arguments && ... arguments )
         {
             auto _this = static_cast< MixInWrapper * >( this );
@@ -305,7 +305,7 @@ namespace ScL { namespace Feature
         }
 
         template< typename _Type, typename ... _Arguments >
-        constexpr ::std::enable_if_t< ::std::is_constructible< _Value, _Arguments && ... >::value, MixInValue & >
+        constexpr ::std::enable_if_t< ::std::is_constructible< _Value, _Arguments && ... >{}, MixInValue & >
         emplace ( std::initializer_list< _Type > list, _Arguments && ... arguments )
         {
             auto _this = static_cast< MixInWrapper * >( this );

@@ -28,7 +28,7 @@ namespace ScL { namespace Feature { namespace Guard
 
             //! Access to internal value of Holder for any king of referencies.
             template < typename _HolderRefer,
-                typename = ::std::enable_if_t< ::std::is_same< ThisType, ::std::decay_t< _HolderRefer > >::value > >
+                typename = ::std::enable_if_t< ::std::is_same< ThisType, ::std::decay_t< _HolderRefer > >{} > >
             static constexpr decltype(auto) value ( _HolderRefer && holder )
             {
                 using HolderRefer = _HolderRefer &&;

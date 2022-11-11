@@ -134,9 +134,9 @@ namespace ScL { namespace Feature { namespace Heap
              * right is not constantrvalue reference.
              */
             template < typename _LeftWrapperRefer, typename _RightWrapperRefer,
-            typename = ::std::enable_if_t< !::std::is_const< ::std::remove_reference_t< _LeftWrapperRefer > >::value && !::std::is_const< ::std::remove_reference_t< _RightWrapperRefer > >::value
-                && ( ::std::is_volatile< ::std::remove_reference_t< _LeftWrapperRefer > >::value == ::std::is_volatile< ::std::remove_reference_t< _RightWrapperRefer > >::value )
-                && ::std::is_rvalue_reference< _RightWrapperRefer && >::value > >
+            typename = ::std::enable_if_t< !::std::is_const< ::std::remove_reference_t< _LeftWrapperRefer > >{} && !::std::is_const< ::std::remove_reference_t< _RightWrapperRefer > >{}
+                && ( ::std::is_volatile< ::std::remove_reference_t< _LeftWrapperRefer > >{} == ::std::is_volatile< ::std::remove_reference_t< _RightWrapperRefer > >{} )
+                && ::std::is_rvalue_reference< _RightWrapperRefer && >{} > >
             static decltype(auto) operatorAssignment ( _LeftWrapperRefer && left, _RightWrapperRefer && right )
             {
                 ::std::swap( ::ScL::Feature::Detail::wrapperHolder( left ).m_pointer
