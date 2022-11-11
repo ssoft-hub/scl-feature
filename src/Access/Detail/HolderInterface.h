@@ -12,7 +12,7 @@ namespace ScL { namespace Feature { namespace Detail
     template < typename _WrapperRefer >
     struct WrapperAccess
     {
-        static_assert( ::std::is_reference< _WrapperRefer >::value,
+        static_assert( ::std::is_reference< _WrapperRefer >{},
             "The template parameter _WrapperRefer must to be a reference type." );
 
         using WrapperRefer = _WrapperRefer;
@@ -50,14 +50,14 @@ namespace ScL { namespace Feature { namespace Detail
     template < typename _HolderRefer >
     struct GuardHelper< _HolderRefer, false >
     {
-        static_assert( ::std::is_reference< _HolderRefer >::value, "The template parameter _HolderRefer type must to be a reference type." );
+        static_assert( ::std::is_reference< _HolderRefer >{}, "The template parameter _HolderRefer type must to be a reference type." );
         static constexpr void guard ( _HolderRefer ) {}
     };
 
     template < typename _HolderRefer >
     struct GuardHelper< _HolderRefer, true >
     {
-        static_assert( ::std::is_reference< _HolderRefer >::value, "The template parameter _HolderRefer type must to be a reference type." );
+        static_assert( ::std::is_reference< _HolderRefer >{}, "The template parameter _HolderRefer type must to be a reference type." );
         using Holder = ::std::decay_t< _HolderRefer >;
         static constexpr void guard ( _HolderRefer holder )
         {
@@ -71,14 +71,14 @@ namespace ScL { namespace Feature { namespace Detail
     template < typename _HolderRefer >
     struct UnguardHelper< _HolderRefer, false >
     {
-        static_assert( ::std::is_reference< _HolderRefer >::value, "The template parameter _HolderRefer type must to be a reference type." );
+        static_assert( ::std::is_reference< _HolderRefer >{}, "The template parameter _HolderRefer type must to be a reference type." );
         static constexpr void unguard ( _HolderRefer ) {}
     };
 
     template < typename _HolderRefer >
     struct UnguardHelper< _HolderRefer, true >
     {
-        static_assert( ::std::is_reference< _HolderRefer >::value, "The template parameter _HolderRefer type must to be a reference type." );
+        static_assert( ::std::is_reference< _HolderRefer >{}, "The template parameter _HolderRefer type must to be a reference type." );
         static constexpr void unguard ( _HolderRefer holder )
         {
             using Holder = ::std::decay_t< _HolderRefer >;

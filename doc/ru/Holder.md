@@ -220,7 +220,7 @@ static const volatile Value & value ( const volatile ThisType & holder );
 
 ```cpp
 template < typename _HolderRefer,
-    typename = ::std::enable_if_t< ::std::is_same< ThisType, ::std::decay_t< _HolderRefer > >::value > >
+    typename = ::std::enable_if_t< ::std::is_same< ThisType, ::std::decay_t< _HolderRefer > >{} > >
 static decltype(auto) value ( _HolderRefer && holder );
 ```
 
@@ -259,7 +259,7 @@ static void operator[Name] ( const volatile ThisType & other );
 
 ```cpp
 template < typename _HolderRefer,
-    typename = ::std::enable_if_t< ::std::is_same< ThisType, ::std::decay_t< _HolderRefer > >::value > >
+    typename = ::std::enable_if_t< ::std::is_same< ThisType, ::std::decay_t< _HolderRefer > >{} > >
 static void operator[Name] ( _HolderRefer && holder );
 ```
 
@@ -301,7 +301,7 @@ static void operator[Name] ( const volatile ThisType & other, _Argument && argum
 
 ```cpp
 template < typename _HolderRefer, typename _Argument,
-    typename = ::std::enable_if_t< ::std::is_same< ThisType, ::std::decay_t< _HolderRefer > >::value > >
+    typename = ::std::enable_if_t< ::std::is_same< ThisType, ::std::decay_t< _HolderRefer > >{} > >
 static void operator[Name] ( _HolderRefer && holder, _Argument && argument );
 ```
 
@@ -336,7 +336,7 @@ static void operator[Name] ( const volatile ThisType & other, _Arguments && ... 
 
 ```cpp
 template < typename _HolderRefer, typename ... _Arguments,
-    typename = ::std::enable_if_t< ::std::is_same< ThisType, ::std::decay_t< _HolderRefer > >::value > >
+    typename = ::std::enable_if_t< ::std::is_same< ThisType, ::std::decay_t< _HolderRefer > >{} > >
 static void operator[Name] ( _HolderRefer && holder, _Arguments && ... arguments );
 ```
 
@@ -369,7 +369,7 @@ static void operator[Name]Left ( const volatile ThisType & left, _Right && right
 
 ```cpp
 template < typename _HolderLeftRefer, typename _Right,
-    typename = ::std::enable_if_t< ::std::is_same< ThisType, ::std::decay_t< _HolderLeftRefer > >::value > >
+    typename = ::std::enable_if_t< ::std::is_same< ThisType, ::std::decay_t< _HolderLeftRefer > >{} > >
 static void operator[Name]Left ( _HolderLeftRefer && left, _Right && right );
 ```
 
@@ -398,7 +398,7 @@ static void operator[Name]Right ( _Left && left, const volatile ThisType & right
 
 ```cpp
 template < typename _Left, typename _HolderRightRefer,
-    typename = ::std::enable_if_t< ::std::is_same< ThisType, ::std::decay_t< _HolderRightRefer > >::value > >
+    typename = ::std::enable_if_t< ::std::is_same< ThisType, ::std::decay_t< _HolderRightRefer > >{} > >
 static void operator[Name]Right ( _Left && left, _HolderRightRefer && right );
 ```
 
@@ -414,7 +414,7 @@ static void operator[Name] ( ThisType && left, Holder< _Right > && right );
 
 ```cpp
 template < typename _HolderLeftRefer, typename _HolderRightRefer,
-    typename = ::std::enable_if_t< ::std::is_same< ThisType, ::std::decay_t< _HolderLeftRefer > >::value > >
+    typename = ::std::enable_if_t< ::std::is_same< ThisType, ::std::decay_t< _HolderLeftRefer > >{} > >
 static void operator[Name] ( _HolderLeftRefer && left, _HolderRightRefer && right );
 ```
 

@@ -34,24 +34,25 @@ namespace ScL { namespace Feature { namespace Detail
     using Does ## Invokable ## OperatorExist = Does ## Invokable ## OperatorExistHelper< ::ScL::Feature::Detail::Operator::WrapperSwitchCase< _LeftRefer, _RightRefer >, _LeftRefer, _RightRefer >; \
      \
     template < typename _LeftRefer, typename _RightRefer > \
-    inline constexpr bool does ## Invokable ## OperatorExist () { return Does ## Invokable ## OperatorExist< _LeftRefer, _RightRefer >::value; } \
+    inline constexpr bool does ## Invokable ## OperatorExist () { return Does ## Invokable ## OperatorExist< _LeftRefer, _RightRefer >{}; } \
      \
     /* Non wrapper case */ \
     template < typename _LeftRefer, typename _RightRefer > \
     struct Does ## Invokable ## OperatorExistHelper< ::ScL::Feature::Detail::Operator::NoneWrapperCase, _LeftRefer, _RightRefer > \
     { \
-        static_assert( ::std::is_reference< _LeftRefer >::value, "The template parameter _LeftRefer must to be a reference type." ); \
-        static_assert( ::std::is_reference< _RightRefer >::value, "The template parameter _RightRefer must to be a reference type." ); \
+        static_assert( ::std::is_reference< _LeftRefer >{}, "The template parameter _LeftRefer must to be a reference type." ); \
+        static_assert( ::std::is_reference< _RightRefer >{}, "The template parameter _RightRefer must to be a reference type." ); \
      \
-        static const bool value = ::ScL::Meta::isDetected< ::ScL::Meta::Invokable ## UnstrictOperation, _LeftRefer, _RightRefer >(); \
+        static constexpr bool value = ::ScL::Meta::isDetected< ::ScL::Meta::Invokable ## UnstrictOperation, _LeftRefer, _RightRefer >(); \
+        constexpr operator bool () const noexcept { return value; } \
     }; \
      \
     /* Member of Wrapper case */ \
     template < typename _LeftWrapperRefer, typename _RightRefer > \
     struct Does ## Invokable ## OperatorExistHelper< ::ScL::Feature::Detail::Operator::LeftWrapperCase, _LeftWrapperRefer, _RightRefer > \
     { \
-        static_assert( ::std::is_reference< _LeftWrapperRefer >::value, "The template parameter _LeftWrapperRefer must to be a reference type." ); \
-        static_assert( ::std::is_reference< _RightRefer >::value || ::std::is_function< _RightRefer >::value, "The template parameter _RightRefer must to be a reference type." ); \
+        static_assert( ::std::is_reference< _LeftWrapperRefer >{}, "The template parameter _LeftWrapperRefer must to be a reference type." ); \
+        static_assert( ::std::is_reference< _RightRefer >{} || ::std::is_function< _RightRefer >{}, "The template parameter _RightRefer must to be a reference type." ); \
      \
         using LeftWrapperRefer = _LeftWrapperRefer; \
         using LeftWrapper = ::std::decay_t< LeftWrapperRefer >; \
@@ -60,16 +61,17 @@ namespace ScL { namespace Feature { namespace Detail
         using LeftValueRefer = ::ScL::SimilarRefer< LeftValue, LeftWrapperRefer >; \
         using RightRefer = _RightRefer; \
      \
-        static const bool value = ::ScL::Meta::isDetected< ::ScL::Meta::Invokable ## UnstrictOperation, LeftValueRefer, RightRefer >() \
+        static constexpr bool value = ::ScL::Meta::isDetected< ::ScL::Meta::Invokable ## UnstrictOperation, LeftValueRefer, RightRefer >() \
             || ::ScL::Meta::isDetected< Operator ## Invokable ## ForLeftWrapperStaticMethodStrictOperation, LeftHolder, LeftWrapperRefer, RightRefer >(); \
+        constexpr operator bool () const noexcept { return value; } \
     }; \
      \
     /* Global case */ \
     template < typename _LeftRefer, typename _RightWrapperRefer > \
     struct Does ## Invokable ## OperatorExistHelper< ::ScL::Feature::Detail::Operator::RightWrapperCase, _LeftRefer, _RightWrapperRefer > \
     { \
-        static_assert( ::std::is_reference< _LeftRefer >::value, "The template parameter _LeftRefer must to be a reference type." ); \
-        static_assert( ::std::is_reference< _RightWrapperRefer >::value, "The template parameter _RightWrapperRefer must to be a reference type." ); \
+        static_assert( ::std::is_reference< _LeftRefer >{}, "The template parameter _LeftRefer must to be a reference type." ); \
+        static_assert( ::std::is_reference< _RightWrapperRefer >{}, "The template parameter _RightWrapperRefer must to be a reference type." ); \
      \
         using LeftRefer = _LeftRefer; \
         using RightWrapperRefer = _RightWrapperRefer; \
@@ -78,16 +80,17 @@ namespace ScL { namespace Feature { namespace Detail
         using RightValue = typename RightWrapper::Value; \
         using RightValueRefer = ::ScL::SimilarRefer< RightValue, RightWrapperRefer >; \
      \
-        static const bool value = ::ScL::Meta::isDetected< ::ScL::Meta::Invokable ## UnstrictOperation, LeftRefer, RightValueRefer >() \
+        static constexpr bool value = ::ScL::Meta::isDetected< ::ScL::Meta::Invokable ## UnstrictOperation, LeftRefer, RightValueRefer >() \
             || ::ScL::Meta::isDetected< Operator ## Invokable ## ForRightWrapperStaticMethodStrictOperation, RightHolder, LeftRefer, RightWrapperRefer >(); \
+        constexpr operator bool () const noexcept { return value; } \
     }; \
      \
     /* Member of Wrapper case */ \
     template < typename _LeftWrapperRefer, typename _RightWrapperRefer > \
     struct Does ## Invokable ## OperatorExistHelper< ::ScL::Feature::Detail::Operator::BothWrapperCase, _LeftWrapperRefer, _RightWrapperRefer > \
     { \
-        static_assert( ::std::is_reference< _LeftWrapperRefer >::value, "The template parameter _LeftWrapperRefer must to be a reference type." ); \
-        static_assert( ::std::is_reference< _RightWrapperRefer >::value, "The template parameter _RightWrapperRefer must to be a reference type." ); \
+        static_assert( ::std::is_reference< _LeftWrapperRefer >{}, "The template parameter _LeftWrapperRefer must to be a reference type." ); \
+        static_assert( ::std::is_reference< _RightWrapperRefer >{}, "The template parameter _RightWrapperRefer must to be a reference type." ); \
      \
         using LeftWrapperRefer = _LeftWrapperRefer; \
         using LeftWrapper = ::std::decay_t< LeftWrapperRefer >; \
@@ -99,23 +102,24 @@ namespace ScL { namespace Feature { namespace Detail
         using RightValue = typename RightWrapper::Value; \
         using RightValueRefer = ::ScL::SimilarRefer< RightValue, RightWrapperRefer >; \
      \
-        static const bool is_compatible_value = ::ScL::Feature::isCompatible< LeftWrapper, RightWrapper >() \
+        static constexpr bool is_compatible_value = ::ScL::Feature::IsThisCompatibleWithOther< LeftWrapper, RightWrapper >{} \
             && ( ::ScL::Meta::isDetected< Operator ## Invokable ## StaticMethodStrictOperation, LeftHolder, LeftWrapperRefer, RightWrapperRefer >() \
                 || does ## Invokable ## OperatorExist< LeftValueRefer, RightValueRefer >() ); \
      \
-        static const bool is_left_path_of_right_value = ::ScL::Feature::isThisPartOfOther< LeftWrapper, RightWrapper >() \
+        static constexpr bool is_left_path_of_right_value = ::ScL::Feature::IsThisPartOfOther< LeftWrapper, RightWrapper >{} \
             && does ## Invokable ## OperatorExist< LeftWrapperRefer, RightValueRefer >(); \
      \
-        static const bool is_right_path_of_left_value = ::ScL::Feature::isThisPartOfOther< RightWrapper, LeftWrapper >() \
+        static constexpr bool is_right_path_of_left_value = ::ScL::Feature::IsThisPartOfOther< RightWrapper, LeftWrapper >{} \
             && does ## Invokable ## OperatorExist< LeftValueRefer, RightWrapperRefer >(); \
      \
-        static const bool is_not_compatible_value = !::ScL::Feature::isCompatible< LeftWrapper, RightWrapper >() \
+        static constexpr bool is_not_compatible_value = !::ScL::Feature::IsThisCompatibleWithOther< LeftWrapper, RightWrapper >{} \
             && does ## Invokable ## OperatorExist< LeftValueRefer, RightValueRefer >(); \
      \
-        static const bool value = is_compatible_value \
+        static constexpr bool value = is_compatible_value \
             || is_left_path_of_right_value \
             || is_right_path_of_left_value \
             || is_not_compatible_value; \
+        constexpr operator bool () const noexcept { return value; } \
     }; \
 
 #define SCL_BINARY_OPERATOR_IMPLEMENTAION( symbol, Invokable ) \
@@ -374,7 +378,7 @@ namespace ScL { namespace Feature { namespace Detail
                     using RightWrapper = ::std::decay_t< RightWrapperRefer >; \
                     using RightHolder = typename RightWrapper::Holder; \
      \
-                    constexpr bool is_left_compatible_to_right = ::ScL::Feature::isCompatible< LeftHolder, RightHolder >(); \
+                    constexpr bool is_left_compatible_to_right = ::ScL::Feature::isThisCompatibleWithOther< LeftHolder, RightHolder >(); \
                     constexpr bool holder_has_method_for_operator = ::ScL::Feature::Detail::Operator::Binary::doesOperator ## Invokable ## StaticMethodExist< LeftHolder, LeftWrapperRefer, RightWrapperRefer >(); \
                     using OperatorSwitchCase = ::std::conditional_t< is_left_compatible_to_right && holder_has_method_for_operator, ::ScL::Feature::Detail::Operator::Binary::HolderHasOperatorCase, ::ScL::Feature::Detail::Operator::Binary::HolderHasNoOperatorCase >; \
                     return ::ScL::Feature::Detail::Operator::Binary::Invokable ## Switch< BothWrapperCase, OperatorSwitchCase >::invoke( ::std::forward< LeftWrapperRefer >( left ), ::std::forward< RightWrapperRefer >( right ) ); \
@@ -390,8 +394,8 @@ namespace ScL { namespace Feature { namespace Detail
             template < typename _LeftRefer, typename _RightRefer > \
             struct Invokable ## Helper \
             { \
-                static_assert( ::std::is_reference< _LeftRefer >::value, "The template parameter _LeftRefer must to be a reference type." ); \
-                static_assert( ::std::is_reference< _RightRefer >::value || ::std::is_function<  _RightRefer >::value, "The template parameter _RightRefer must to be a reference type." ); \
+                static_assert( ::std::is_reference< _LeftRefer >{}, "The template parameter _LeftRefer must to be a reference type." ); \
+                static_assert( ::std::is_reference< _RightRefer >{} || ::std::is_function<  _RightRefer >{}, "The template parameter _RightRefer must to be a reference type." ); \
      \
                 using LeftRefer = _LeftRefer; \
                 using RightRefer = _RightRefer; \

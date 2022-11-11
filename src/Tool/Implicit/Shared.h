@@ -91,8 +91,8 @@ namespace ScL { namespace Feature { namespace Implicit
              * kind of right.
              */
             template < typename _LeftWrapperRefer, typename _RightWrapperRefer,
-                typename = ::std::enable_if_t< !::std::is_const< ::std::remove_reference_t< _LeftWrapperRefer > >::value
-                    && ( ::std::is_volatile< ::std::remove_reference_t< _LeftWrapperRefer > >::value == ::std::is_volatile< ::std::remove_reference_t< _RightWrapperRefer > >::value ) > >
+                typename = ::std::enable_if_t< !::std::is_const< ::std::remove_reference_t< _LeftWrapperRefer > >{}
+                    && ( ::std::is_volatile< ::std::remove_reference_t< _LeftWrapperRefer > >{} == ::std::is_volatile< ::std::remove_reference_t< _RightWrapperRefer > >{} ) > >
             static decltype(auto) operatorAssignment ( _LeftWrapperRefer && left, _RightWrapperRefer && right )
             {
                 using RightWrapperRefer = _RightWrapperRefer &&;
@@ -107,7 +107,7 @@ namespace ScL { namespace Feature { namespace Implicit
              */
             template < typename _HolderRefer,
                 typename = ::std::enable_if_t<
-                    !::std::is_const< ::std::remove_reference_t< _HolderRefer > >::value > >
+                    !::std::is_const< ::std::remove_reference_t< _HolderRefer > >{} > >
             static constexpr void guard ( _HolderRefer && holder )
             {
                 if ( !!holder.m_pointer && !holder.m_pointer.unique() )
@@ -119,7 +119,7 @@ namespace ScL { namespace Feature { namespace Implicit
              * (except volatile).
              */
             template < typename _HolderRefer,
-                typename = ::std::enable_if_t< !::std::is_volatile< ::std::remove_reference_t< _HolderRefer > >::value > >
+                typename = ::std::enable_if_t< !::std::is_volatile< ::std::remove_reference_t< _HolderRefer > >{} > >
             static constexpr decltype(auto) value ( _HolderRefer && holder )
             {
                 using HolderRefer = _HolderRefer &&;

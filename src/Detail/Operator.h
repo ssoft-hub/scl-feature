@@ -186,7 +186,7 @@ SCL_BINARY_OPERATOR_IMPLEMENTAION( ^=, BitwiseXorAssignment )
 
 #define SCL_CONSTRUCTOR_FOR_THIS_WRAPPER_PROTOTYPE_V2( other_refer ) \
     template < typename ... _Arguments, \
-        typename = ::std::enable_if_t< ::std::is_constructible< ThisType, ThisType other_refer >::value && \
+        typename = ::std::enable_if_t< ::std::is_constructible< ThisType, ThisType other_refer >{} && \
             sizeof...( _Arguments ) == 0 > > \
     constexpr Wrapper ( ThisType other_refer other ) \
         : m_holder( ::ScL::Feature::Detail::WrapperResolver< ThisType, ThisType other_refer >( \

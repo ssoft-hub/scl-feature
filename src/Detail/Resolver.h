@@ -62,13 +62,13 @@ namespace ScL { namespace Feature { namespace Detail
         using OtherWrapper = ::std::decay_t< _OtherRefer >;
 
         using Type = ::std::conditional_t<
-            ::ScL::Feature::isCompatible< Wrapper, OtherWrapper >(),
+            ::ScL::Feature::IsThisCompatibleWithOther< OtherWrapper, Wrapper >{},
             ::ScL::Feature::Detail::WrapperCompatibleResolver< Wrapper, OtherRefer >,
             ::std::conditional_t<
-                ::ScL::Feature::isThisPartOfOther< OtherWrapper, Wrapper >(),
+                ::ScL::Feature::IsThisPartOfOther< OtherWrapper, Wrapper >{},
                 ::ScL::Feature::Detail::WrapperOtherPathOfThisResolver< Wrapper, OtherRefer >,
                 ::std::conditional_t<
-                    ::ScL::Feature::isThisPartOfOther< Wrapper, OtherWrapper >(),
+                    ::ScL::Feature::IsThisPartOfOther< Wrapper, OtherWrapper >{},
                     ::ScL::Feature::Detail::WrapperThisPathOfOtherResolver< Wrapper, OtherRefer >,
                     ::ScL::Feature::Detail::WrapperValueResolver< Wrapper, OtherRefer > > > >;
     };
@@ -154,7 +154,7 @@ namespace ScL { namespace Feature { namespace Detail
         using AccessRefer = typename NextResolver::AccessRefer;
 
         static_assert( ::ScL::Feature::isWrapper< Wrapper >(), "The template parameter _Wrapper must to be a Wrapper type!" );
-        static_assert( ::std::is_reference< OtherRefer >::value, "The template parameter _OtherRefer must to be a reference type." );
+        static_assert( ::std::is_reference< OtherRefer >{}, "The template parameter _OtherRefer must to be a reference type." );
         static_assert( ::ScL::Feature::isWrapper< OtherWrapper >(), "The template parameter _OtherRefer must to be a Wrapper type reference!" );
         static_assert( ::ScL::Feature::isSimilar< OtherRefer, OtherValueRefer >(), "The OtherRefer and OtherValueRefer must to be similar types!" );
 
@@ -191,7 +191,7 @@ namespace ScL { namespace Feature { namespace Detail
         using AccessRefer = typename OtherValueGuard::ValueRefer;
 
         static_assert( ::ScL::Feature::isWrapper< Wrapper >(), "The template parameter _Wrapper must to be a wrapper!" );
-        static_assert( ::std::is_reference< OtherRefer >::value, "The template parameter _OtherRefer must to be a reference type." );
+        static_assert( ::std::is_reference< OtherRefer >{}, "The template parameter _OtherRefer must to be a reference type." );
 
     private:
         OtherValueGuard m_value_guard;
