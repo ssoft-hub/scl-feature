@@ -47,7 +47,7 @@ namespace ScL { namespace Feature
     /// производным от типа _Other.
     template < typename _Test, typename _Other >
     struct IsThisCompatibleWithOther
-        : public ::std::bool_constant< ::ScL::Feature::IsSimilar< _Test, _Other >{}
+        : public ::std::integral_constant< bool, ::ScL::Feature::IsSimilar< _Test, _Other >{}
             && ( ::std::is_same< ::std::decay_t< _Test >, ::std::decay_t< _Other > >{}
                || ::std::is_base_of< ::std::decay_t< _Other >, ::std::decay_t< _Test > >{} ) >
     {};
@@ -56,7 +56,7 @@ namespace ScL { namespace Feature
     /// инструмент _Tool, и вложенные типы также являются совместимыми.
     template < typename _Test, typename _Other, typename _Tool >
     struct IsThisCompatibleWithOther< ::ScL::Feature::Detail::Wrapper< _Test, _Tool >, ::ScL::Feature::Detail::Wrapper< _Other, _Tool > >
-       : public ::std::bool_constant< ::ScL::Feature::IsThisCompatibleWithOther< _Test, _Other >{} >
+       : public ::std::integral_constant< bool, ::ScL::Feature::IsThisCompatibleWithOther< _Test, _Other >{} >
     {};
 }}
 
@@ -70,7 +70,7 @@ namespace ScL { namespace Feature
     /// вложенной частью другого.
     template < typename _Test, typename _TestTool, typename _Other, typename _OtherTool >
     struct IsThisPartOfOther< ::ScL::Feature::Detail::Wrapper< _Test, _TestTool >, ::ScL::Feature::Detail::Wrapper< _Other, _OtherTool > >
-        : public ::std::bool_constant<
+        : public ::std::integral_constant< bool,
                ::ScL::Feature::IsThisCompatibleWithOther< ::ScL::Feature::Detail::Wrapper< _Test, _TestTool >, _Other >{}
             || ::ScL::Feature::IsThisPartOfOther< ::ScL::Feature::Detail::Wrapper< _Test, _TestTool >, _Other >{} >
     {};
@@ -80,7 +80,7 @@ namespace ScL { namespace Feature
 {
     template < typename _Type, typename _Other >
     struct IsSimilar
-        : public ::std::bool_constant<
+        : public ::std::integral_constant< bool,
                ::std::is_rvalue_reference< _Type >{} == ::std::is_rvalue_reference< _Other >{}
             && ::std::is_lvalue_reference< _Type >{} == ::std::is_lvalue_reference< _Other >{}
             && ::std::is_const< ::std::remove_reference_t< _Type > >{} == ::std::is_const< ::std::remove_reference_t< _Other > >{}
