@@ -46,6 +46,32 @@ namespace ScL { namespace Feature { namespace Implicit
             }
         };
 
+        template < typename _Holder, bool abstract_case >
+        struct ConstructHelper;
+
+        template < typename _Holder >
+        struct ConstructHelper< _Holder, true >
+        {
+            using Access = typename _Holder::Access;
+            using CountedPointer = typename _Holder::CountedPointer;
+
+            template < typename ... _Arguments >
+            static CountedPointer makePointer ( _Arguments && ... ) { return nullptr; }
+            static Access access ( CountedPointer ) { return nullptr; }
+        };
+
+        template < typename _Holder >
+        struct ConstructHelper< _Holder, false >
+        {
+            using Access = typename _Holder::Access;
+            using CountedPointer = typename _Holder::CountedPointer;
+            using CountedValue = typename _Holder::CountedValue;
+
+            template < typename ... _Arguments >
+            static CountedPointer makePointer ( _Arguments && ... arguments ) { return new CountedValue( ::std::forward< _Arguments >( arguments ) ... ); }
+            static Access access ( CountedPointer pointer ) { return ::std::addressof( static_cast< CountedValue * >( pointer )->m_value ); }
+        };
+
         template < typename _Value >
         struct Holder
         {
@@ -62,8 +88,8 @@ namespace ScL { namespace Feature { namespace Implicit
 
             template < typename ... _Arguments >
             Holder ( _Arguments && ... arguments )
-                : m_pointer( new CountedValue( ::std::forward< _Arguments >( arguments ) ... ) )
-                , m_access( ::std::addressof( static_cast< CountedValue * >( m_pointer )->m_value ) )
+                : m_pointer( ConstructHelper< ThisType, ::std::is_abstract< Value >{} >::makePointer( ::std::forward< _Arguments >( arguments ) ... ) )
+                , m_access( ConstructHelper< ThisType, ::std::is_abstract< Value >{} >::access( m_pointer ) )
             {
                 increment();
             }
@@ -266,6 +292,37 @@ namespace ScL { namespace Feature { namespace Implicit
                 return ::std::forward< ValueRefer >( *holder.m_access );
             }
         };
+
+        template < typename _WrapperRefer >
+        static bool isEmpty ( _WrapperRefer && wrapper ) noexcept
+        {
+            return !::ScL::Feature::Detail::wrapperHolder( wrapper ).m_pointer;
+        }
+
+        template < typename _TestWrapper, typename _WrapperRefer >
+        static bool isKindOf( _WrapperRefer && wrapper ) noexcept
+        {
+            using TestAccess = typename _TestWrapper::Holder::Access;
+            return dynamic_cast< TestAccess >( ::ScL::Feature::Detail::wrapperHolder( wrapper ).m_access );
+        }
+
+
+        template < typename _LeftWrapperRefer, typename _RightWrapperRefer,
+            typename = ::std::enable_if_t< !::std::is_const< ::std::remove_reference_t< _LeftWrapperRefer > >{}
+                && ( ::std::is_volatile< ::std::remove_reference_t< _LeftWrapperRefer > >{} == ::std::is_volatile< ::std::remove_reference_t< _RightWrapperRefer > >{} ) > >
+        static void staticCast ( _LeftWrapperRefer && left, _RightWrapperRefer && right ) noexcept
+        {
+            auto & left_holder = ::ScL::Feature::Detail::wrapperHolder( left );
+            auto & right_holder = ::ScL::Feature::Detail::wrapperHolder( right );
+
+            if ( left_holder.m_pointer != right_holder.m_pointer )
+            {
+                left_holder.decrement();
+                left_holder.m_pointer = right_holder.m_pointer;
+                left_holder.m_access = static_cast< typeof( left_holder.m_access ) >( right_holder.m_access );
+                left_holder.increment();
+            }
+        }
     };
 }}}
 
@@ -274,4 +331,43 @@ namespace ScL { namespace Feature { namespace Implicit
     using Raw = ::ScL::Feature::Implicit::CountedRaw< ::std::atomic< int32_t > >;
 }}}
 
+#include <ScL/Feature/MixIn.h>
+
+namespace ScL { namespace Feature
+{
+    template < typename _Type >
+    class MixIn< ::ScL::Feature::Detail::Wrapper< _Type, ::ScL::Feature::Implicit::Raw > >
+    {
+        using Extended = ::ScL::Feature::Detail::Wrapper< _Type, ::ScL::Feature::Implicit::Raw >;
+        auto & self () const { return *static_cast< Extended const * >( this ); }
+
+    public:
+        bool isEmpty() const noexcept
+        {
+            return Extended::Tool::isEmpty( self() );
+        }
+
+        template < typename _Other >
+        bool isKindOf () const noexcept
+        {
+            return Extended::Tool::template isKindOf< _Other >( self() );
+        }
+
+        template < typename _Other >
+        _Other staticCast () const noexcept
+        {
+            _Other result;
+            Extended::Tool::staticCast( result, self() );
+            return result;
+        }
+
+        template < typename _Other >
+        _Other dynamicCast () const noexcept
+        {
+            if ( isKindOf< _Other >() )
+                return staticCast< _Other >();
+            return {};
+        }
+    };
+}}
 #endif
