@@ -102,7 +102,7 @@ namespace ScL { namespace Feature { namespace Detail
         using RightValue = typename RightWrapper::Value; \
         using RightValueRefer = ::ScL::SimilarRefer< RightValue, RightWrapperRefer >; \
      \
-        static constexpr bool is_compatible_value = ::ScL::Feature::IsThisCompatibleWithOther< LeftWrapper, RightWrapper >{} \
+        static constexpr bool is_compatible_value = ::ScL::Feature::IsThisCompatibleWithOther< RightWrapper, LeftWrapper >{} \
             && ( ::ScL::Meta::isDetected< Operator ## Invokable ## StaticMethodStrictOperation, LeftHolder, LeftWrapperRefer, RightWrapperRefer >() \
                 || does ## Invokable ## OperatorExist< LeftValueRefer, RightValueRefer >() ); \
      \
@@ -112,7 +112,7 @@ namespace ScL { namespace Feature { namespace Detail
         static constexpr bool is_right_path_of_left_value = ::ScL::Feature::IsThisPartOfOther< RightWrapper, LeftWrapper >{} \
             && does ## Invokable ## OperatorExist< LeftValueRefer, RightWrapperRefer >(); \
      \
-        static constexpr bool is_not_compatible_value = !::ScL::Feature::IsThisCompatibleWithOther< LeftWrapper, RightWrapper >{} \
+        static constexpr bool is_not_compatible_value = !::ScL::Feature::IsThisCompatibleWithOther< RightWrapper, LeftWrapper >{} \
             && does ## Invokable ## OperatorExist< LeftValueRefer, RightValueRefer >(); \
      \
         static constexpr bool value = is_compatible_value \
@@ -376,9 +376,9 @@ namespace ScL { namespace Feature { namespace Detail
                     using LeftHolder = typename LeftWrapper::Holder; \
                     using RightWrapperRefer = _Right &&; \
                     using RightWrapper = ::std::decay_t< RightWrapperRefer >; \
-                    using RightHolder = typename RightWrapper::Holder; \
+                    /*using RightHolder = typename RightWrapper::Holder;*/ \
      \
-                    constexpr bool is_left_compatible_to_right = ::ScL::Feature::isThisCompatibleWithOther< LeftHolder, RightHolder >(); \
+                    constexpr bool is_left_compatible_to_right = ::ScL::Feature::IsThisCompatibleWithOther< RightWrapper, LeftWrapper >{}; \
                     constexpr bool holder_has_method_for_operator = ::ScL::Feature::Detail::Operator::Binary::doesOperator ## Invokable ## StaticMethodExist< LeftHolder, LeftWrapperRefer, RightWrapperRefer >(); \
                     using OperatorSwitchCase = ::std::conditional_t< is_left_compatible_to_right && holder_has_method_for_operator, ::ScL::Feature::Detail::Operator::Binary::HolderHasOperatorCase, ::ScL::Feature::Detail::Operator::Binary::HolderHasNoOperatorCase >; \
                     return ::ScL::Feature::Detail::Operator::Binary::Invokable ## Switch< BothWrapperCase, OperatorSwitchCase >::invoke( ::std::forward< LeftWrapperRefer >( left ), ::std::forward< RightWrapperRefer >( right ) ); \
