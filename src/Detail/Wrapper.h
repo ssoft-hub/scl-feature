@@ -18,7 +18,7 @@ namespace ScL { namespace Feature { namespace Detail
      * свойствами. Дополнительные свойства реализуются посредством функциональности _Tool.
      */
     template < typename _Value, typename _Tool >
-    class Wrapper
+    class Wrapper final
         : public ::ScL::Feature::MixIn< Wrapper< _Value, _Tool > >
     {
         static_assert( !::std::is_reference< _Tool >{},
@@ -34,6 +34,7 @@ namespace ScL { namespace Feature { namespace Detail
 
     public:
         using Value = _Value;
+        using Data = Value;     // convenient alias
         using Tool = _Tool;
         using Holder = typename Tool:: template Holder< _Value >;
 
