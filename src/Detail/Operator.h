@@ -60,17 +60,6 @@ SCL_BINARY_OPERATOR_IMPLEMENTAION( &=, BitwiseAndAssignment )
 SCL_BINARY_OPERATOR_IMPLEMENTAION( |=, BitwiseOrAssignment )
 SCL_BINARY_OPERATOR_IMPLEMENTAION( ^=, BitwiseXorAssignment )
 
-#define SCL_GLOBAL_BINARY_OPERATOR_PROTOTYPE( symbol, right_refer, Invokable ) \
-    template < typename _Left, typename _RightValue, typename _RightTool, \
-        typename = ::std::enable_if_t< !::ScL::Feature::isWrapper< ::std::decay_t< _Left > >() \
-            && ::ScL::Feature::Detail::Operator::Binary::does ## Invokable ## OperatorExist< _Left &&, ::ScL::Feature::Detail::Wrapper< _RightValue, _RightTool > right_refer >() > > \
-    constexpr decltype(auto) operator symbol ( _Left && left, ::ScL::Feature::Detail::Wrapper< _RightValue, _RightTool > right_refer right ) \
-    { \
-        using LeftRefer = _Left &&; \
-        using RightRefer = ::ScL::Feature::Detail::Wrapper< _RightValue, _RightTool > right_refer; \
-        return ::ScL::Feature::Detail::Operator::Binary::Invokable ## Helper< LeftRefer, RightRefer >::invoke( ::std::forward< LeftRefer >( left ), ::std::forward< RightRefer >( right ) ); \
-    } \
-
 #define SCL_GLOBAL_BINARY_OPERATOR_SPECIALIZATION( Invokable ) \
     namespace ScL { namespace Feature { namespace Detail \
     { \
@@ -93,14 +82,16 @@ SCL_BINARY_OPERATOR_IMPLEMENTAION( ^=, BitwiseXorAssignment )
 
 #define SCL_GLOBAL_BINARY_OPERATOR( symbol, Invokable ) \
     SCL_GLOBAL_BINARY_OPERATOR_SPECIALIZATION( Invokable ) \
-    SCL_GLOBAL_BINARY_OPERATOR_PROTOTYPE( SCL_SINGLE_ARG( symbol ), &&, Invokable ) \
-    SCL_GLOBAL_BINARY_OPERATOR_PROTOTYPE( SCL_SINGLE_ARG( symbol ), const &&, Invokable ) \
-    SCL_GLOBAL_BINARY_OPERATOR_PROTOTYPE( SCL_SINGLE_ARG( symbol ), volatile &&, Invokable ) \
-    SCL_GLOBAL_BINARY_OPERATOR_PROTOTYPE( SCL_SINGLE_ARG( symbol ), const volatile &&, Invokable ) \
-    SCL_GLOBAL_BINARY_OPERATOR_PROTOTYPE( SCL_SINGLE_ARG( symbol ), &, Invokable ) \
-    SCL_GLOBAL_BINARY_OPERATOR_PROTOTYPE( SCL_SINGLE_ARG( symbol ), const &, Invokable ) \
-    SCL_GLOBAL_BINARY_OPERATOR_PROTOTYPE( SCL_SINGLE_ARG( symbol ), volatile &, Invokable ) \
-    SCL_GLOBAL_BINARY_OPERATOR_PROTOTYPE( SCL_SINGLE_ARG( symbol ), const volatile &, Invokable ) \
+    template < typename _Left, typename _Right, \
+        typename = ::std::enable_if_t< !::ScL::Feature::isWrapper< ::std::decay_t< _Left > >() \
+            && ::ScL::Feature::isWrapper< ::std::decay_t< _Right > >() \
+            && ::ScL::Feature::Detail::Operator::Binary::does ## Invokable ## OperatorExist< _Left &&, ::ScL::SimilarRefer< typename ::std::decay_t< _Right >::Value, _Right && > >() > > \
+    constexpr decltype(auto) operator symbol ( _Left && left, _Right && right ) \
+    { \
+        using LeftRefer = _Left &&; \
+        using RightRefer = _Right &&; \
+        return ::ScL::Feature::Detail::Operator::Binary::LeftShiftHelper< LeftRefer, RightRefer >::invoke( ::std::forward< LeftRefer >( left ), ::std::forward< RightRefer >( right ) ); \
+    } \
 
 #define SCL_BINARY_OPERATOR_PROTOTYPE_FOR_THIS( symbol, this_refer, other_refer, Invokable ) \
     /*template < typename ... _Arguments, \
@@ -186,8 +177,8 @@ SCL_BINARY_OPERATOR_IMPLEMENTAION( ^=, BitwiseXorAssignment )
 
 #define SCL_CONSTRUCTOR_FOR_THIS_WRAPPER_PROTOTYPE_V2( other_refer ) \
     template < typename ... _Arguments, \
-        typename = ::std::enable_if_t< ::std::is_constructible< ThisType, ThisType other_refer >{} && \
-            sizeof...( _Arguments ) == 0 > > \
+        typename = ::std::enable_if_t< sizeof...( _Arguments ) == 0 \
+            && ::std::is_constructible< ThisType, ThisType other_refer >::value > > \
     constexpr Wrapper ( ThisType other_refer other ) \
         : m_holder( ::ScL::Feature::Detail::WrapperResolver< ThisType, ThisType other_refer >( \
             ::std::forward< ThisType other_refer >( other ) ).resolve() ) \
