@@ -19,6 +19,7 @@ static_assert( isDetected< SquareBracketsMemberStrictOperation, Test const, int 
 
 #include <iomanip>
 #include <ostream>
+#include <sstream>
 #include <vector>
 
 ::std::ostream & my ( ::std::ostream & stream )
@@ -31,7 +32,7 @@ void wrapper ()
     using Test = ::std::vector< int >;
     Wrapper< Test > test{{0,1,2,3,4,5}};
     Wrapper< int > i{1};
-    auto n = test[ 1.0 ];
+    auto n = test[ 1 ];
     ::std::cout << ::std::setbase( 16 );
 
     static_assert( ::ScL::Meta::isDetected< ::ScL::Meta::LeftShiftMemberStrictOperation, decltype( ::std::cout ), int >(), "" );
@@ -59,7 +60,7 @@ void wrapper ()
 void test ()
 {
     Test test{};
-    auto n = test[ 1.0 ];
+    auto n = test[ 1 ];
     ::std::cout << n << ::std::endl;
 }
 
