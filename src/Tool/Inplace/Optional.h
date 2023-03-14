@@ -4,6 +4,7 @@
 
 #include <utility>
 #include <type_traits>
+#include <ScL/Feature/MixIn.h>
 #include <ScL/Utility/SimilarRefer.h>
 
 namespace ScL { namespace Feature { namespace Inplace
@@ -230,11 +231,12 @@ namespace ScL { namespace Feature
 {
     namespace Detail { template < typename, typename > class Wrapper; }
 
-    template < typename _Value, typename _Tool >
-    class MixIn< ::ScL::Feature::Detail::Wrapper< _Value, _Tool > >
+    template < typename _Value >
+    class MixIn< ::ScL::Feature::Detail::Wrapper< _Value, ::ScL::Feature::Inplace::Optional > >
     {
         using MixInValue = _Value;
-        using MixInWrapper = ::ScL::Feature::Detail::Wrapper< _Value, _Tool >;
+        using Tool = ::ScL::Feature::Inplace::Optional;
+        using MixInWrapper = ::ScL::Feature::Detail::Wrapper< _Value, Tool >;
         using MixInHolder = ::ScL::Feature::Inplace::Optional::Holder< _Value >;
 
     public:
@@ -250,7 +252,7 @@ namespace ScL { namespace Feature
         }
 
         template< typename _Type,
-            typename = ::std::enable_if_t< ::std::is_constructible< MixInValue, _Type && >{} > >
+            typename = ::std::enable_if_t< ::std::is_constructible< MixInValue, _Type && >::value > >
         constexpr MixInValue valueOr ( _Type && value ) const &
         noexcept
         {
@@ -261,7 +263,7 @@ namespace ScL { namespace Feature
         }
 
         template< typename _Type,
-            typename = ::std::enable_if_t< ::std::is_constructible< MixInValue, _Type && >{} > >
+            typename = ::std::enable_if_t< ::std::is_constructible< MixInValue, _Type && >::value > >
         MixInValue valueOr ( _Type && value ) &&
         noexcept
         {
@@ -295,7 +297,7 @@ namespace ScL { namespace Feature
         }
 
         template < typename ... _Arguments >
-        constexpr ::std::enable_if_t< ::std::is_constructible< _Value, _Arguments && ... >{}, MixInValue & >
+        constexpr ::std::enable_if_t< ::std::is_constructible< _Value, _Arguments && ... >::value, MixInValue & >
         emplace ( _Arguments && ... arguments )
         {
             auto _this = static_cast< MixInWrapper * >( this );
@@ -305,7 +307,7 @@ namespace ScL { namespace Feature
         }
 
         template< typename _Type, typename ... _Arguments >
-        constexpr ::std::enable_if_t< ::std::is_constructible< _Value, _Arguments && ... >{}, MixInValue & >
+        constexpr ::std::enable_if_t< ::std::is_constructible< _Value, _Arguments && ... >::value, MixInValue & >
         emplace ( std::initializer_list< _Type > list, _Arguments && ... arguments )
         {
             auto _this = static_cast< MixInWrapper * >( this );
@@ -314,14 +316,14 @@ namespace ScL { namespace Feature
             return _this->m_holder.m_value;
         }
 
-        constexpr explicit operator bool() const noexcept
+        constexpr explicit operator bool () const noexcept
         {
             using WrapperRefer = MixInWrapper const &;
             return static_cast< WrapperRefer >( *this ).m_holder.m_is_exists;
         }
 
 
-        constexpr bool hasValue() const noexcept
+        constexpr bool hasValue () const noexcept
         {
             using WrapperRefer = MixInWrapper const &;
             return static_cast< WrapperRefer >( *this ).m_holder.m_is_exists;

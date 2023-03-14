@@ -59,9 +59,9 @@ inline constexpr bool isThisCompatibleWithOther ();
 
 ```cpp
 template < _Test, _Other >
-struct IsThisPartOfOther; // ::std::true_type or ::std::false_type
+struct IsThisCompatibleWithPartOfOther; // ::std::true_type or ::std::false_type
 template < _Test, _Other >
-inline constexpr bool isThisPartOfOther ();
+inline constexpr bool IsThisCompatibleWithPartOfOther ();
 ```
 
 Для произвольных типов значение этого отношения равно ```false```. Для типов **Wrapper** значение отношения равно ```true```, если тип **_Test** совместим с любой вложенной частью типа **_Other**.
