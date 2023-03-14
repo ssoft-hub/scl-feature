@@ -4,10 +4,13 @@
 
 #include <atomic>
 #include <cassert>
+#include <cinttypes>
 #include <memory>
 #include <utility>
 
 #include <ScL/Feature/Access/HolderGuard.h>
+#include <ScL/Feature/Trait.h>
+#include <ScL/Meta/Trait/Detection.h>
 #include <ScL/Utility/SimilarRefer.h>
 
 namespace ScL { namespace Feature { namespace Implicit
@@ -24,9 +27,15 @@ namespace ScL { namespace Feature { namespace Implicit
         struct BaseCounted
         {
             using Counter = _Counter;
+            using TypeId = std::size_t;
+
             Counter m_counter;
+
             BaseCounted () : m_counter() {}
             virtual ~BaseCounted () {}
+
+            virtual TypeId typeId () const noexcept = 0;
+            virtual BaseCounted * clone () const = 0;
         };
 
         template < typename _Value >
@@ -34,15 +43,29 @@ namespace ScL { namespace Feature { namespace Implicit
             : public BaseCounted
         {
             using ThisType = Counted< _Value >;
+            using ParentType = BaseCounted;
+
             using Value = _Value;
+            using TypeId = typename ParentType::TypeId;
 
             Value m_value;
 
             template < typename ... _Arguments >
             Counted ( _Arguments && ... arguments )
-                : BaseCounted()
-                , m_value( ::std::forward< _Arguments >( arguments ) ... )
+                : BaseCounted{}
+                , m_value{ ::std::forward< _Arguments >( arguments ) ... }
             {
+            }
+
+            virtual TypeId typeId () const noexcept override
+            {
+                static auto const type_id = typeid( Value ).hash_code();
+                return type_id;
+            }
+
+            virtual BaseCounted * clone () const override
+            {
+                return new ThisType( m_value );
             }
         };
 
@@ -83,13 +106,21 @@ namespace ScL { namespace Feature { namespace Implicit
             using Access = Value *;
             using WritableGuard = ::ScL::Feature::HolderGuard< ThisType & >;
 
+            struct Empty {};
+
             CountedPointer m_pointer;
             Access m_access; // to resolve multiple inheritance
 
+            Holder ( Empty )
+                : m_pointer{}
+                , m_access{}
+            {
+            }
+
             template < typename ... _Arguments >
             Holder ( _Arguments && ... arguments )
-                : m_pointer( ConstructHelper< ThisType, ::std::is_abstract< Value >{} >::makePointer( ::std::forward< _Arguments >( arguments ) ... ) )
-                , m_access( ConstructHelper< ThisType, ::std::is_abstract< Value >{} >::access( m_pointer ) )
+                : m_pointer( ConstructHelper< ThisType, ::std::is_abstract< Value >::value >::makePointer( ::std::forward< _Arguments >( arguments ) ... ) )
+                , m_access( ConstructHelper< ThisType, ::std::is_abstract< Value >::value >::access( m_pointer ) )
             {
                 increment();
             }
@@ -245,12 +276,13 @@ namespace ScL { namespace Feature { namespace Implicit
              * kind of right.
              */
             template < typename _LeftWrapperRefer, typename _RightWrapperRefer,
-                typename = ::std::enable_if_t< !::std::is_const< ::std::remove_reference_t< _LeftWrapperRefer > >{}
-                    && ( ::std::is_volatile< ::std::remove_reference_t< _LeftWrapperRefer > >{} == ::std::is_volatile< ::std::remove_reference_t< _RightWrapperRefer > >{} ) > >
+                typename = ::std::enable_if_t< !::std::is_const< ::std::remove_reference_t< _LeftWrapperRefer > >::value
+                    && ::ScL::Feature::IsThisCompatibleWithOther< ::std::decay_t< _RightWrapperRefer >, ::std::decay_t< _LeftWrapperRefer > >::value
+                    && ( ::std::is_volatile< ::std::remove_reference_t< _LeftWrapperRefer > >::value == ::std::is_volatile< ::std::remove_reference_t< _RightWrapperRefer > >::value ) > >
             static decltype(auto) operatorAssignment ( _LeftWrapperRefer && left, _RightWrapperRefer && right )
             {
-                auto & left_holder = ::ScL::Feature::Detail::wrapperHolder( left );
-                auto & right_holder = ::ScL::Feature::Detail::wrapperHolder( right );
+                auto && left_holder = ::ScL::Feature::Detail::wrapperHolder( ::std::forward< _LeftWrapperRefer >( left ) );
+                auto && right_holder = ::ScL::Feature::Detail::wrapperHolder( ::std::forward< _RightWrapperRefer >( right ) );
 
                 if ( left_holder.m_pointer != right_holder.m_pointer )
                 {
@@ -268,15 +300,17 @@ namespace ScL { namespace Feature { namespace Implicit
              */
             template < typename _HolderRefer,
                 typename = ::std::enable_if_t<
-                        !::std::is_const< ::std::remove_reference_t< _HolderRefer > >{} > >
+                        !::std::is_const< ::std::remove_reference_t< _HolderRefer > >::value > >
             static constexpr void guard ( _HolderRefer && holder )
             {
                 if ( !!holder.m_pointer && holder.m_pointer->m_counter > 1 )
                 {
-                    CountedPointer pointer = new CountedValue( *holder.m_access );
+                    using Offset = ::std::intptr_t;
+                    Offset offset = Offset( holder.m_access ) - Offset( holder.m_pointer );
+                    auto pointer = holder.m_pointer->clone();
                     holder.decrement();
                     holder.m_pointer = pointer;
-                    holder.m_access = ::std::addressof( static_cast< CountedValue * >( holder.m_pointer )->m_value );
+                    holder.m_access =  decltype( holder.m_access )( Offset( pointer ) + offset );
                     holder.increment();
                 }
             }
@@ -296,32 +330,80 @@ namespace ScL { namespace Feature { namespace Implicit
         template < typename _WrapperRefer >
         static bool isEmpty ( _WrapperRefer && wrapper ) noexcept
         {
-            return !::ScL::Feature::Detail::wrapperHolder( wrapper ).m_pointer;
+            return !::ScL::Feature::Detail::wrapperHolder( ::std::forward< _WrapperRefer >( wrapper ) ).m_pointer;
+        }
+
+        template < typename _WrapperRefer >
+        static typename ::std::decay_t< _WrapperRefer >::TypeId typeId( _WrapperRefer && wrapper ) noexcept
+        {
+            if ( isEmpty( ::std::forward< _WrapperRefer >( wrapper ) ) )
+                return {};
+            return ::ScL::Feature::Detail::wrapperHolder( ::std::forward< _WrapperRefer >( wrapper ) ).m_pointer->typeId();
+        }
+
+        template < typename _TestWrapper, typename _WrapperRefer >
+        static bool isA( _WrapperRefer && wrapper ) noexcept
+        {
+            if ( isEmpty( ::std::forward< _WrapperRefer >( wrapper ) ) )
+                return false;
+
+            using TestType = typename _TestWrapper::Holder::Value;
+            static auto const test_type_id = typeid( TestType ).hash_code();
+            return test_type_id == ::ScL::Feature::Detail::wrapperHolder( ::std::forward< _WrapperRefer >( wrapper ) ).m_pointer->typeId();
         }
 
         template < typename _TestWrapper, typename _WrapperRefer >
         static bool isKindOf( _WrapperRefer && wrapper ) noexcept
         {
+            if ( isEmpty( ::std::forward< _WrapperRefer >( wrapper ) ) )
+                return false;
+
             using TestAccess = typename _TestWrapper::Holder::Access;
-            return dynamic_cast< TestAccess >( ::ScL::Feature::Detail::wrapperHolder( wrapper ).m_access );
+            return dynamic_cast< TestAccess >( ::ScL::Feature::Detail::wrapperHolder( ::std::forward< _WrapperRefer >( wrapper ) ).m_access );
         }
 
-
-        template < typename _LeftWrapperRefer, typename _RightWrapperRefer,
-            typename = ::std::enable_if_t< !::std::is_const< ::std::remove_reference_t< _LeftWrapperRefer > >{}
-                && ( ::std::is_volatile< ::std::remove_reference_t< _LeftWrapperRefer > >{} == ::std::is_volatile< ::std::remove_reference_t< _RightWrapperRefer > >{} ) > >
-        static void staticCast ( _LeftWrapperRefer && left, _RightWrapperRefer && right ) noexcept
+        template < typename _LeftWrapper, typename _RightWrapperRefer >
+        static decltype(auto) staticCast ( _RightWrapperRefer && right ) noexcept
         {
-            auto & left_holder = ::ScL::Feature::Detail::wrapperHolder( left );
-            auto & right_holder = ::ScL::Feature::Detail::wrapperHolder( right );
+            using LeftHolder = typename _LeftWrapper::Holder;
+            using Empty = typename _LeftWrapper::Holder::Empty;
+
+            LeftHolder left_holder{ Empty{} };
+            auto && right_holder = ::ScL::Feature::Detail::wrapperHolder( ::std::forward< _RightWrapperRefer >( right ) );
 
             if ( left_holder.m_pointer != right_holder.m_pointer )
             {
                 left_holder.decrement();
                 left_holder.m_pointer = right_holder.m_pointer;
-                left_holder.m_access = static_cast< typeof( left_holder.m_access ) >( right_holder.m_access );
+                left_holder.m_access = static_cast< decltype( left_holder.m_access ) >( right_holder.m_access );
                 left_holder.increment();
             }
+
+            return _LeftWrapper{ left_holder };
+        }
+
+        template < typename _LeftWrapper, typename _RightWrapperRefer >
+        static decltype(auto) dynamicCast ( _RightWrapperRefer && right ) noexcept
+        {
+            using LeftHolder = typename _LeftWrapper::Holder;
+            using Empty = typename _LeftWrapper::Holder::Empty;
+
+            LeftHolder left_holder{ Empty{} };
+            auto && right_holder = ::ScL::Feature::Detail::wrapperHolder( ::std::forward< _RightWrapperRefer >( right ) );
+
+            if ( left_holder.m_pointer != right_holder.m_pointer )
+            {
+                auto access = dynamic_cast< decltype( left_holder.m_access ) >( right_holder.m_access );
+                if ( access )
+                {
+                    left_holder.decrement();
+                    left_holder.m_pointer = right_holder.m_pointer;
+                    left_holder.m_access = access;
+                    left_holder.increment();
+                }
+            }
+
+            return _LeftWrapper{ left_holder };
         }
     };
 }}}
@@ -342,9 +424,23 @@ namespace ScL { namespace Feature
         auto & self () const { return *static_cast< Extended const * >( this ); }
 
     public:
+        using TypeId = ::std::size_t;
+
+    public:
         bool isEmpty() const noexcept
         {
             return Extended::Tool::isEmpty( self() );
+        }
+
+        auto typeId () const noexcept
+        {
+            return Extended::Tool::typeId( self() );
+        }
+
+        template < typename _Other >
+        bool isA () const noexcept
+        {
+            return Extended::Tool::template isA< _Other >( self() );
         }
 
         template < typename _Other >
@@ -356,17 +452,13 @@ namespace ScL { namespace Feature
         template < typename _Other >
         _Other staticCast () const noexcept
         {
-            _Other result;
-            Extended::Tool::staticCast( result, self() );
-            return result;
+            return Extended::Tool::template staticCast< _Other >( self() );
         }
 
         template < typename _Other >
         _Other dynamicCast () const noexcept
         {
-            if ( isKindOf< _Other >() )
-                return staticCast< _Other >();
-            return {};
+            return Extended::Tool::template dynamicCast< _Other >( self() );
         }
     };
 }}
