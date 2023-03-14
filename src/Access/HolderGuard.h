@@ -17,7 +17,7 @@ namespace ScL { namespace Feature
         using HolderRefer = _HolderRefer;
         using Holder = ::std::decay_t< HolderRefer >;
 
-        static_assert( ::std::is_reference< HolderRefer >{}, "The template parameter _HolderRefer must to be a reference type." );
+        static_assert( ::std::is_reference< HolderRefer >::value, "The template parameter _HolderRefer must to be a reference type." );
 
     private:
         HolderRefer m_holder;

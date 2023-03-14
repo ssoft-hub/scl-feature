@@ -22,7 +22,7 @@ namespace ScL { namespace Feature { namespace Detail
         using Value = ::std::remove_reference_t< Refer >;
         using RawPointer = ::std::add_pointer_t< Value >;
 
-        static_assert( ::std::is_reference< Refer >{}, "The template parameter _Refer must to be a reference type." );
+        static_assert( ::std::is_reference< Refer >::value, "The template parameter _Refer must to be a reference type." );
 
     private:
         Refer m_refer;
