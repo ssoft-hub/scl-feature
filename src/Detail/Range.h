@@ -49,16 +49,16 @@ namespace std
     SCL_RANGE_METHOD( csize )
 }
 
-namespace std { namespace ranges
-{
-    SCL_RANGE_METHOD( begin )
-    SCL_RANGE_METHOD( cbegin )
-    SCL_RANGE_METHOD( end )
-    SCL_RANGE_METHOD( cend )
-    SCL_RANGE_METHOD( size )
-    SCL_RANGE_METHOD( ssize )
-    SCL_RANGE_METHOD( data )
-    SCL_RANGE_METHOD( csize )
-}}
+//namespace std { namespace ranges
+//{
+//    SCL_RANGE_METHOD( begin )
+//    SCL_RANGE_METHOD( cbegin )
+//    SCL_RANGE_METHOD( end )
+//    SCL_RANGE_METHOD( cend )
+//    SCL_RANGE_METHOD( size )
+//    SCL_RANGE_METHOD( ssize )
+//    SCL_RANGE_METHOD( data )
+//    SCL_RANGE_METHOD( csize )
+//}}
 
 #endif
