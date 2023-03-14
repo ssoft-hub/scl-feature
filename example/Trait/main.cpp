@@ -144,53 +144,53 @@ int main ( int /*argc*/, char ** /*argv*/ )
     using FirstPartType = ::ScL::Feature::Wrapper< BaseType, ::ScL::Feature::Implicit::Shared >;
     using SecondPartType = ::ScL::Feature::Wrapper< DerivedType, ::ScL::Feature::Implicit::Shared >;
 
-    static_assert( ::ScL::Feature::isThisPartOfOther< FirstPartType, FirstType >(), "" );
+    static_assert( ::ScL::Feature::IsThisCompatibleWithPartOfOther< FirstPartType, FirstType >(), "" );
     ::std::cout
-        << "isThisPartOfOther< FirstPartType, FirstType >()" << ::std::endl
+        << "IsThisCompatibleWithPartOfOther< FirstPartType, FirstType >()" << ::std::endl
         << true << " = "
-        << ::ScL::Feature::isThisPartOfOther< FirstPartType, FirstType >() << ::std::endl;
+        << ::ScL::Feature::IsThisCompatibleWithPartOfOther< FirstPartType, FirstType >() << ::std::endl;
 
-    static_assert( ::ScL::Feature::isThisPartOfOther< SecondPartType, FirstType >(), "" );
+    static_assert( ::ScL::Feature::IsThisCompatibleWithPartOfOther< SecondPartType, FirstType >(), "" );
     ::std::cout
-        << "isThisPartOfOther< SecondPartType, FirstType >()" << ::std::endl
+        << "IsThisCompatibleWithPartOfOther< SecondPartType, FirstType >()" << ::std::endl
         << true << " = "
-        << ::ScL::Feature::isThisPartOfOther< SecondPartType, FirstType >() << ::std::endl;
+        << ::ScL::Feature::IsThisCompatibleWithPartOfOther< SecondPartType, FirstType >() << ::std::endl;
 
-    static_assert( !::ScL::Feature::isThisPartOfOther< FirstPartType, SecondType >(), "" );
+    static_assert( !::ScL::Feature::IsThisCompatibleWithPartOfOther< FirstPartType, SecondType >(), "" );
     ::std::cout
-        << "isThisPartOfOther< FirstPartType, SecondType >()" << ::std::endl
+        << "IsThisCompatibleWithPartOfOther< FirstPartType, SecondType >()" << ::std::endl
         << false << " = "
-        << ::ScL::Feature::isThisPartOfOther< FirstPartType, SecondType >() << ::std::endl;
+        << ::ScL::Feature::IsThisCompatibleWithPartOfOther< FirstPartType, SecondType >() << ::std::endl;
 
-    static_assert( ::ScL::Feature::isThisPartOfOther< SecondPartType, SecondType >(), "" );
+    static_assert( ::ScL::Feature::IsThisCompatibleWithPartOfOther< SecondPartType, SecondType >(), "" );
     ::std::cout
-        << "isThisPartOfOther< SecondPartType, SecondType >()" << ::std::endl
+        << "IsThisCompatibleWithPartOfOther< SecondPartType, SecondType >()" << ::std::endl
         << true << " = "
-        << ::ScL::Feature::isThisPartOfOther< SecondPartType, SecondType >() << ::std::endl;
+        << ::ScL::Feature::IsThisCompatibleWithPartOfOther< SecondPartType, SecondType >() << ::std::endl;
 
-    static_assert( !::ScL::Feature::isThisPartOfOther< FirstType, FirstType >(), "" );
+    static_assert( !::ScL::Feature::IsThisCompatibleWithPartOfOther< FirstType, FirstType >(), "" );
     ::std::cout
-        << "isThisPartOfOther< FirstType, FirstType >()" << ::std::endl
+        << "IsThisCompatibleWithPartOfOther< FirstType, FirstType >()" << ::std::endl
         << false << " = "
-        << ::ScL::Feature::isThisPartOfOther< FirstType, FirstType >() << ::std::endl;
+        << ::ScL::Feature::IsThisCompatibleWithPartOfOther< FirstType, FirstType >() << ::std::endl;
 
-    static_assert( !::ScL::Feature::isThisPartOfOther< FirstType, SecondType >(), "" );
+    static_assert( !::ScL::Feature::IsThisCompatibleWithPartOfOther< FirstType, SecondType >(), "" );
     ::std::cout
-        << "isThisPartOfOther< FirstType, SecondType >()" << ::std::endl
+        << "IsThisCompatibleWithPartOfOther< FirstType, SecondType >()" << ::std::endl
         << false << " = "
-        << ::ScL::Feature::isThisPartOfOther< FirstType, SecondType >() << ::std::endl;
+        << ::ScL::Feature::IsThisCompatibleWithPartOfOther< FirstType, SecondType >() << ::std::endl;
 
-    static_assert( !::ScL::Feature::isThisPartOfOther< SecondType, FirstType >(), "" );
+    static_assert( !::ScL::Feature::IsThisCompatibleWithPartOfOther< SecondType, FirstType >(), "" );
     ::std::cout
-        << "isThisPartOfOther< SecondType, FirstType >()" << ::std::endl
+        << "IsThisCompatibleWithPartOfOther< SecondType, FirstType >()" << ::std::endl
         << false << " = "
-        << ::ScL::Feature::isThisPartOfOther< SecondType, FirstType >() << ::std::endl;
+        << ::ScL::Feature::IsThisCompatibleWithPartOfOther< SecondType, FirstType >() << ::std::endl;
 
-    static_assert( !::ScL::Feature::isThisPartOfOther< FirstPartType, SecondPartType >(), "" );
+    static_assert( !::ScL::Feature::IsThisCompatibleWithPartOfOther< FirstPartType, SecondPartType >(), "" );
     ::std::cout
-        << "isThisPartOfOther< FirstPartType, SecondPartType >()" << ::std::endl
+        << "IsThisCompatibleWithPartOfOther< FirstPartType, SecondPartType >()" << ::std::endl
         << false << " = "
-        << ::ScL::Feature::isThisPartOfOther< FirstPartType, SecondPartType >() << ::std::endl;
+        << ::ScL::Feature::IsThisCompatibleWithPartOfOther< FirstPartType, SecondPartType >() << ::std::endl;
 
     FirstType first_value;
     FirstPartType first_part_value;
