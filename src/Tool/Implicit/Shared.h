@@ -5,7 +5,9 @@
 #include <cassert>
 #include <memory>
 #include <utility>
+
 #include <ScL/Feature/Access/HolderGuard.h>
+#include <ScL/Feature/Trait.h>
 #include <ScL/Utility/SimilarRefer.h>
 
 namespace ScL { namespace Feature { namespace Implicit
@@ -91,8 +93,9 @@ namespace ScL { namespace Feature { namespace Implicit
              * kind of right.
              */
             template < typename _LeftWrapperRefer, typename _RightWrapperRefer,
-                typename = ::std::enable_if_t< !::std::is_const< ::std::remove_reference_t< _LeftWrapperRefer > >{}
-                    && ( ::std::is_volatile< ::std::remove_reference_t< _LeftWrapperRefer > >{} == ::std::is_volatile< ::std::remove_reference_t< _RightWrapperRefer > >{} ) > >
+                typename = ::std::enable_if_t< !::std::is_const< ::std::remove_reference_t< _LeftWrapperRefer > >::value
+                    && ::ScL::Feature::IsThisCompatibleWithOther< ::std::decay_t< _RightWrapperRefer >, ::std::decay_t< _LeftWrapperRefer > >::value
+                    && ( ::std::is_volatile< ::std::remove_reference_t< _LeftWrapperRefer > >::value == ::std::is_volatile< ::std::remove_reference_t< _RightWrapperRefer > >::value ) > >
             static decltype(auto) operatorAssignment ( _LeftWrapperRefer && left, _RightWrapperRefer && right )
             {
                 using RightWrapperRefer = _RightWrapperRefer &&;
@@ -107,7 +110,7 @@ namespace ScL { namespace Feature { namespace Implicit
              */
             template < typename _HolderRefer,
                 typename = ::std::enable_if_t<
-                    !::std::is_const< ::std::remove_reference_t< _HolderRefer > >{} > >
+                    !::std::is_const< ::std::remove_reference_t< _HolderRefer > >::value > >
             static constexpr void guard ( _HolderRefer && holder )
             {
                 if ( !!holder.m_pointer && !holder.m_pointer.unique() )
@@ -119,7 +122,7 @@ namespace ScL { namespace Feature { namespace Implicit
              * (except volatile).
              */
             template < typename _HolderRefer,
-                typename = ::std::enable_if_t< !::std::is_volatile< ::std::remove_reference_t< _HolderRefer > >{} > >
+                typename = ::std::enable_if_t< !::std::is_volatile< ::std::remove_reference_t< _HolderRefer > >::value > >
             static constexpr decltype(auto) value ( _HolderRefer && holder )
             {
                 using HolderRefer = _HolderRefer &&;
