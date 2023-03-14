@@ -21,7 +21,7 @@ namespace ScL { namespace Feature { namespace Detail
     class Wrapper final
         : public ::ScL::Feature::MixIn< Wrapper< _Value, _Tool > >
     {
-        static_assert( !::std::is_reference< _Tool >{},
+        static_assert( !::std::is_reference< _Tool >::value,
             "The template parameter _Tool must to be not a reference type." );
 
         template < typename >
@@ -44,14 +44,14 @@ namespace ScL { namespace Feature { namespace Detail
     public:
         /// Конструктор инициализации значения по заданным параметрам
         template < typename ... _Arguments,
-            typename = ::std::enable_if_t< ::std::is_constructible< Holder, _Arguments && ... >{} > >
+            typename = ::std::enable_if_t< ::std::is_constructible< Holder, _Arguments && ... >::value > >
         constexpr Wrapper ( _Arguments && ... arguments )
         noexcept( ::std::is_nothrow_constructible< Value, _Arguments && ... >() )
             : m_holder( ::std::forward< _Arguments >( arguments ) ... )
         {}
 
         template < typename _Type, typename ... _Arguments,
-            typename = ::std::enable_if_t< ::std::is_constructible< Holder, ::std::initializer_list< _Type >, _Arguments && ... >{} > >
+            typename = ::std::enable_if_t< ::std::is_constructible< Holder, ::std::initializer_list< _Type >, _Arguments && ... >::value > >
         constexpr Wrapper ( ::std::initializer_list< _Type > list, _Arguments && ... arguments )
         noexcept( ::std::is_nothrow_constructible< Value, ::std::initializer_list< _Type >, _Arguments && ... >() )
             : m_holder( list, ::std::forward< _Arguments >( arguments ) ... )
@@ -59,8 +59,8 @@ namespace ScL { namespace Feature { namespace Detail
 
         /* All kind of constructors for ThisType */
         SCL_CONSTRUCTOR_FOR_THIS_WRAPPER
-        /* All kind of constructors for Wrapper< _OtherValue, _Other > */
-        SCL_CONSTRUCTOR_FOR_OTHER_WRAPPER // TODO: to remove
+        /* All kind of constructors for Wrapper< _OtherValue, _OtherTool > */
+        SCL_CONSTRUCTOR_FOR_OTHER_WRAPPER
 
         /* All kind of assignment operators for any type (including Wrapper< _OtherValue, _Other >) */
         SCL_BINARY_OPERATOR_FOR_ANY( =, Assignment )
@@ -74,7 +74,7 @@ namespace ScL { namespace Feature { namespace Detail
         // а для оператора "->" использовать реализацию подобно другим.
         SCL_DEREFERENCE_OPERATOR( -> )
         SCL_ADDRESS_OF_OPERATOR( & )
-        //PREFIX_UNARY_OPERATOR( &, AddressOf )
+        // NOTE: SCL_PREFIX_UNARY_OPERATOR( &, AddressOf ) restricted
         SCL_PREFIX_UNARY_OPERATOR( *, Indirection )
         SCL_POSTFIX_UNARY_OPERATOR_WITH_ARGUMENT( ->*, MemberIndirection )
         SCL_BINARY_OPERATOR_FOR_ANY( SCL_SINGLE_ARG( , ), Comma )
@@ -126,7 +126,7 @@ namespace ScL { namespace Feature { namespace Detail
         SCL_BINARY_OPERATOR_FOR_ANY( <<, LeftShift )
         SCL_BINARY_OPERATOR_FOR_ANY( >>, RightShift )
 
-        // These overloads are used to implement output I/O manipulators such as std::endl.
+        // NOTE: These overloads are used to implement output I/O manipulators such as std::endl.
         template < typename ... _Arguments,
             typename = ::std::enable_if_t< sizeof...( _Arguments ) == 0 && ::ScL::Meta::isDetected< ::ScL::Meta::LeftShiftMemberStrictOperation, Value, Value & (*)( Value & ) >() > >
         decltype(auto) operator << ( Value & (*right)( Value & ) )
@@ -193,5 +193,11 @@ namespace std
         }
     };
 }
+
+namespace ScL { namespace Feature
+{
+    template < typename _Value, typename _Tool >
+    class MixIn< ::ScL::Feature::Detail::Wrapper< _Value, _Tool > > {};
+}}
 
 #endif
