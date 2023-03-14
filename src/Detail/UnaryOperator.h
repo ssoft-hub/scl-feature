@@ -81,7 +81,7 @@ namespace ScL { namespace Feature { namespace Detail
                 { \
                     using WrapperRefer = _Wrapper &&; \
                     using ValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< WrapperRefer >::Value, WrapperRefer >; \
-                    using Returned = ::std::result_of_t< Invokable( ValueRefer, _Arguments && ... ) >; \
+                    using Returned = ::std::invoke_result_t< Invokable, ValueRefer, _Arguments && ... >; \
      \
                     return ::ScL::Feature::Detail::Operator::ResultSwitch< ::ScL::Feature::Detail::Operator::LeftWrapperCase, ::ScL::Feature::Detail::Operator::ResultSwitchCase< Returned, ValueRefer > > \
                         ::invoke( ::ScL::Feature::Detail::Operator::Unary::Invokable{}, ::std::forward< WrapperRefer >( wrapper ), ::std::forward< _Arguments >( arguments ) ... ); \
