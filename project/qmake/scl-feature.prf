@@ -6,7 +6,7 @@ INCLUDEPATH *= \
 DEPENDPATH *= \
     $${PWD}/../../include \
 
-CONFIG *= c++11
+CONFIG *= c++17
 
 DEPENDS *= \
     scl-meta \

@@ -24,7 +24,7 @@ namespace ScL { namespace Feature { namespace Detail { namespace Guard
             using ValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< WrapperRefer >::Value, WrapperRefer >;
             using ResultRefer = _Type;
 
-            static_assert( ::std::is_same< ResultRefer, ::std::result_of_t< Invokable( ValueRefer, _Arguments && ... ) > >{},
+            static_assert( ::std::is_same< ResultRefer, ::std::invoke_result_t< Invokable, ValueRefer, _Arguments && ... > >{},
                 "The result of _Invokable( _LeftRefer, _WrapperRefer ) must to be a _Type" );
 
             WrapperGuard m_feature_guard;
@@ -77,7 +77,7 @@ namespace ScL { namespace Feature { namespace Detail { namespace Guard
             using ValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< WrapperRefer >::Value, WrapperRefer >;
             using ResultRefer = _Type;
 
-            static_assert( ::std::is_same< ResultRefer, ::std::result_of_t< Invokable( LeftRefer, ValueRefer ) > >{},
+            static_assert( ::std::is_same< ResultRefer, ::std::invoke_result_t< Invokable, LeftRefer, ValueRefer > >{},
                 "The result of _Invokable( _LeftRefer, _WrapperRefer ) must to be a _Type" );
 
             WrapperGuard m_feature_guard;
@@ -131,7 +131,7 @@ namespace ScL { namespace Feature { namespace Detail { namespace Guard
             using RightValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< RightWrapperRefer >::Value, RightWrapperRefer >;
             using ResultRefer = _Type;
 
-            static_assert( ::std::is_same< ResultRefer, ::std::result_of_t< Invokable( LeftValueRefer, RightValueRefer ) > >{},
+            static_assert( ::std::is_same< ResultRefer, ::std::invoke_result_t< Invokable, LeftValueRefer, RightValueRefer > >{},
                 "The result of _Invokable( _LeftRefer, _WrapperRefer ) must to be a _Type" );
 
             LeftWrapperGuard m_left_feature_guard;
