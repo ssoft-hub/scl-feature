@@ -44,9 +44,9 @@ namespace ScL { namespace Feature { namespace Detail
         {
             using Left = ::std::decay_t< _Left >;
             using Right = ::std::decay_t< _Right >;
-            using Type = ::std::conditional_t< ::ScL::Feature::isThisPartOfOther< Left, Right >(),
+            using Type = ::std::conditional_t< ::ScL::Feature::isPartOfThisCompatibleWithOther< Right, Left >(),
                     RightExposingCase,          // The Right Wrapper should be exposed
-                    ::std::conditional_t< ::ScL::Feature::isThisPartOfOther< Right, Left >(),
+                    ::std::conditional_t< ::ScL::Feature::isThisCompatibleWithPartOfOther< Right, Left >(),
                         LeftExposingCase,       // The Left Wrapper should be exposed
                         BothExposingCase > >;   // The Both Wrappers should be exposed
         };
@@ -153,7 +153,7 @@ namespace ScL { namespace Feature { namespace Detail
                 using WrapperRefer = _Wrapper &&;
                 using ValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< WrapperRefer >::Value, WrapperRefer >;
                 using Invokable = _Invokable;
-                using Returned = ::std::result_of_t< Invokable( ValueRefer, _Arguments && ... ) >;
+                using Returned = ::std::invoke_result_t< Invokable, ValueRefer, _Arguments && ... >;
 
                 static_assert( !::std::is_reference< Returned >{},
                     "The type of return parameter must to be not a reference type." );
@@ -174,7 +174,7 @@ namespace ScL { namespace Feature { namespace Detail
                 using ValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< WrapperRefer >::Value, WrapperRefer >;
                 using Invokable = _Invokable;
                 using InvokableRefer = _Invokable &&;
-                using Returned = ::std::result_of_t< Invokable( ValueRefer, _Arguments && ... ) >;
+                using Returned = ::std::invoke_result_t< Invokable, ValueRefer, _Arguments && ... >;
 
                 static_assert( ::std::is_reference< Returned >{},
                     "The type of return parameter must to be a reference type." );
@@ -222,7 +222,7 @@ namespace ScL { namespace Feature { namespace Detail
                 using WrapperRefer = _Wrapper &&;
                 using ValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< WrapperRefer >::Value, WrapperRefer >;
                 using Invokable = _Invokable;
-                using Returned = ::std::result_of_t< Invokable( LeftRefer, ValueRefer ) >;
+                using Returned = ::std::invoke_result_t< Invokable, LeftRefer, ValueRefer >;
 
                 static_assert( !::std::is_reference< Returned >{},
                     "The type of return parameter must to be not a reference type." );
@@ -244,7 +244,7 @@ namespace ScL { namespace Feature { namespace Detail
                 using ValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< WrapperRefer >::Value, WrapperRefer >;
                 using Invokable = _Invokable;
                 using InvokableRefer = _Invokable &&;
-                using Returned = ::std::result_of_t< Invokable( LeftRefer, ValueRefer ) >;
+                using Returned = ::std::invoke_result_t< Invokable, LeftRefer, ValueRefer >;
 
                 static_assert( ::std::is_reference< Returned >{},
                     "The type of return parameter must to be a reference type." );
@@ -355,7 +355,7 @@ namespace ScL { namespace Feature { namespace Detail
                 using RightWrapperRefer = _Right &&;
                 using RightValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< RightWrapperRefer >::Value, RightWrapperRefer >;
                 using Invokable = _Invokable;
-                using Returned = ::std::result_of_t< Invokable( LeftValueRefer, RightValueRefer ) >;
+                using Returned = ::std::invoke_result_t< Invokable, LeftValueRefer, RightValueRefer >;
 
                 static_assert( !::std::is_reference< Returned >{},
                     "The type of return parameter must to be not a reference type." );
@@ -378,7 +378,7 @@ namespace ScL { namespace Feature { namespace Detail
                 using RightWrapperRefer = _Right &&;
                 using RightValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< RightWrapperRefer >::Value, RightWrapperRefer >;
                 using Invokable = _Invokable;
-                using Returned = ::std::result_of_t< Invokable( LeftWrapperRefer, RightValueRefer ) >;
+                using Returned = ::std::invoke_result_t< Invokable, LeftWrapperRefer, RightValueRefer >;
 
                 static_assert( !::std::is_reference< Returned >{},
                     "The type of return parameter must to be not a reference type." );
@@ -400,7 +400,7 @@ namespace ScL { namespace Feature { namespace Detail
                 using LeftValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< LeftWrapperRefer >::Value, LeftWrapperRefer >;
                 using RightWrapperRefer = _Right &&;
                 using Invokable = _Invokable;
-                using Returned = ::std::result_of_t< Invokable( LeftValueRefer, RightWrapperRefer ) >;
+                using Returned = ::std::invoke_result_t< Invokable, LeftValueRefer, RightWrapperRefer >;
 
                 static_assert( !::std::is_reference< Returned >{},
                     "The type of return parameter must to be not a reference type." );
@@ -424,7 +424,7 @@ namespace ScL { namespace Feature { namespace Detail
                 using RightValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< RightWrapperRefer >::Value, RightWrapperRefer >;
                 using Invokable = _Invokable;
                 using InvokableRefer = _Invokable &&;
-                using Returned = ::std::result_of_t< Invokable( LeftValueRefer, RightValueRefer ) >;
+                using Returned = ::std::invoke_result_t< Invokable, LeftValueRefer, RightValueRefer >;
 
                 using GuardTool = ::ScL::Feature::Detail::Guard::BothTool< Invokable, LeftWrapperRefer, RightWrapperRefer >;
                 using ResultWrapper = ::ScL::Feature::Wrapper< Returned, GuardTool >;
@@ -443,7 +443,7 @@ namespace ScL { namespace Feature { namespace Detail
                 using RightValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< RightWrapperRefer >::Value, RightWrapperRefer >;
                 using Invokable = _Invokable;
                 using InvokableRefer = _Invokable &&;
-                using Returned = ::std::result_of_t< Invokable( LeftWrapperRefer, RightValueRefer ) >;
+                using Returned = ::std::invoke_result_t< Invokable, LeftWrapperRefer, RightValueRefer >;
 
                 using GuardTool = ::ScL::Feature::Detail::Guard::RightTool< Invokable, LeftWrapperRefer, RightWrapperRefer >;
                 using ResultWrapper = ::ScL::Feature::Wrapper< Returned, GuardTool >;
@@ -462,7 +462,7 @@ namespace ScL { namespace Feature { namespace Detail
                 using RightWrapperRefer = _Right &&;
                 using Invokable = _Invokable;
                 using InvokableRefer = _Invokable &&;
-                using Returned = ::std::result_of_t< Invokable( LeftValueRefer, RightWrapperRefer ) >;
+                using Returned = ::std::invoke_result_t< Invokable, LeftValueRefer, RightWrapperRefer >;
 
                 using GuardTool = ::ScL::Feature::Detail::Guard::LeftTool< Invokable, LeftWrapperRefer, RightWrapperRefer >;
                 using ResultWrapper = ::ScL::Feature::Wrapper< Returned, GuardTool >;

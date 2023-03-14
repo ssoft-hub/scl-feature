@@ -102,23 +102,23 @@ namespace ScL { namespace Feature { namespace Detail
         using RightValue = typename RightWrapper::Value; \
         using RightValueRefer = ::ScL::SimilarRefer< RightValue, RightWrapperRefer >; \
      \
-        static constexpr bool is_compatible_value = ::ScL::Feature::IsThisCompatibleWithOther< RightWrapper, LeftWrapper >{} \
+        static constexpr bool is_right_compatible_with_left = ::ScL::Feature::isThisCompatibleWithOther< RightWrapper, LeftWrapper >() \
             && ( ::ScL::Meta::isDetected< Operator ## Invokable ## StaticMethodStrictOperation, LeftHolder, LeftWrapperRefer, RightWrapperRefer >() \
                 || does ## Invokable ## OperatorExist< LeftValueRefer, RightValueRefer >() ); \
      \
-        static constexpr bool is_left_path_of_right_value = ::ScL::Feature::IsThisPartOfOther< LeftWrapper, RightWrapper >{} \
+        static constexpr bool is_path_of_right_compatible_with_left = ::ScL::Feature::isPartOfThisCompatibleWithOther< RightWrapper, LeftWrapper >() \
             && does ## Invokable ## OperatorExist< LeftWrapperRefer, RightValueRefer >(); \
      \
-        static constexpr bool is_right_path_of_left_value = ::ScL::Feature::IsThisPartOfOther< RightWrapper, LeftWrapper >{} \
+        static constexpr bool is_right_compatible_with_path_of_left = ::ScL::Feature::isThisCompatibleWithPartOfOther< RightWrapper, LeftWrapper >() \
             && does ## Invokable ## OperatorExist< LeftValueRefer, RightWrapperRefer >(); \
      \
-        static constexpr bool is_not_compatible_value = !::ScL::Feature::IsThisCompatibleWithOther< RightWrapper, LeftWrapper >{} \
+        static constexpr bool is_right_not_compatible_with_left = !::ScL::Feature::isThisCompatibleWithOther< RightWrapper, LeftWrapper >() \
             && does ## Invokable ## OperatorExist< LeftValueRefer, RightValueRefer >(); \
      \
-        static constexpr bool value = is_compatible_value \
-            || is_left_path_of_right_value \
-            || is_right_path_of_left_value \
-            || is_not_compatible_value; \
+        static constexpr bool value = is_right_compatible_with_left \
+            || is_path_of_right_compatible_with_left \
+            || is_right_compatible_with_path_of_left \
+            || is_right_not_compatible_with_left; \
         constexpr operator bool () const noexcept { return value; } \
     }; \
 
@@ -213,7 +213,9 @@ namespace ScL { namespace Feature { namespace Detail
                     using LeftWrapperRefer = _Left &&; \
                     using LeftValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< LeftWrapperRefer >::Value, LeftWrapperRefer >; \
                     using RightRefer = _Right &&; \
-                    using Returned = ::std::result_of_t< ::ScL::Feature::Detail::Operator::Binary::Invokable( LeftValueRefer, RightRefer ) >; \
+                    using Invokable = ::ScL::Feature::Detail::Operator::Binary::Invokable; \
+     \
+                    using Returned = ::std::invoke_result_t< Invokable, LeftValueRefer, RightRefer >; \
                     return ::ScL::Feature::Detail::Operator::ResultSwitch< ::ScL::Feature::Detail::Operator::LeftWrapperCase, ::ScL::Feature::Detail::Operator::ResultSwitchCase< Returned, LeftValueRefer > > \
                         ::invoke( ::ScL::Feature::Detail::Operator::Binary::Invokable(), ::std::forward< LeftWrapperRefer >( left ), ::std::forward< RightRefer >( right ) ); \
                 } \
@@ -241,7 +243,9 @@ namespace ScL { namespace Feature { namespace Detail
                     using LeftRefer = _Left &&; \
                     using RightWrapperRefer = _Right &&; \
                     using RightValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< RightWrapperRefer >::Value, RightWrapperRefer >; \
-                    using Returned = ::std::result_of_t< ::ScL::Feature::Detail::Operator::Binary::Invokable( LeftRefer, RightValueRefer ) >; \
+                    using Invokable = ::ScL::Feature::Detail::Operator::Binary::Invokable; \
+     \
+                    using Returned = ::std::invoke_result_t< Invokable, LeftRefer, RightValueRefer >; \
                     return ::ScL::Feature::Detail::Operator::ResultSwitch< ::ScL::Feature::Detail::Operator::RightWrapperCase, ::ScL::Feature::Detail::Operator::ResultSwitchCase< Returned, RightValueRefer > > \
                         ::invoke( ::ScL::Feature::Detail::Operator::Binary::Invokable(), ::std::forward< LeftRefer >( left ), ::std::forward< RightWrapperRefer >( right ) ); \
                 } \
@@ -283,8 +287,9 @@ namespace ScL { namespace Feature { namespace Detail
                     using LeftValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< LeftWrapperRefer >::Value, LeftWrapperRefer >; \
                     using RightWrapperRefer = _Right &&; \
                     using RightValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< RightWrapperRefer >::Value, RightWrapperRefer >; \
+                    using Invokable = ::ScL::Feature::Detail::Operator::Binary::Invokable; \
      \
-                    using Returned = ::std::result_of_t< ::ScL::Feature::Detail::Operator::Binary::Invokable( LeftValueRefer, RightValueRefer ) >; \
+                    using Returned = ::std::invoke_result_t< Invokable, LeftValueRefer, RightValueRefer >; \
                     return ::ScL::Feature::Detail::Operator::ResultSwitch< ::ScL::Feature::Detail::Operator::BothExposingCase, ::ScL::Feature::Detail::Operator::ResultSwitchCase< Returned, LeftValueRefer > > \
                         ::invoke( ::ScL::Feature::Detail::Operator::Binary::Invokable(), ::std::forward< LeftWrapperRefer >( left ), ::std::forward< RightWrapperRefer >( right ) ); \
                 } \
@@ -299,8 +304,9 @@ namespace ScL { namespace Feature { namespace Detail
                     using LeftWrapperRefer = _Left &&; \
                     using LeftValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< LeftWrapperRefer >::Value, LeftWrapperRefer >; \
                     using RightWrapperRefer = _Right &&; \
+                    using Invokable = ::ScL::Feature::Detail::Operator::Binary::Invokable; \
      \
-                    using Returned = ::std::result_of_t< ::ScL::Feature::Detail::Operator::Binary::Invokable( LeftValueRefer, RightWrapperRefer ) >; \
+                    using Returned = ::std::invoke_result_t< Invokable, LeftValueRefer, RightWrapperRefer >; \
                     return ::ScL::Feature::Detail::Operator::ResultSwitch< ::ScL::Feature::Detail::Operator::LeftExposingCase, ::ScL::Feature::Detail::Operator::ResultSwitchCase< Returned, LeftValueRefer > > \
                         ::invoke( ::ScL::Feature::Detail::Operator::Binary::Invokable(), ::std::forward< LeftWrapperRefer >( left ), ::std::forward< RightWrapperRefer >( right ) ); \
                 } \
@@ -315,8 +321,9 @@ namespace ScL { namespace Feature { namespace Detail
                     using LeftWrapperRefer = _Left &&; \
                     using RightWrapperRefer = _Right &&; \
                     using RightValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< RightWrapperRefer >::Value, RightWrapperRefer >; \
+                    using Invokable = ::ScL::Feature::Detail::Operator::Binary::Invokable; \
      \
-                    using Returned = ::std::result_of_t< ::ScL::Feature::Detail::Operator::Binary::Invokable( LeftWrapperRefer, RightValueRefer ) >; \
+                    using Returned = ::std::invoke_result_t< Invokable, LeftWrapperRefer, RightValueRefer >; \
                     return ::ScL::Feature::Detail::Operator::ResultSwitch< ::ScL::Feature::Detail::Operator::RightExposingCase, ::ScL::Feature::Detail::Operator::ResultSwitchCase< Returned, LeftWrapperRefer > > \
                         ::invoke( ::ScL::Feature::Detail::Operator::Binary::Invokable(), ::std::forward< LeftWrapperRefer >( left ), ::std::forward< RightWrapperRefer >( right ) ); \
                 } \
