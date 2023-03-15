@@ -90,7 +90,7 @@ SCL_BINARY_OPERATOR_IMPLEMENTAION( ^=, BitwiseXorAssignment )
     { \
         using LeftRefer = _Left &&; \
         using RightRefer = _Right &&; \
-        return ::ScL::Feature::Detail::Operator::Binary::LeftShiftHelper< LeftRefer, RightRefer >::invoke( ::std::forward< LeftRefer >( left ), ::std::forward< RightRefer >( right ) ); \
+        return ::ScL::Feature::Detail::Operator::Binary::Invokable ## Helper< LeftRefer, RightRefer >::invoke( ::std::forward< LeftRefer >( left ), ::std::forward< RightRefer >( right ) ); \
     } \
 
 #define SCL_BINARY_OPERATOR_PROTOTYPE_FOR_THIS( symbol, this_refer, other_refer, Invokable ) \
