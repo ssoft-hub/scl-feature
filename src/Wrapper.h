@@ -12,36 +12,36 @@ namespace ScL { namespace Feature { namespace Detail { template < typename, type
 namespace ScL { namespace Feature { namespace Detail
 {
     template < typename _Value, typename ... _Tools >
-    struct MultyToolHelper;
+    struct MultiToolHelper;
 
     template < typename _Value >
-    struct MultyToolHelper< _Value >
+    struct MultiToolHelper< _Value >
     {
-        using Type = typename MultyToolHelper< _Value, ::ScL::Feature::Inplace::Default >::Type;
+        using Type = typename MultiToolHelper< _Value, ::ScL::Feature::Inplace::Default >::Type;
     };
 
     template < typename _Value, typename _Tool >
-    struct MultyToolHelper< _Value, _Tool >
+    struct MultiToolHelper< _Value, _Tool >
     {
         using Type = ::ScL::Feature::Detail::Wrapper< _Value, _Tool >;
     };
 
     template < typename _Value, typename _Tool >
-    struct MultyToolHelper< ::ScL::Feature::Detail::Wrapper< _Value, _Tool > >
+    struct MultiToolHelper< ::ScL::Feature::Detail::Wrapper< _Value, _Tool > >
     {
         using Type = ::ScL::Feature::Detail::Wrapper< _Value, _Tool >;
     };
 
     template < typename _Value, typename _Tool, typename ... _Tools >
-    struct MultyToolHelper< _Value, _Tool, _Tools ... >
+    struct MultiToolHelper< _Value, _Tool, _Tools ... >
     {
-        using Type = typename MultyToolHelper< ::ScL::Feature::Detail::Wrapper< _Value, _Tool >, _Tools ... >::Type;
+        using Type = typename MultiToolHelper< ::ScL::Feature::Detail::Wrapper< _Value, _Tool >, _Tools ... >::Type;
     };
 
     template < typename _Value, typename _Tool, typename ... _Tools >
-    struct MultyToolHelper< _Value, _Tool, _Tool, _Tools ... >
+    struct MultiToolHelper< _Value, _Tool, _Tool, _Tools ... >
     {
-        using Type = typename MultyToolHelper< _Value, _Tool, _Tools ... >::Type;
+        using Type = typename MultiToolHelper< _Value, _Tool, _Tools ... >::Type;
     };
 }}}
 
@@ -65,7 +65,7 @@ namespace ScL { namespace Feature { namespace Detail
 namespace ScL { namespace Feature
 {
     template < typename _Value, typename ... _Tools >
-    using Wrapper = typename ::ScL::Feature::Detail::WrapperSimplifyHelper< typename ::ScL::Feature::Detail::MultyToolHelper< _Value, _Tools ... >::Type >::Type;
+    using Wrapper = typename ::ScL::Feature::Detail::WrapperSimplifyHelper< typename ::ScL::Feature::Detail::MultiToolHelper< _Value, _Tools ... >::Type >::Type;
         //!< This is definition of Wrapper type. No tool duplicates are guarantee.
 }}
 
