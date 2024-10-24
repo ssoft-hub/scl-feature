@@ -3,8 +3,7 @@
 #define SCL_WRAPPER_TOOL_IMPLICIT_RAW_H
 
 #include <atomic>
-#include <cassert>
-#include <cinttypes>
+#include <cstddef>
 #include <memory>
 #include <utility>
 
