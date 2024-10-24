@@ -2,7 +2,6 @@
 #ifndef SCL_WRAPPER_TOOL_IMPLICIT_SHARED_H
 #define SCL_WRAPPER_TOOL_IMPLICIT_SHARED_H
 
-#include <cassert>
 #include <memory>
 #include <utility>
 
@@ -113,7 +112,7 @@ namespace ScL { namespace Feature { namespace Implicit
                     !::std::is_const< ::std::remove_reference_t< _HolderRefer > >::value > >
             static constexpr void guard ( _HolderRefer && holder )
             {
-                if ( !!holder.m_pointer && !holder.m_pointer.unique() )
+                if ( !!holder.m_pointer && holder.m_pointer.use_count() != 1 )
                     holder.m_pointer = ::std::make_shared< Value >( *holder.m_pointer.get() );
             }
 
