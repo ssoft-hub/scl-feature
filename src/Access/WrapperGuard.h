@@ -2,10 +2,10 @@
 #ifndef SCL_GUARD_FEATURE_POINTER_H
 #define SCL_GUARD_FEATURE_POINTER_H
 
+#include <cassert>
 #include <ScL/Utility/SimilarRefer.h>
 
 #include "Detail/HolderInterface.h"
-#include "Detail/ReferPointer.h"
 
 namespace ScL { namespace Feature { namespace Detail { template < typename _Value, typename _Tool > class Wrapper; }}}
 namespace ScL { namespace Feature { namespace Detail { template < typename _Refer > struct WrapperGuardHelper; }}}
@@ -30,36 +30,35 @@ namespace ScL { namespace Feature { namespace Detail
 
     public:
         using Refer = _Refer;
-        using ReferPointer = ::ScL::Feature::Detail::ReferPointer< Refer >;
+        using Pointer = ::std::add_pointer_t< ::std::remove_reference_t< Refer > >;
 
         using ValueAccess = Refer;
-        using PointerAccess = ReferPointer const &;
+        using PointerAccess = Pointer;
 
         static_assert( ::std::is_reference< Refer >::value, "The template parameter _Refer must to be a reference type." );
         static_assert( !::ScL::Feature::isWrapper< ::std::decay_t< Refer > >(), "The template parameter _Refer must to be a not Wrapper type reference!" );
 
     private:
-        ReferPointer m_refer_pointer;
+        Pointer m_pointer;
+
+    private:
+        DefaultWrapperGuard ( ThisType && other ) = delete;
+        DefaultWrapperGuard ( const ThisType & other ) = delete;
 
     public:
-        DefaultWrapperGuard ( Refer refer )
-            : m_refer_pointer( ::std::forward< Refer >( refer ) )
+        constexpr DefaultWrapperGuard ( Refer refer )
+            : m_pointer( ::std::addressof( refer ) )
         {
         }
 
-        DefaultWrapperGuard ( ThisType && other )
-            : m_refer_pointer( ::std::forward< ReferPointer >( other.m_refer_pointer ) )
+        constexpr ValueAccess valueAccess () const
         {
+            return ::std::forward< ValueAccess >( *m_pointer );
         }
 
-        ValueAccess valueAccess () const
+        constexpr PointerAccess pointerAccess () const
         {
-            return ::std::forward< ValueAccess >( *m_refer_pointer );
-        }
-
-        PointerAccess pointerAccess () const
-        {
-            return m_refer_pointer;
+            return m_pointer;
         }
     };
 }}}
@@ -82,7 +81,9 @@ namespace ScL { namespace Feature { namespace Detail
         using ValueRefer = ::ScL::SimilarRefer< Value, WrapperRefer >;
         using Holder = typename Wrapper::Holder;
         using HolderRefer = ::ScL::SimilarRefer< Holder, WrapperRefer >;
-        using ReferPointer = ::ScL::Feature::Detail::ReferPointer< WrapperRefer >;
+        using WrapperPointer = ::std::add_pointer_t< ::std::remove_reference_t< WrapperRefer > >;
+
+        //using ReferPointer = ::ScL::Feature::Detail::ReferPointer< WrapperRefer >;
 
         using WrapperAccess = ValueRefer;
         using HolderAccess = HolderRefer;
@@ -93,41 +94,38 @@ namespace ScL { namespace Feature { namespace Detail
         static_assert( ::ScL::Feature::isSimilar< HolderRefer, WrapperRefer >(), "The Refer and HolderRefer must to be similar types!" );
 
     private:
-        ReferPointer m_refer_pointer;
+        //ReferPointer m_pointer;
+        WrapperPointer m_pointer;
 
     private:
+        SpecialWrapperGuard ( ThisType && other ) = delete;
         SpecialWrapperGuard ( const ThisType & other ) = delete;
 
     public:
-        SpecialWrapperGuard ( WrapperRefer refer )
-            : m_refer_pointer( ::std::forward< WrapperRefer >( refer ) )
+        constexpr SpecialWrapperGuard ( WrapperRefer refer )
+            : m_pointer( ::std::addressof( refer ) )
         {
             static_assert( ::ScL::Feature::Detail::HolderInterface::doesValueStaticMethodExist< Holder, HolderRefer >()
                 , "There are no appropriate access methods for Holder." );
-            ::ScL::Feature::Detail::HolderInterface::guard< HolderRefer >( ::ScL::Feature::Detail::wrapperHolder< WrapperRefer >( *m_refer_pointer ) );
-        }
-
-        SpecialWrapperGuard ( ThisType && other )
-            : m_refer_pointer( ::std::forward< ReferPointer >( other.m_refer_pointer ) )
-        {
+            ::ScL::Feature::Detail::HolderInterface::guard< HolderRefer >( ::ScL::Feature::Detail::wrapperHolder< WrapperRefer >( ::std::forward< WrapperRefer >( *m_pointer ) ) );
         }
 
         ~SpecialWrapperGuard ()
         {
-            if ( !!m_refer_pointer )
-                ::ScL::Feature::Detail::HolderInterface::unguard< HolderRefer >( ::ScL::Feature::Detail::wrapperHolder< WrapperRefer >( *m_refer_pointer ) );
+            assert( m_pointer );
+            ::ScL::Feature::Detail::HolderInterface::unguard< HolderRefer >( ::ScL::Feature::Detail::wrapperHolder< WrapperRefer >( ::std::forward< WrapperRefer >( *m_pointer ) ) );
         }
 
-        WrapperAccess wrapperAccess () const
+        constexpr WrapperAccess wrapperAccess () const
         {
-            assert( m_refer_pointer );
-            return ::ScL::Feature::Detail::HolderInterface::value< HolderRefer >( ::ScL::Feature::Detail::wrapperHolder< WrapperRefer >( *m_refer_pointer ) );
+            assert( m_pointer );
+            return ::ScL::Feature::Detail::HolderInterface::value< HolderRefer >( ::ScL::Feature::Detail::wrapperHolder< WrapperRefer >( ::std::forward< WrapperRefer >( *m_pointer ) ) );
         }
 
-        HolderAccess holderAccess () const
+        constexpr HolderAccess holderAccess () const
         {
-            assert( m_refer_pointer );
-            return ::ScL::Feature::Detail::wrapperHolder< WrapperRefer >( *m_refer_pointer );
+            assert( m_pointer );
+            return ::ScL::Feature::Detail::wrapperHolder< WrapperRefer >( ::std::forward< WrapperRefer >( *m_pointer ) );
         }
     };
 }}}
