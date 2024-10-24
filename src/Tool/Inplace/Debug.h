@@ -92,111 +92,111 @@ namespace ScL { namespace Feature { namespace Inplace
 
             template < typename ... _Arguments >
             constexpr Holder ( _Arguments && ... arguments )
-                : m_value( ::std::forward< _Arguments >( arguments ) ... )
+                : m_value{ ::std::forward< _Arguments >( arguments ) ... }
             {
                 outText( SCL_DEBUG_FUNC_INFO );
             }
 
             constexpr Holder ( ThisType && other )
-                : m_value( ::std::forward< Value >( other.m_value ) )
+                : m_value{ ::std::forward< Value >( other.m_value ) }
             {
                 outText( SCL_DEBUG_FUNC_INFO );
             }
 
             constexpr Holder ( const ThisType && other )
-                : m_value( ::std::forward< const Value >( other.m_value ) )
+                : m_value{ ::std::forward< const Value >( other.m_value ) }
             {
                 outText( SCL_DEBUG_FUNC_INFO );
             }
 
             constexpr Holder ( volatile ThisType && other )
-                : m_value( ::std::forward< volatile Value >( other.m_value ) )
+                : m_value{ ::std::forward< volatile Value >( other.m_value ) }
             {
                 outText( SCL_DEBUG_FUNC_INFO );
             }
 
             constexpr Holder ( const volatile ThisType && other )
-                : m_value( ::std::forward< const volatile Value >( other.m_value ) )
+                : m_value{ ::std::forward< const volatile Value >( other.m_value ) }
             {
                 outText( SCL_DEBUG_FUNC_INFO );
             }
 
             constexpr Holder ( ThisType & other )
-                : m_value( other.m_value )
+                : m_value{ other.m_value }
             {
                 outText( SCL_DEBUG_FUNC_INFO );
             }
 
             constexpr Holder ( const ThisType & other )
-                : m_value( other.m_value )
+                : m_value{ other.m_value }
             {
                 outText( SCL_DEBUG_FUNC_INFO );
             }
 
             constexpr Holder ( volatile ThisType & other )
-                : m_value( other.m_value )
+                : m_value{ other.m_value }
             {
                 outText( SCL_DEBUG_FUNC_INFO );
             }
 
             constexpr Holder ( const volatile ThisType & other )
-                : m_value( other.m_value )
+                : m_value{ other.m_value }
             {
                 outText( SCL_DEBUG_FUNC_INFO );
             }
 
             template < typename _OtherValue >
             constexpr Holder ( Holder< _OtherValue > && other )
-                : m_value( ::std::forward< typename Holder< _OtherValue >::Value >( other.m_value ) )
+                : m_value{ ::std::forward< typename Holder< _OtherValue >::Value >( other.m_value ) }
             {
                 outText( SCL_DEBUG_FUNC_INFO );
             }
 
             template < typename _OtherValue >
             constexpr Holder ( const Holder< _OtherValue > && other )
-                : m_value( ::std::forward< typename Holder< const _OtherValue >::Value >( other.m_value ) )
+                : m_value{ ::std::forward< typename Holder< const _OtherValue >::Value >( other.m_value ) }
             {
                 outText( SCL_DEBUG_FUNC_INFO );
             }
 
             template < typename _OtherValue >
             constexpr Holder ( volatile Holder< _OtherValue > && other )
-                : m_value( ::std::forward< typename Holder< volatile _OtherValue >::Value >( other.m_value ) )
+                : m_value{ ::std::forward< typename Holder< volatile _OtherValue >::Value >( other.m_value ) }
             {
                 outText( SCL_DEBUG_FUNC_INFO );
             }
 
             template < typename _OtherValue >
             constexpr Holder ( const volatile Holder< _OtherValue > && other )
-                : m_value( ::std::forward< typename Holder< const volatile _OtherValue >::Value >( other.m_value ) )
+                : m_value{ ::std::forward< typename Holder< const volatile _OtherValue >::Value >( other.m_value ) }
             {
                 outText( SCL_DEBUG_FUNC_INFO );
             }
 
             template < typename _OtherValue >
             constexpr Holder ( Holder< _OtherValue > & other )
-                : m_value( other.m_value )
+                : m_value{ other.m_value }
             {
                 outText( SCL_DEBUG_FUNC_INFO );
             }
 
             template < typename _OtherValue >
             constexpr Holder ( const Holder< _OtherValue > & other )
-                : m_value( other.m_value )
+                : m_value{ other.m_value }
             {
                 outText( SCL_DEBUG_FUNC_INFO );
             }
 
             template < typename _OtherValue >
             constexpr Holder ( volatile Holder< _OtherValue > & other )
-                : m_value( other.m_value )
+                : m_value{ other.m_value }
             {
                 outText( SCL_DEBUG_FUNC_INFO );
             }
 
             template < typename _OtherValue >
             constexpr Holder ( const volatile Holder< _OtherValue > & other )
-                : m_value( other.m_value )
+                : m_value{ other.m_value }
             {
                 outText( SCL_DEBUG_FUNC_INFO );
             }
