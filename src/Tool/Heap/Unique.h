@@ -29,12 +29,12 @@ namespace ScL { namespace Feature { namespace Heap
 
             template < typename ... _Arguments >
             Holder ( _Arguments && ... arguments )
-                : m_pointer( ::std::make_unique< Value >( ::std::forward< _Arguments >( arguments ) ... ) )
+                : m_pointer{ ::std::make_unique< Value >( ::std::forward< _Arguments >( arguments ) ... ) }
             {
             }
 
             Holder ( ThisType && other )
-                : m_pointer( ::std::forward< Pointer >( other.m_pointer ) )
+                : m_pointer{ ::std::forward< Pointer >( other.m_pointer ) }
             {
             }
 
@@ -55,7 +55,7 @@ namespace ScL { namespace Feature { namespace Heap
 
             template < typename _OtherValue >
             Holder ( Holder< _OtherValue > && other )
-                : m_pointer( ::std::forward< typename Holder< _OtherValue >::Pointer >( other.m_pointer ) )
+                : m_pointer{ ::std::forward< typename Holder< _OtherValue >::Pointer >( other.m_pointer ) }
             {
             }
 

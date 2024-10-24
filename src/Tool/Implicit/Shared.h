@@ -33,27 +33,27 @@ namespace ScL { namespace Feature { namespace Implicit
 
             template < typename ... _Arguments >
             Holder ( _Arguments && ... arguments )
-                : m_pointer( ::std::make_shared< Value >( ::std::forward< _Arguments >( arguments ) ... ) )
+                : m_pointer{ ::std::make_shared< Value >( ::std::forward< _Arguments >( arguments ) ... ) }
             {
             }
 
             Holder ( ThisType && other )
-                : m_pointer( ::std::forward< Pointer >( other.m_pointer ) )
+                : m_pointer{ ::std::forward< Pointer >( other.m_pointer ) }
             {
             }
 
             Holder ( const ThisType && other )
-                : m_pointer( other.m_pointer )
+                : m_pointer{ other.m_pointer }
             {
             }
 
             Holder ( ThisType & other )
-                : m_pointer( other.m_pointer )
+                : m_pointer{ other.m_pointer }
             {
             }
 
             Holder ( const ThisType & other )
-                : m_pointer( other.m_pointer )
+                : m_pointer{ other.m_pointer }
             {
             }
 
@@ -65,19 +65,19 @@ namespace ScL { namespace Feature { namespace Implicit
 
             template < typename _OtherValue >
             Holder ( const Holder< _OtherValue > && other )
-                : m_pointer( other.m_pointer )
+                : m_pointer{ other.m_pointer }
             {
             }
 
             template < typename _OtherValue >
             Holder ( Holder< _OtherValue > & other )
-                : m_pointer( other.m_pointer )
+                : m_pointer{ other.m_pointer }
             {
             }
 
             template < typename _OtherValue >
             Holder ( Holder< _OtherValue > const  & other )
-                : m_pointer( other.m_pointer )
+                : m_pointer{ other.m_pointer }
             {
             }
 
