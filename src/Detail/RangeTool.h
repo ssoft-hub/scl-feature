@@ -2,10 +2,10 @@
 #ifndef SCL_FEATURE_TOOL_GUARD_RANGE_TOOL_H
 #define SCL_FEATURE_TOOL_GUARD_RANGE_TOOL_H
 
+#include <cassert>
 #include <ScL/Feature/Access/ValueGuard.h>
 #include <ScL/Feature/Trait.h>
 #include <ScL/Utility/SimilarRefer.h>
-#include <functional>
 
 namespace ScL { namespace Feature { namespace Detail { namespace Guard
 {

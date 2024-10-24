@@ -2,7 +2,6 @@
 #ifndef SCL_WRAPPER_TOOL_HEAP_UNIQUE_H
 #define SCL_WRAPPER_TOOL_HEAP_UNIQUE_H
 
-#include <cassert>
 #include <memory>
 #include <utility>
 

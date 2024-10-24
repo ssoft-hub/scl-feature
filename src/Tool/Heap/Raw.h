@@ -2,10 +2,7 @@
 #ifndef SCL_WRAPPER_TOOL_HEAP_RAW_H
 #define SCL_WRAPPER_TOOL_HEAP_RAW_H
 
-#include <cassert>
-#include <memory>
 #include <utility>
-
 #include <ScL/Feature/Access/HolderGuard.h>
 #include <ScL/Feature/Trait.h>
 #include <ScL/Utility/SimilarRefer.h>
