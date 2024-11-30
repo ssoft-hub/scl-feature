@@ -25,111 +25,111 @@ namespace ScL { namespace Feature { namespace Inplace
             template < typename ... _Arguments >
             constexpr Holder ( _Arguments && ... arguments )
             noexcept( ::std::is_nothrow_constructible< Value, _Arguments && ... >() )
-                : m_value( ::std::forward< _Arguments >( arguments ) ... )
+                : m_value{ ::std::forward< _Arguments >( arguments ) ... }
             {
             }
 
             constexpr Holder ( ThisType && other )
             noexcept( ::std::is_nothrow_constructible< Value, Value && >() )
-                : m_value( ::std::forward< Value >( other.m_value ) )
+                : m_value{ ::std::forward< Value >( other.m_value ) }
             {
             }
 
             constexpr Holder ( const ThisType && other )
             noexcept( ::std::is_nothrow_constructible< Value, const Value && >() )
-                : m_value( ::std::forward< const Value >( other.m_value ) )
+                : m_value{ ::std::forward< const Value >( other.m_value ) }
             {
             }
 
             constexpr Holder ( volatile ThisType && other )
             noexcept( ::std::is_nothrow_constructible< Value, volatile Value && >() )
-                : m_value( ::std::forward< volatile Value >( other.m_value ) )
+                : m_value{ ::std::forward< volatile Value >( other.m_value ) }
             {
             }
 
             constexpr Holder ( const volatile ThisType && other )
             noexcept( ::std::is_nothrow_constructible< Value, const volatile Value && >() )
-                : m_value( ::std::forward< const volatile Value >( other.m_value ) )
+                : m_value{ ::std::forward< const volatile Value >( other.m_value ) }
             {
             }
 
             constexpr Holder ( ThisType & other )
             noexcept( ::std::is_nothrow_constructible< Value, Value & >() )
-                : m_value( other.m_value )
+                : m_value{ other.m_value }
             {
             }
 
             constexpr Holder ( const ThisType & other )
             noexcept( ::std::is_nothrow_constructible< Value, const Value & >() )
-                : m_value( other.m_value )
+                : m_value{ other.m_value }
             {
             }
 
             constexpr Holder ( volatile ThisType & other )
             noexcept( ::std::is_nothrow_constructible< Value, volatile Value & >() )
-                : m_value( other.m_value )
+                : m_value{ other.m_value }
             {
             }
 
             constexpr Holder ( const volatile ThisType & other )
             noexcept( ::std::is_nothrow_constructible< Value, const volatile Value & >() )
-                : m_value( other.m_value )
+                : m_value{ other.m_value }
             {
             }
 
             template < typename _OtherValue >
             constexpr Holder ( Holder< _OtherValue > && other )
             noexcept( ::std::is_nothrow_constructible< Value, _OtherValue && >() )
-                : m_value( ::std::forward< typename Holder< _OtherValue >::Value >( other.m_value ) )
+                : m_value{ ::std::forward< typename Holder< _OtherValue >::Value >( other.m_value ) }
             {
             }
 
             template < typename _OtherValue >
             constexpr Holder ( const Holder< _OtherValue > && other )
             noexcept( ::std::is_nothrow_constructible< Value, const _OtherValue && >() )
-                : m_value( ::std::forward< typename Holder< const _OtherValue >::Value >( other.m_value ) )
+                : m_value{ ::std::forward< typename Holder< const _OtherValue >::Value >( other.m_value ) }
             {
             }
 
             template < typename _OtherValue >
             constexpr Holder ( volatile Holder< _OtherValue > && other )
             noexcept( ::std::is_nothrow_constructible< Value, volatile _OtherValue && >() )
-                : m_value( ::std::forward< typename Holder< volatile _OtherValue >::Value >( other.m_value ) )
+                : m_value{ ::std::forward< typename Holder< volatile _OtherValue >::Value >( other.m_value ) }
             {
             }
 
             template < typename _OtherValue >
             constexpr Holder ( const volatile Holder< _OtherValue > && other )
             noexcept( ::std::is_nothrow_constructible< Value, const volatile _OtherValue && >() )
-                : m_value( ::std::forward< typename Holder< const volatile _OtherValue >::Value >( other.m_value ) )
+                : m_value{ ::std::forward< typename Holder< const volatile _OtherValue >::Value >( other.m_value ) }
             {
             }
 
             template < typename _OtherValue >
             constexpr Holder ( Holder< _OtherValue > & other )
             noexcept( ::std::is_nothrow_constructible< Value, _OtherValue & >() )
-                : m_value( other.m_value )
+                : m_value{ other.m_value }
             {
             }
 
             template < typename _OtherValue >
             constexpr Holder ( const Holder< _OtherValue > & other )
             noexcept( ::std::is_nothrow_constructible< Value, const _OtherValue & >() )
-                : m_value( other.m_value )
+                : m_value{ other.m_value }
             {
             }
 
             template < typename _OtherValue >
             constexpr Holder ( volatile Holder< _OtherValue > & other )
             noexcept( ::std::is_nothrow_constructible< Value, volatile _OtherValue & >() )
-                : m_value( other.m_value )
+                : m_value{ other.m_value }
             {
             }
 
             template < typename _OtherValue >
             constexpr Holder ( const volatile Holder< _OtherValue > & other )
             noexcept( ::std::is_nothrow_constructible< Value, const volatile _OtherValue & >() )
-                : m_value( other.m_value )
+                : m_value{ other.m_value }
             {
             }
 

@@ -32,13 +32,13 @@ namespace ScL { namespace Feature { namespace ThreadSafe
 
             template < typename ... _Arguments >
             Holder ( _Arguments && ... arguments )
-                : m_lock()
-                , m_value( ::std::forward< _Arguments >( arguments ) ... )
+                : m_lock{}
+                , m_value{ ::std::forward< _Arguments >( arguments ) ... }
             {
             }
 
             Holder ( ThisType && other )
-                : m_lock()
+                : m_lock{}
             {
                 using OtherMovableGuard = ::ScL::Feature::HolderGuard< ThisType && >;
                 OtherMovableGuard guard( other );
@@ -46,7 +46,7 @@ namespace ScL { namespace Feature { namespace ThreadSafe
             }
 
             Holder ( const ThisType && other )
-                : m_lock()
+                : m_lock{}
             {
                 using OtherReadableGuard = ::ScL::Feature::HolderGuard< const ThisType && >;
                 OtherReadableGuard guard( other );
@@ -54,7 +54,7 @@ namespace ScL { namespace Feature { namespace ThreadSafe
             }
 
             Holder ( volatile ThisType && other )
-                : m_lock()
+                : m_lock{}
             {
                 using OtherMovableGuard = ::ScL::Feature::HolderGuard< volatile ThisType && >;
                 OtherMovableGuard guard( other );
@@ -62,7 +62,7 @@ namespace ScL { namespace Feature { namespace ThreadSafe
             }
 
             Holder ( const volatile ThisType && other )
-                : m_lock()
+                : m_lock{}
             {
                 using OtherReadableGuard = ::ScL::Feature::HolderGuard< const volatile ThisType && >;
                 OtherReadableGuard guard( other );
@@ -70,7 +70,7 @@ namespace ScL { namespace Feature { namespace ThreadSafe
             }
 
             Holder ( ThisType & other )
-                : m_lock()
+                : m_lock{}
             {
                 using OtherMovableGuard = ::ScL::Feature::HolderGuard< ThisType & >;
                 OtherMovableGuard guard( other );
@@ -78,7 +78,7 @@ namespace ScL { namespace Feature { namespace ThreadSafe
             }
 
             Holder ( const ThisType & other )
-                : m_lock()
+                : m_lock{}
             {
                 using OtherReadableGuard = ::ScL::Feature::HolderGuard< const ThisType & >;
                 OtherReadableGuard guard( other );
@@ -86,7 +86,7 @@ namespace ScL { namespace Feature { namespace ThreadSafe
             }
 
             Holder ( volatile ThisType & other )
-                : m_lock()
+                : m_lock{}
             {
                 using OtherMovableGuard = ::ScL::Feature::HolderGuard< volatile ThisType & >;
                 OtherMovableGuard guard( other );
@@ -94,7 +94,7 @@ namespace ScL { namespace Feature { namespace ThreadSafe
             }
 
             Holder ( const volatile ThisType & other )
-                : m_lock()
+                : m_lock{}
             {
                 using OtherReadableGuard = ::ScL::Feature::HolderGuard< const volatile ThisType & >;
                 OtherReadableGuard guard( other );
@@ -103,7 +103,7 @@ namespace ScL { namespace Feature { namespace ThreadSafe
 
             template < typename _OtherValue >
             Holder ( Holder< _OtherValue > && other )
-                : m_lock()
+                : m_lock{}
             {
                 using OtherMovableGuard = ::ScL::Feature::HolderGuard< Holder< _OtherValue > && >;
                 OtherMovableGuard guard( other );
@@ -112,7 +112,7 @@ namespace ScL { namespace Feature { namespace ThreadSafe
 
             template < typename _OtherValue >
             Holder ( const Holder< _OtherValue > && other )
-                : m_lock()
+                : m_lock{}
             {
                 using OtherReadableGuard = ::ScL::Feature::HolderGuard< const Holder< _OtherValue > && >;
                 OtherReadableGuard guard( other );
@@ -121,7 +121,7 @@ namespace ScL { namespace Feature { namespace ThreadSafe
 
             template < typename _OtherValue >
             Holder ( volatile Holder< _OtherValue > && other )
-                : m_lock()
+                : m_lock{}
             {
                 using OtherMovableGuard = ::ScL::Feature::HolderGuard< volatile Holder< _OtherValue > && >;
                 OtherMovableGuard guard( other );
@@ -130,7 +130,7 @@ namespace ScL { namespace Feature { namespace ThreadSafe
 
             template < typename _OtherValue >
             Holder ( const volatile Holder< _OtherValue > && other )
-                : m_lock()
+                : m_lock{}
             {
                 using OtherReadableGuard = ::ScL::Feature::HolderGuard< const volatile Holder< _OtherValue > && >;
                 OtherReadableGuard guard( other );
@@ -139,7 +139,7 @@ namespace ScL { namespace Feature { namespace ThreadSafe
 
             template < typename _OtherValue >
             Holder ( Holder< _OtherValue > & other )
-                : m_lock()
+                : m_lock{}
             {
                 using OtherMovableGuard = ::ScL::Feature::HolderGuard< Holder< _OtherValue > & >;
                 OtherMovableGuard guard( other );
@@ -148,7 +148,7 @@ namespace ScL { namespace Feature { namespace ThreadSafe
 
             template < typename _OtherValue >
             Holder ( const Holder< _OtherValue > & other )
-                : m_lock()
+                : m_lock{}
             {
                 using OtherReadableGuard = ::ScL::Feature::HolderGuard< const Holder< _OtherValue > & >;
                 OtherReadableGuard guard( other );
@@ -157,7 +157,7 @@ namespace ScL { namespace Feature { namespace ThreadSafe
 
             template < typename _OtherValue >
             Holder ( volatile Holder< _OtherValue > & other )
-                : m_lock()
+                : m_lock{}
             {
                 using OtherMovableGuard = ::ScL::Feature::HolderGuard< volatile Holder< _OtherValue > & >;
                 OtherMovableGuard guard( other );
@@ -166,7 +166,7 @@ namespace ScL { namespace Feature { namespace ThreadSafe
 
             template < typename _OtherValue >
             Holder ( const volatile Holder< _OtherValue > & other )
-                : m_lock()
+                : m_lock{}
             {
                 using OtherReadableGuard = ::ScL::Feature::HolderGuard< const volatile Holder< _OtherValue > & >;
                 OtherReadableGuard guard( other );

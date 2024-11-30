@@ -7,9 +7,6 @@
 #include <type_traits>
 #include <vector>
 #include <iostream>
-#include <memory>
-
-#define mayby_unused void
 
 #if defined( __GNUC__ )
 #   include <cxxabi.h>
@@ -138,13 +135,14 @@ int main ( int /*argc*/, char ** /*argv*/ )
 
 void testWrapperValue ()
 {
-    { Wrapper< double > value; (mayby_unused) value; }
-    { Wrapper< double > value{ double() }; (mayby_unused) value; }
-    { Wrapper< double > value = double(); (mayby_unused) value; }
-    { Wrapper< double > value{ Wrapper< double >() }; (mayby_unused) value; }
-    { Wrapper< double > value = Wrapper< double >(); (mayby_unused) value; }
-    { Wrapper< double > value{ Wrapper< int >() }; (mayby_unused) value; }
-    { Wrapper< double > value = Wrapper< int >(); (mayby_unused) value; }
+    { [[maybe_unused]] Wrapper< double > value; }
+    { [[maybe_unused]] Wrapper< double > value{}; }
+    { [[maybe_unused]] Wrapper< double > value{ double() }; }
+    { [[maybe_unused]] Wrapper< double > value = double(); }
+    { [[maybe_unused]] Wrapper< double > value{ Wrapper< double >() }; }
+    { [[maybe_unused]] Wrapper< double > value = Wrapper< double >(); }
+    // { [[maybe_unused]] Wrapper< double > value{ Wrapper< int >() }; }
+    // { [[maybe_unused]] Wrapper< double > value = Wrapper< int >(); }
 }
 
 void testWrapperContainer ()
@@ -152,11 +150,11 @@ void testWrapperContainer ()
     //using Container = ::std::vector< double >;
     using Container = Wrapper< ::std::vector< double >, Implicit::Shared >;
 
-    { Wrapper< Container > value; (mayby_unused) value; }
-    { Wrapper< Container > value{{ 0.0, 1.0, 2.0, 3.0, 4.0 }}; (mayby_unused) value; }
-    { Wrapper< Container > value = {{ 0.0, 1.0, 2.0, 3.0, 4.0 }}; (mayby_unused) value; }
-    { Wrapper< Container > value{ Container() }; (mayby_unused) value; }
-    { Wrapper< Container > value = Container(); (mayby_unused) value; }
+    { [[maybe_unused]] Wrapper< Container > value; }
+    { [[maybe_unused]] Wrapper< Container > value{{ 0.0, 1.0, 2.0, 3.0, 4.0 }}; }
+    { [[maybe_unused]] Wrapper< Container > value = {{ 0.0, 1.0, 2.0, 3.0, 4.0 }}; }
+    { [[maybe_unused]] Wrapper< Container > value{ Container() }; }
+    { [[maybe_unused]] Wrapper< Container > value = Container(); }
     {
         Wrapper< Container > container;
         for ( int i = 0; i < 10; ++i )
@@ -168,6 +166,7 @@ void testWrapperContainer ()
         auto v0 = container[5];
         auto v1 = asConst( container )[5];
         auto v2 = &(asConst( container )[5]);
+        [[maybe_unused]]
         auto v3 = *v2;
 
         printTypeOf< decltype( v0 ) >();

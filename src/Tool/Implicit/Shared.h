@@ -2,7 +2,6 @@
 #ifndef SCL_WRAPPER_TOOL_IMPLICIT_SHARED_H
 #define SCL_WRAPPER_TOOL_IMPLICIT_SHARED_H
 
-#include <cassert>
 #include <memory>
 #include <utility>
 
@@ -34,27 +33,27 @@ namespace ScL { namespace Feature { namespace Implicit
 
             template < typename ... _Arguments >
             Holder ( _Arguments && ... arguments )
-                : m_pointer( ::std::make_shared< Value >( ::std::forward< _Arguments >( arguments ) ... ) )
+                : m_pointer{ ::std::make_shared< Value >( ::std::forward< _Arguments >( arguments ) ... ) }
             {
             }
 
             Holder ( ThisType && other )
-                : m_pointer( ::std::forward< Pointer >( other.m_pointer ) )
+                : m_pointer{ ::std::forward< Pointer >( other.m_pointer ) }
             {
             }
 
             Holder ( const ThisType && other )
-                : m_pointer( other.m_pointer )
+                : m_pointer{ other.m_pointer }
             {
             }
 
             Holder ( ThisType & other )
-                : m_pointer( other.m_pointer )
+                : m_pointer{ other.m_pointer }
             {
             }
 
             Holder ( const ThisType & other )
-                : m_pointer( other.m_pointer )
+                : m_pointer{ other.m_pointer }
             {
             }
 
@@ -66,19 +65,19 @@ namespace ScL { namespace Feature { namespace Implicit
 
             template < typename _OtherValue >
             Holder ( const Holder< _OtherValue > && other )
-                : m_pointer( other.m_pointer )
+                : m_pointer{ other.m_pointer }
             {
             }
 
             template < typename _OtherValue >
             Holder ( Holder< _OtherValue > & other )
-                : m_pointer( other.m_pointer )
+                : m_pointer{ other.m_pointer }
             {
             }
 
             template < typename _OtherValue >
             Holder ( Holder< _OtherValue > const  & other )
-                : m_pointer( other.m_pointer )
+                : m_pointer{ other.m_pointer }
             {
             }
 
@@ -113,7 +112,7 @@ namespace ScL { namespace Feature { namespace Implicit
                     !::std::is_const< ::std::remove_reference_t< _HolderRefer > >::value > >
             static constexpr void guard ( _HolderRefer && holder )
             {
-                if ( !!holder.m_pointer && !holder.m_pointer.unique() )
+                if ( !!holder.m_pointer && holder.m_pointer.use_count() != 1 )
                     holder.m_pointer = ::std::make_shared< Value >( *holder.m_pointer.get() );
             }
 
