@@ -2,6 +2,8 @@
 #ifndef SCL_FEATURE_RANGE_H
 #define SCL_FEATURE_RANGE_H
 
+#include <vector>
+    //< The range global methods definitions
 #include <utility>
 #include "RangeTool.h"
 

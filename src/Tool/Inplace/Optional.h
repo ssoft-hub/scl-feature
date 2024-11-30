@@ -177,7 +177,7 @@ namespace ScL { namespace Feature { namespace Inplace
             void construct( _Arguments && ... _arguments )
             noexcept( ::std::is_nothrow_constructible< Value, _Arguments ... >() )
             {
-                ::new ( (void *) ::std::addressof( m_value ) )Value( ::std::forward< _Arguments >( _arguments ) ... );
+                ::new ( (void *) ::std::addressof( m_value ) )Value{ ::std::forward< _Arguments >( _arguments ) ... };
                 m_is_exists = true;
             }
 

@@ -2,6 +2,7 @@
 #ifndef SCL_FEATURE_TOOL_GUARD_OPERATOR_TOOL_H
 #define SCL_FEATURE_TOOL_GUARD_OPERATOR_TOOL_H
 
+#include <cassert>
 #include <ScL/Feature/Access/WrapperGuard.h>
 #include <ScL/Feature/Trait.h>
 #include <ScL/Utility/SimilarRefer.h>

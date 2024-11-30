@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cassert>
 #include <memory>
 #include <utility>
 
@@ -25,41 +24,36 @@ namespace ScL { namespace Feature { namespace Detail
         static_assert( ::std::is_reference< Refer >::value, "The template parameter _Refer must to be a reference type." );
 
     private:
-        Refer m_refer;
+        RawPointer m_pointer{};
 
     private:
+        ReferPointer ( ThisType && other ) = delete;
         ReferPointer ( const ThisType & other ) = delete;
 
     public:
         constexpr ReferPointer ( Refer refer )
-            : m_refer( ::std::forward< Refer >( refer ) )
+            : m_pointer( ::std::addressof( refer ) )
         {
         }
 
-        constexpr ReferPointer ( ThisType && other )
-            : m_refer( ::std::forward< Refer >( other.m_refer ) )
+        explicit constexpr operator bool () const
         {
-            assert( false ); // Used resrticted constuctor.
-        }
-
-        explicit operator bool () const
-        {
-            return ::std::addressof( m_refer );
+            return m_pointer;
         }
 
         constexpr bool operator ! () const
         {
-            return !::std::addressof( m_refer );
+            return !m_pointer;
         }
 
         constexpr Refer operator * () const
         {
-            return ::std::forward< Refer >( m_refer );
+            return ::std::forward< Refer >( *m_pointer );
         }
 
         constexpr RawPointer operator -> () const
         {
-            return ::std::addressof( m_refer );
+            return m_pointer;
         }
     };
 }}}
