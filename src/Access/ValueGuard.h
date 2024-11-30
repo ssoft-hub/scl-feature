@@ -217,6 +217,10 @@ namespace ScL { namespace Feature { namespace Detail
     struct ValueGuardHelper< ::ScL::Feature::Detail::Wrapper< _Value, _Tool > > {};
     template < typename _Value, typename _Tool >
     struct ValueGuardHelper< const ::ScL::Feature::Detail::Wrapper< _Value, _Tool > > {};
+    template < typename _Value, typename _Tool >
+    struct ValueGuardHelper< volatile ::ScL::Feature::Detail::Wrapper< _Value, _Tool > > {};
+    template < typename _Value, typename _Tool >
+    struct ValueGuardHelper< const volatile ::ScL::Feature::Detail::Wrapper< _Value, _Tool > > {};
 }}}
 
 #endif

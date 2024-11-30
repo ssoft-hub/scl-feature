@@ -94,7 +94,6 @@ namespace ScL { namespace Feature { namespace Detail
         static_assert( ::ScL::Feature::isSimilar< HolderRefer, WrapperRefer >(), "The Refer and HolderRefer must to be similar types!" );
 
     private:
-        //ReferPointer m_pointer;
         WrapperPointer m_pointer;
 
     private:
@@ -102,29 +101,26 @@ namespace ScL { namespace Feature { namespace Detail
         SpecialWrapperGuard ( const ThisType & other ) = delete;
 
     public:
-        constexpr SpecialWrapperGuard ( WrapperRefer refer )
+        constexpr SpecialWrapperGuard ( WrapperRefer refer ) noexcept
             : m_pointer( ::std::addressof( refer ) )
         {
             static_assert( ::ScL::Feature::Detail::HolderInterface::doesValueStaticMethodExist< Holder, HolderRefer >()
                 , "There are no appropriate access methods for Holder." );
-            ::ScL::Feature::Detail::HolderInterface::guard< HolderRefer >( ::ScL::Feature::Detail::wrapperHolder< WrapperRefer >( ::std::forward< WrapperRefer >( *m_pointer ) ) );
+            ::ScL::Feature::Detail::HolderInterface::guard< HolderRefer >( holderAccess() );
         }
 
         ~SpecialWrapperGuard ()
         {
-            assert( m_pointer );
-            ::ScL::Feature::Detail::HolderInterface::unguard< HolderRefer >( ::ScL::Feature::Detail::wrapperHolder< WrapperRefer >( ::std::forward< WrapperRefer >( *m_pointer ) ) );
+            ::ScL::Feature::Detail::HolderInterface::unguard< HolderRefer >( holderAccess() );
         }
 
-        constexpr WrapperAccess wrapperAccess () const
+        constexpr WrapperAccess wrapperAccess () const noexcept
         {
-            assert( m_pointer );
-            return ::ScL::Feature::Detail::HolderInterface::value< HolderRefer >( ::ScL::Feature::Detail::wrapperHolder< WrapperRefer >( ::std::forward< WrapperRefer >( *m_pointer ) ) );
+            return ::ScL::Feature::Detail::HolderInterface::value< HolderRefer >( holderAccess() );
         }
 
-        constexpr HolderAccess holderAccess () const
+        constexpr HolderAccess holderAccess () const noexcept
         {
-            assert( m_pointer );
             return ::ScL::Feature::Detail::wrapperHolder< WrapperRefer >( ::std::forward< WrapperRefer >( *m_pointer ) );
         }
     };
