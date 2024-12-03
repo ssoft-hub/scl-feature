@@ -46,14 +46,14 @@ namespace ScL { namespace Feature { namespace Detail
         template < typename ... _Arguments,
             typename = ::std::enable_if_t< ::std::is_constructible< Holder, _Arguments && ... >::value > >
         constexpr Wrapper ( _Arguments && ... arguments )
-        noexcept( ::std::is_nothrow_constructible< Holder, _Arguments && ... >() )
+        noexcept( ::std::is_nothrow_constructible< Holder, _Arguments && ... >::value )
             : m_holder( ::std::forward< _Arguments >( arguments ) ... )
         {}
 
         template < typename _Type, typename ... _Arguments,
             typename = ::std::enable_if_t< ::std::is_constructible< Holder, ::std::initializer_list< _Type >, _Arguments && ... >::value > >
         constexpr Wrapper ( ::std::initializer_list< _Type > list, _Arguments && ... arguments )
-        noexcept( ::std::is_nothrow_constructible< Holder, ::std::initializer_list< _Type >, _Arguments && ... >() )
+        noexcept( ::std::is_nothrow_constructible< Holder, ::std::initializer_list< _Type >, _Arguments && ... >::value )
             : m_holder( list, ::std::forward< _Arguments >( arguments ) ... )
         {}
 
