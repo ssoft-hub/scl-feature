@@ -1,6 +1,5 @@
 #include <ScL/Feature.h>
 
-
 struct MyData {};
 
 void foo ( MyData && ) { ::std::cout << "MyData && " << ::std::endl; }
@@ -14,31 +13,59 @@ void foo ( MyData const volatile & ) { ::std::cout << "MyData const volatile & "
 
 namespace ScL::Feature::Detail
 {
-    template < typename _WrapperRefer >
+    template < typename Type_ >
     struct Caster
     {
-        static_assert( ::ScL::Feature::isWrapper< ::std::decay_t< _WrapperRefer > >() );
-        using WrapperRefer = _WrapperRefer;
-        using Wrapper = ::std::decay_t< WrapperRefer >;
-        using ValueRefer = ::ScL::SimilarRefer< typename Wrapper::Value, WrapperRefer >;
+        using ValueRefer = Type_;
 
-        _WrapperRefer m_wrapper;
+        ValueRefer m_refer;
 
-        Caster ( _WrapperRefer wrapper_refer )
-            : m_wrapper( ::std::forward< _WrapperRefer >( wrapper_refer ) )
+        Caster ( ValueRefer refer )
+            : m_refer{ ::std::forward< ValueRefer >( refer ) }
         {}
 
         operator ValueRefer () &&
         {
-            return ::std::forward< ValueRefer >( *&m_wrapper );
+            return ::std::forward< ValueRefer >( m_refer );
         }
-
-    //    template < typename _Type >
-    //    operator ::ScL::SimilarRefer< _Type, WrapperRefer > () &&
-    //    {
-    //        return ::std::forward< ValueRefer >( *&m_wrapper );
-    //    }
     };
+
+    template <typename Type_>
+    Type_ refer ()
+    {
+        static ::std::decay_t<Type_> value;
+        return ::std::forward<Type_>(value);
+    }
+
+#define CASTER( ref ) \
+    template < typename Type_, typename Tool_ > \
+    struct Caster< Wrapper< Type_, Tool_ > ref > : Caster< Type_ ref > \
+    { \
+        using WrapperRefer = Wrapper< Type_, Tool_ > ref; \
+        using WrapperType = ::std::decay_t< WrapperRefer >; \
+        using ValueRefer = ::ScL::SimilarRefer< typename WrapperType::Value, WrapperRefer >; \
+     \
+        WrapperRefer m_wrapper_refer; \
+     \
+        Caster ( WrapperRefer wrapper_refer ) \
+            : Caster< Type_ ref >{ ::std::forward< Type_ ref >( refer<Type_ ref>()/*wrapper_refer.m_value*/ ) } \
+            , m_wrapper_refer{ ::std::forward< WrapperRefer >( wrapper_refer ) } \
+        {} \
+     \
+        operator ValueRefer () && \
+        { \
+            return ::std::forward< ValueRefer >( refer<Type_ ref>() ); \
+        } \
+    }; \
+
+    CASTER( & )
+    CASTER( const & )
+    CASTER( volatile & )
+    CASTER( const volatile & )
+    CASTER( && )
+    CASTER( const && )
+    CASTER( volatile && )
+    CASTER( const volatile && )
 }
 
 namespace ScL::Feature
@@ -53,7 +80,7 @@ namespace ScL::Feature
 
 int main ( int, char ** )
 {
-    using MyWrapper = ::ScL::Feature::Wrapper< MyData >;
+    using MyWrapper = ::ScL::Feature::Wrapper< MyData, ::ScL::Feature::Inplace::Optional, ::ScL::Feature::Implicit::Raw >;
     using ::ScL::Feature::cast;
 
     MyWrapper data;
@@ -64,11 +91,14 @@ int main ( int, char ** )
     foo( cast( data ) );
     foo( cast( ::std::move( data ) ) );
     foo( cast( c_data ) );
-    foo( cast( ::std::move( c_data ) ) );
-    foo( cast( v_data ) );
-    foo( cast( ::std::move( v_data ) ) );
-    foo( cast( cv_data ) );
-    foo( cast( ::std::move( cv_data ) ) );
+
+    // CLANG makes error without static_cast
+    // MSVC and GCC do not require static_cast
+    foo( static_cast< MyData const & >( cast( ::std::move( c_data ) ) ) );
+    foo( static_cast< MyData volatile & >( cast( v_data ) ) );
+    foo( static_cast< MyData volatile && >( cast( ::std::move( v_data ) ) ) );
+    foo( static_cast< MyData const volatile & >( cast( cv_data ) ) );
+    foo( static_cast< MyData const volatile && >( cast( ::std::move( cv_data ) ) ) );
 
     return 0;
 }
