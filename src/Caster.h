@@ -2,83 +2,81 @@
 #define SCL_FEATURE_CASTER_H
 
 #include <ScL/Feature/Trait.h>
+#include <ScL/Feature/Wrapper.h>
 #include <ScL/Utility/SimilarRefer.h>
 #include <utility>
 
+#define ConceptCaster typename
+#define ConceptReference typename
+#define ConceptNonReference typename
+
 namespace ScL::Feature::Detail
 {
-    template < typename Refer_ >
-    struct Caster
+    template <ConceptCaster Caster_, ConceptReference Ref_>
+    struct CastMixIn
     {
-        using ValueRefer = Refer_;
-
-        ValueRefer m_refer;
-
-        Caster ( ValueRefer refer )
-            : m_refer{ ::std::forward< ValueRefer >( refer ) }
-        {}
-
-        operator ValueRefer () &&
-        {
-            return ::std::forward< ValueRefer >( m_refer );
+        operator Ref_ () && {
+            return static_cast<Caster_ &&>(*this).template reference<Ref_>();
         }
     };
 
-    //TODO:
-    template <typename Type_>
-    Type_ refer ()
-    {
-        static ::std::decay_t<Type_> value;
-        return ::std::forward<Type_>(value);
-    }
-
-#define SCL_FEATURE_CASTER( ref ) \
-    template < typename Type_, typename Tool_ > \
-    struct Caster< Wrapper< Type_, Tool_ > ref > : Caster< Type_ ref > \
+#define SCL_FEATURE_CAST_MIXIN( ref ) \
+    template < typename Caster_, typename Type_, typename Tool_ > \
+    struct CastMixIn< Caster_, Wrapper< Type_, Tool_ > ref > \
+        : public CastMixIn< Caster_, Type_ ref > \
     { \
-        using WrapperRefer = Wrapper< Type_, Tool_ > ref; \
-        using WrapperType = ::std::decay_t< WrapperRefer >; \
-        using ValueRefer = ::ScL::SimilarRefer< typename WrapperType::Value, WrapperRefer >; \
-        using ParentCaster = Caster< Type_ ref >; \
-     \
-        WrapperRefer m_wrapper_refer; \
-     \
-        Caster ( WrapperRefer wrapper_refer ) \
-            : ParentCaster{ ::std::forward< Type_ ref >( refer<Type_ ref>()/*wrapper_refer.m_value*/ ) } \
-            , m_wrapper_refer{ ::std::forward< WrapperRefer >( wrapper_refer ) } \
-        {} \
-     \
-        operator ValueRefer () && \
-        { \
-            return ::std::forward< ValueRefer >( refer<Type_ ref>() ); \
+        operator Wrapper< Type_, Tool_ > ref () && { \
+            return static_cast<Caster_ &&>(*this).template reference<Type_ ref>(); \
         } \
     }; \
 
-    SCL_FEATURE_CASTER( & )
-    SCL_FEATURE_CASTER( const & )
-    SCL_FEATURE_CASTER( volatile & )
-    SCL_FEATURE_CASTER( const volatile & )
-    SCL_FEATURE_CASTER( && )
-    SCL_FEATURE_CASTER( const && )
-    SCL_FEATURE_CASTER( volatile && )
-    SCL_FEATURE_CASTER( const volatile && )
+    SCL_FEATURE_CAST_MIXIN( & )
+    SCL_FEATURE_CAST_MIXIN( const & )
+    SCL_FEATURE_CAST_MIXIN( volatile & )
+    SCL_FEATURE_CAST_MIXIN( const volatile & )
+    SCL_FEATURE_CAST_MIXIN( && )
+    SCL_FEATURE_CAST_MIXIN( const && )
+    SCL_FEATURE_CAST_MIXIN( volatile && )
+    SCL_FEATURE_CAST_MIXIN( const volatile && )
+}
+
+namespace ScL::Feature
+{
+    template <ConceptReference Ref_>
+    struct Caster : public Detail::CastMixIn< Caster<Ref_>, Ref_ >
+    {
+        static_assert( ::std::is_reference_v<Ref_>, "Ref_ must be a reference type." );
+
+        using Refer = Ref_;
+
+        Caster ( Ref_ ) {};
+
+        template <ConceptReference Type_>
+        Type_ reference () &&
+        {
+            // TODO: guard / unguard
+            static ::std::decay_t<Type_> value;
+            return ::std::forward<Type_>(value);
+        }
+    };
 }
 
 namespace ScL::Feature
 {
     template < typename Type_ >
     inline auto cast ( Type_ && value )
-        -> ::std::enable_if_t< !::ScL::Feature::isWrapper< ::std::decay_t< Type_ > >(), Type_ && >
+        -> ::std::enable_if_t< !::ScL::Feature::isWrapper< ::std::remove_reference_t< Type_ > >(),
+    Type_ && >
     {
         return ::std::forward< Type_ && >( value );
     }
 
-    template < typename _Wrapper >
-    inline auto cast ( _Wrapper && wrapper )
-        -> ::std::enable_if_t< ::ScL::Feature::isWrapper< ::std::decay_t< _Wrapper > >(),
-            ::ScL::Feature::Detail::Caster< _Wrapper && > >
+    template < typename Wrapper_ >
+    inline auto cast ( Wrapper_ && wrapper )
+        -> ::std::enable_if_t< ::ScL::Feature::isWrapper< ::std::remove_reference_t< Wrapper_ > >(),
+    ::ScL::Feature::Caster< Wrapper_ && > >
     {
-        return ::std::forward< _Wrapper && >( wrapper );
+        return ::ScL::Feature::Caster< Wrapper_ && >( ::std::forward< Wrapper_ && >( wrapper ) );
     }
 }
 
