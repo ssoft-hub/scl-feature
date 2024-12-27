@@ -170,8 +170,8 @@ SCL_BINARY_OPERATOR_IMPLEMENTAION( ^=, BitwiseXorAssignment )
 
 #define SCL_CONSTRUCTOR_FOR_THIS_WRAPPER_PROTOTYPE( other_refer ) \
     constexpr Wrapper ( ThisType other_refer other ) \
-        : m_holder( ::ScL::Feature::Detail::WrapperResolver< ThisType, ThisType other_refer >( \
-            ::std::forward< ThisType other_refer >( other ) ).resolve() ) \
+        : m_holder{ ::ScL::Feature::Detail::WrapperResolver< ThisType, ThisType other_refer >{ \
+            ::std::forward< ThisType other_refer >( other ) }.resolve() } \
     { \
     } \
 
@@ -188,8 +188,8 @@ SCL_BINARY_OPERATOR_IMPLEMENTAION( ^=, BitwiseXorAssignment )
 #define SCL_CONSTRUCTOR_FOR_OTHER_WRAPPER_PROTOTYPE( other_refer ) \
     template < typename _OtherValue, typename _OtherTool > \
     constexpr Wrapper ( Wrapper< _OtherValue, _OtherTool > other_refer other ) \
-        : m_holder( ::ScL::Feature::Detail::WrapperResolver< ThisType, Wrapper< _OtherValue, _OtherTool > other_refer >( \
-            ::std::forward< Wrapper< _OtherValue, _OtherTool > other_refer >( other ) ).resolve() ) \
+        : m_holder{ ::ScL::Feature::Detail::WrapperResolver< ThisType, Wrapper< _OtherValue, _OtherTool > other_refer >{ \
+            ::std::forward< Wrapper< _OtherValue, _OtherTool > other_refer >( other ) }.resolve() } \
     { \
     } \
 

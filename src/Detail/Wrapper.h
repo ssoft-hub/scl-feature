@@ -19,14 +19,16 @@ namespace ScL { namespace Feature { namespace Detail
      */
     template < typename _Value, typename _Tool >
     class Wrapper final
-        : public ::ScL::Feature::MixIn< Wrapper< _Value, _Tool > >
+        : public ::ScL::Feature::ToolMixIn< Wrapper< _Value, _Tool > >
+        , public ::ScL::Feature::ValueMixIn< Wrapper< _Value, _Tool > >
     {
         static_assert( !::std::is_reference< _Tool >::value,
             "The template parameter _Tool must to be not a reference type." );
 
         template < typename >
-        friend class ::ScL::Feature::MixIn;
-
+        friend class ::ScL::Feature::ValueMixIn;
+        template < typename >
+        friend class ::ScL::Feature::ToolMixIn;
         template < typename >
         friend struct ::ScL::Feature::Detail::WrapperAccess;
 
@@ -197,7 +199,9 @@ namespace std
 namespace ScL { namespace Feature
 {
     template < typename _Value, typename _Tool >
-    class MixIn< ::ScL::Feature::Detail::Wrapper< _Value, _Tool > > {};
+    class ValueMixIn< ::ScL::Feature::Detail::Wrapper< _Value, _Tool > > {};
+    template < typename _Value, typename _Tool >
+    class ToolMixIn< ::ScL::Feature::Detail::Wrapper< _Value, _Tool > > {};
 }}
 
 #endif

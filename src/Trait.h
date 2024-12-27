@@ -59,12 +59,21 @@ namespace ScL::Feature
 {
     namespace Detail
     {
-        //! Типы, не являющиеся Wrapper, не могут быть вложенными.
+        //! Типы, не являющиеся Wrapper, не имеют вложенных частей
         template < typename _Test, typename _Other >
         struct IsThisCompatibleWithPartOfOther : ::std::false_type {};
 
-        //!< Один тип Wrapper является частью другого, если он совместим с любой
-        /// вложенной частью другого.
+
+        //! Тип является частью Wrapper, если он совместим
+        ///  с любой его вложенной частью
+        template < typename _Test, typename _Other, typename _OtherTool >
+        struct IsThisCompatibleWithPartOfOther< _Test, ::ScL::Feature::Detail::Wrapper< _Other, _OtherTool > >
+            : ::std::integral_constant< bool,
+                   ::ScL::Feature::IsThisCompatibleWithOther< ::std::remove_cv_t< _Test >, ::std::remove_cv_t< _Other > >::value >
+        {};
+
+        //! Один тип Wrapper является частью другого Wrapper,
+        /// если он совместим с любой вложенной частью другого.
         template < typename _Test, typename _TestTool, typename _Other, typename _OtherTool >
         struct IsThisCompatibleWithPartOfOther< ::ScL::Feature::Detail::Wrapper< _Test, _TestTool >, ::ScL::Feature::Detail::Wrapper< _Other, _OtherTool > >
             : ::std::integral_constant< bool,
@@ -85,9 +94,15 @@ namespace ScL::Feature
 {
     namespace Detail
     {
-        //! Типы, не являющиеся Wrapper, не могут быть вложенными.
+        //! Типы, не являющиеся Wrapper, не могут быть вложенными
         template < typename _Test, typename _Other >
         struct IsPartOfThisCompatibleWithOther : ::std::false_type {};
+
+        template < typename _Test, typename _TestTool, typename _Other >
+        struct IsPartOfThisCompatibleWithOther< ::ScL::Feature::Detail::Wrapper< _Test, _TestTool >, _Other >
+            : ::std::integral_constant< bool,
+                   ::ScL::Feature::IsThisCompatibleWithOther< ::std::remove_cv_t< _Test >, ::std::remove_cv_t< _Other > >::value >
+        {};
 
         //!< Один тип Wrapper является частью другого, если он совместим с любой
         /// вложенной частью другого.
