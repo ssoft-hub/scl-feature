@@ -232,7 +232,7 @@ namespace ScL { namespace Feature
     namespace Detail { template < typename, typename > class Wrapper; }
 
     template < typename _Value >
-    class MixIn< ::ScL::Feature::Detail::Wrapper< _Value, ::ScL::Feature::Inplace::Optional > >
+    class ToolMixIn< ::ScL::Feature::Detail::Wrapper< _Value, ::ScL::Feature::Inplace::Optional > >
     {
         using MixInValue = _Value;
         using Tool = ::ScL::Feature::Inplace::Optional;

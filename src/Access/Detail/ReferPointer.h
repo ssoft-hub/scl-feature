@@ -24,7 +24,7 @@ namespace ScL { namespace Feature { namespace Detail
         static_assert( ::std::is_reference< Refer >::value, "The template parameter _Refer must to be a reference type." );
 
     private:
-        RawPointer m_pointer{};
+        Refer m_refer;
 
     private:
         ReferPointer ( ThisType && other ) = delete;
@@ -32,28 +32,18 @@ namespace ScL { namespace Feature { namespace Detail
 
     public:
         constexpr ReferPointer ( Refer refer )
-            : m_pointer( ::std::addressof( refer ) )
+            : m_refer{ refer }
         {
-        }
-
-        explicit constexpr operator bool () const
-        {
-            return m_pointer;
-        }
-
-        constexpr bool operator ! () const
-        {
-            return !m_pointer;
         }
 
         constexpr Refer operator * () const
         {
-            return ::std::forward< Refer >( *m_pointer );
+            return ::std::forward< Refer >( m_refer );
         }
 
         constexpr RawPointer operator -> () const
         {
-            return m_pointer;
+            return ::std::addressof( m_refer );
         }
     };
 }}}
