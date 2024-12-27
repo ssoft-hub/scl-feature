@@ -2,14 +2,14 @@
 
 struct MyData {};
 
-void foo ( MyData && ) { ::std::cout << "MyData && " << ::std::endl; }
-void foo ( MyData const && ) { ::std::cout << "MyData const && " << ::std::endl; }
 void foo ( MyData & ) { ::std::cout << "MyData & " << ::std::endl; }
 void foo ( MyData const & ) { ::std::cout << "MyData const & " << ::std::endl; }
-void foo ( MyData volatile && ) { ::std::cout << "MyData volatile && " << ::std::endl; }
-void foo ( MyData const volatile && ) { ::std::cout << "MyData const volatile && " << ::std::endl; }
 void foo ( MyData volatile & ) { ::std::cout << "MyData volatile & " << ::std::endl; }
 void foo ( MyData const volatile & ) { ::std::cout << "MyData const volatile & " << ::std::endl; }
+void foo ( MyData && ) { ::std::cout << "MyData && " << ::std::endl; }
+void foo ( MyData const && ) { ::std::cout << "MyData const && " << ::std::endl; }
+void foo ( MyData volatile && ) { ::std::cout << "MyData volatile && " << ::std::endl; }
+void foo ( MyData const volatile && ) { ::std::cout << "MyData const volatile && " << ::std::endl; }
 
 template <typename Type_>
 void testCast ()
@@ -27,13 +27,12 @@ void testCast ()
 
     // CLANG makes error without static_cast
     // MSVC and GCC do not require static_cast
-    foo( static_cast< MyData const & >( cast( ::std::move( c_data ) ) ) );
+    foo( static_cast< MyData const && >( cast( ::std::move( c_data ) ) ) );
     foo( static_cast< MyData volatile & >( cast( v_data ) ) );
     foo( static_cast< MyData volatile && >( cast( ::std::move( v_data ) ) ) );
     foo( static_cast< MyData const volatile & >( cast( cv_data ) ) );
     foo( static_cast< MyData const volatile && >( cast( ::std::move( cv_data ) ) ) );
 }
-
 
 int main ( int, char ** )
 {
