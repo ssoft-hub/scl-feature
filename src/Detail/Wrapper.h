@@ -19,14 +19,15 @@ namespace ScL { namespace Feature { namespace Detail
      */
     template < typename _Value, typename _Tool >
     class Wrapper final
-        : public ::ScL::Feature::ToolMixIn< Wrapper< _Value, _Tool > >
-        , public ::ScL::Feature::ValueMixIn< Wrapper< _Value, _Tool > >
+        : public ::ScL::Feature::MixIn< Wrapper< _Value, _Tool > >
     {
         static_assert( !::std::is_reference< _Tool >::value,
             "The template parameter _Tool must to be not a reference type." );
 
-        template < typename >
-        friend class ::ScL::Feature::ValueMixIn;
+        template < typename, typename >
+        friend class ::ScL::Feature::ValueReflectionMixIn;
+        template < typename, typename >
+        friend class ::ScL::Feature::ToolReflectionMixIn;
         template < typename >
         friend class ::ScL::Feature::ToolMixIn;
         template < typename >
@@ -196,12 +197,26 @@ namespace std
     };
 }
 
-namespace ScL { namespace Feature
+namespace ScL { namespace Feature { namespace Detail
 {
-    template < typename _Value, typename _Tool >
-    class ValueMixIn< ::ScL::Feature::Detail::Wrapper< _Value, _Tool > > {};
-    template < typename _Value, typename _Tool >
-    class ToolMixIn< ::ScL::Feature::Detail::Wrapper< _Value, _Tool > > {};
-}}
+    template <typename Self_, typename Value_, typename Tool_, typename Tool1_>
+    class ReflectionMixIn<Self_, Wrapper<Wrapper<Value_, Tool_>, Tool1_>>
+        : public ReflectionMixIn<Self_, Wrapper<Value_, Tool_>>
+        , public ::ScL::Feature::ValueReflectionMixIn<Self_, Wrapper<Value_, Tool_>>
+        , public ::ScL::Feature::ToolReflectionMixIn<Self_, Tool_>
+    {};
+
+    template <typename Self_, typename Value_, typename Tool_>
+    class ReflectionMixIn<Self_, Wrapper<Value_, Tool_>>
+        : public ReflectionMixIn<Self_, Value_>
+        , public ::ScL::Feature::ValueReflectionMixIn<Self_, Value_>
+    {};
+
+    // template <typename Self_, typename Value_, typename Tool_>
+    // class ToolReflectionMixIn<Self_, Detail::Wrapper<Value_, Tool_> >
+    //     : public ::ScL::Feature::Detail::ToolReflectionMixIn<Self_, Value_>
+    //     , public ::ScL::Feature::ToolReflectionMixIn<Self_, Tool_>
+    // {};
+}}}
 
 #endif

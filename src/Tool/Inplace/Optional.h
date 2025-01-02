@@ -335,4 +335,25 @@ namespace ScL { namespace Feature
 #undef SCL_OPTIONAL_VALUE
 #undef SCL_OPTIONAL_VALUE_METHOD
 
+namespace ScL::Feature
+{
+    template <typename Self_>
+    class ToolReflectionMixIn<Self_, Inplace::Optional>
+    {
+    public:
+        template <typename ... Args_>
+        decltype(auto) value (Args_ && ... /*args*/) const
+        {
+            return 0;
+        }
+
+        template <typename ... Args_>
+        decltype(auto) valueOr (Args_ && ... /*args*/) const
+        {
+            return 0;
+        }
+    };
+}
+
+
 #endif
