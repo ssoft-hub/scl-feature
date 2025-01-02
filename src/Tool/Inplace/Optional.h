@@ -2,6 +2,7 @@
 #ifndef SCL_WRAPPER_TOOL_INPLACE_OPTIONAL_H
 #define SCL_WRAPPER_TOOL_INPLACE_OPTIONAL_H
 
+#include <exception>
 #include <utility>
 #include <type_traits>
 #include <ScL/Feature/MixIn.h>
@@ -21,7 +22,7 @@ namespace ScL { namespace Feature { namespace Inplace
         public:
           BadOptionalAccess () {}
           virtual ~BadOptionalAccess () noexcept = default;
-          virtual const char* what( ) const noexcept override { return "Bad optional access"; }
+          const char* what( ) const noexcept override { return "Bad optional access"; }
         };
 
         template < typename _Value >
