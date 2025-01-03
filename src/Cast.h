@@ -9,6 +9,9 @@
 #define ConceptCaster typename
 #define ConceptReference typename
 #define ConceptNonReference typename
+#define ConceptWrapper typename
+#define ConceptNonWrapper typename
+
 
 namespace ScL::Feature::Detail
 {
@@ -40,10 +43,10 @@ namespace ScL::Feature::Detail
     SCL_FEATURE_CAST_MIXIN( const volatile && )
 }
 
-namespace ScL::Feature
+namespace ScL::Feature::Detail
 {
     template <ConceptReference Ref_>
-    struct Caster : public Detail::CastMixIn< Caster<Ref_>, Ref_ >
+    struct Caster : public ::ScL::Feature::Detail::CastMixIn<Caster<Ref_>, Ref_>
     {
         static_assert( ::std::is_reference_v<Ref_>, "Ref_ must be a reference type." );
 
@@ -63,21 +66,21 @@ namespace ScL::Feature
 
 namespace ScL::Feature
 {
-    template < typename Type_ >
+    template <ConceptNonWrapper Type_>
     inline auto cast ( Type_ && value )
-        -> ::std::enable_if_t< !::ScL::Feature::isWrapper< ::std::remove_reference_t< Type_ > >(),
-    Type_ && >
+        -> ::std::enable_if_t<!::ScL::Feature::isWrapper< ::std::remove_reference_t<Type_>>(),
+    Type_ &&>
     {
-        return ::std::forward< Type_ && >( value );
+        return ::std::forward<Type_ &&>( value );
     }
 
-    template < typename Wrapper_ >
+    template <ConceptWrapper Wrapper_>
     inline auto cast ( Wrapper_ && wrapper )
-        -> ::std::enable_if_t< ::ScL::Feature::isWrapper< ::std::remove_reference_t< Wrapper_ > >(),
-    ::ScL::Feature::Caster< Wrapper_ && > >
+        -> ::std::enable_if_t<::ScL::Feature::isWrapper< ::std::remove_reference_t< Wrapper_>>(),
+    ::ScL::Feature::Detail::Caster< Wrapper_ &&>>
     {
-        return ::ScL::Feature::Caster< Wrapper_ && >( ::std::forward< Wrapper_ && >( wrapper ) );
+        return ::ScL::Feature::Detail::Caster<Wrapper_ &&>( ::std::forward<Wrapper_ &&>( wrapper ) );
     }
 }
 
-#endif // CASTER_H
+#endif
