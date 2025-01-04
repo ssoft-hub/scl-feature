@@ -2,6 +2,7 @@
 #ifndef SCL_FEATURE_ACCESS_VALUE_POINTER_H
 #define SCL_FEATURE_ACCESS_VALUE_POINTER_H
 
+#include <ScL/Meta/Trait/Detection/Operator.h>
 #include "ValueGuard.h"
 
 namespace ScL { namespace Feature
@@ -44,9 +45,12 @@ namespace ScL { namespace Feature
             return m_value_guard.valueAccess();
         }
 
-        PointerAccess operator -> () const
+        decltype(auto) operator -> () const
         {
-            return m_value_guard.pointerAccess();
+            if constexpr (::ScL::Meta::isDetected< ::ScL::Meta::DereferenceUnstrictOperation, ValueAccess>())
+                return m_value_guard.valueAccess();
+            else
+                return m_value_guard.pointerAccess();
         }
     };
 }}
