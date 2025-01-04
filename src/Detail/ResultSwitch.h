@@ -125,6 +125,9 @@ namespace ScL { namespace Feature { namespace Detail
             template < typename _Invokable, typename _Wrapper, typename ... _Arguments >
             static constexpr decltype(auto) invoke ( _Invokable && invokable, _Wrapper && wrapper, _Arguments && ... arguments )
             {
+                static_assert(::ScL::Feature::isWrapper< ::std::remove_reference_t<_Wrapper> >(),
+                              "_Wrapper must to be a wrapper type." );
+
                 using WrapperRefer = _Wrapper &&;
                 using WrapperGuard = ::ScL::Feature::Detail::WrapperGuard< WrapperRefer >;
                 return invokable( WrapperGuard( ::std::forward< WrapperRefer >( wrapper ) ).wrapperAccess(), ::std::forward< _Arguments >( arguments ) ... );
@@ -137,6 +140,9 @@ namespace ScL { namespace Feature { namespace Detail
             template < typename _Invokable, typename _Wrapper, typename ... _Arguments >
             static constexpr decltype(auto) invoke ( _Invokable && invokable, _Wrapper && wrapper, _Arguments && ... arguments )
             {
+                static_assert(::ScL::Feature::isWrapper< ::std::remove_reference_t<_Wrapper> >(),
+                              "_Wrapper must to be a wrapper type." );
+
                 using WrapperRefer = _Wrapper &&;
                 using WrapperGuard = ::ScL::Feature::Detail::WrapperGuard< WrapperRefer >;
                 invokable( WrapperGuard( ::std::forward< WrapperRefer >( wrapper ) ).wrapperAccess(), ::std::forward< _Arguments >( arguments ) ... );
@@ -150,6 +156,9 @@ namespace ScL { namespace Feature { namespace Detail
             template < typename _Invokable, typename _Wrapper, typename ... _Arguments >
             static constexpr decltype(auto) invoke ( _Invokable && invokable, _Wrapper && wrapper, _Arguments && ... arguments )
             {
+                static_assert(::ScL::Feature::isWrapper< ::std::remove_reference_t<_Wrapper> >(),
+                              "_Wrapper must to be a wrapper type." );
+
                 using WrapperRefer = _Wrapper &&;
                 using ValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< WrapperRefer >::Value, WrapperRefer >;
                 using Invokable = _Invokable;
@@ -159,7 +168,7 @@ namespace ScL { namespace Feature { namespace Detail
                     "The type of return parameter must to be not a reference type." );
 
                 using WrapperGuard = ::ScL::Feature::Detail::WrapperGuard< WrapperRefer >;
-                using ResultWrapper = ::ScL::Feature::Wrapper< Returned >;
+                using ResultWrapper = ::ScL::Feature::Detail::Wrapper< Returned, ::ScL::Feature::Inplace::Default >;
                 return ResultWrapper( invokable( WrapperGuard( ::std::forward< WrapperRefer >( wrapper ) ).wrapperAccess(), ::std::forward< _Arguments >( arguments ) ... ) );
             }
         };
@@ -170,6 +179,9 @@ namespace ScL { namespace Feature { namespace Detail
             template < typename _Invokable, typename _Wrapper, typename ... _Arguments >
             static constexpr decltype(auto) invoke ( _Invokable && invokable, _Wrapper && wrapper, _Arguments && ... arguments )
             {
+                static_assert(::ScL::Feature::isWrapper< ::std::remove_reference_t<_Wrapper> >(),
+                              "_Wrapper must to be a wrapper type." );
+
                 using WrapperRefer = _Wrapper &&;
                 using ValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< WrapperRefer >::Value, WrapperRefer >;
                 using Invokable = _Invokable;
@@ -180,7 +192,7 @@ namespace ScL { namespace Feature { namespace Detail
                     "The type of return parameter must to be a reference type." );
 
                 using GuardTool = ::ScL::Feature::Detail::Guard::LeftTool< Invokable, WrapperRefer, _Arguments && ... >;
-                using ResultWrapper = ::ScL::Feature::Wrapper< Returned, GuardTool >;
+                using ResultWrapper = ::ScL::Feature::Detail::Wrapper< Returned, GuardTool >;
                 return ResultWrapper( ::std::forward< InvokableRefer >( invokable ), ::std::forward< WrapperRefer >( wrapper ), ::std::forward< _Arguments && >( arguments ) ... );
             }
         };
@@ -191,6 +203,9 @@ namespace ScL { namespace Feature { namespace Detail
             template < typename _Invokable, typename _Left, typename _Wrapper >
             static constexpr decltype(auto) invoke ( _Invokable && invokable, _Left && left, _Wrapper && wrapper )
             {
+                static_assert(::ScL::Feature::isWrapper< ::std::remove_reference_t<_Wrapper> >(),
+                              "_Wrapper must to be a wrapper type." );
+
                 using LeftRefer = _Left &&;
                 using WrapperRefer = _Wrapper &&;
                 using WrapperGuard = ::ScL::Feature::Detail::WrapperGuard< WrapperRefer >;
@@ -204,6 +219,9 @@ namespace ScL { namespace Feature { namespace Detail
             template < typename _Invokable, typename _Left, typename _Wrapper >
             static constexpr decltype(auto) invoke ( _Invokable && invokable, _Left && left, _Wrapper && wrapper )
             {
+                static_assert(::ScL::Feature::isWrapper< ::std::remove_reference_t<_Wrapper> >(),
+                              "_Wrapper must to be a wrapper type." );
+
                 using LeftRefer = _Left &&;
                 using WrapperRefer = _Wrapper &&;
                 using WrapperGuard = ::ScL::Feature::Detail::WrapperGuard< WrapperRefer >;
@@ -218,6 +236,9 @@ namespace ScL { namespace Feature { namespace Detail
             template < typename _Invokable, typename _Left, typename _Wrapper >
             static constexpr decltype(auto) invoke ( _Invokable && invokable, _Left && left, _Wrapper && wrapper )
             {
+                static_assert(::ScL::Feature::isWrapper< ::std::remove_reference_t<_Wrapper> >(),
+                              "_Wrapper must to be a wrapper type." );
+
                 using LeftRefer = _Left &&;
                 using WrapperRefer = _Wrapper &&;
                 using ValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< WrapperRefer >::Value, WrapperRefer >;
@@ -228,7 +249,7 @@ namespace ScL { namespace Feature { namespace Detail
                     "The type of return parameter must to be not a reference type." );
 
                 using WrapperGuard = ::ScL::Feature::Detail::WrapperGuard< WrapperRefer >;
-                using ResultWrapper = ::ScL::Feature::Wrapper< Returned >;
+                using ResultWrapper = ::ScL::Feature::Detail::Wrapper< Returned, ::ScL::Feature::Inplace::Default >;
                 return ResultWrapper( invokable( ::std::forward< LeftRefer >( left ), WrapperGuard( ::std::forward< WrapperRefer >( wrapper ) ).wrapperAccess() ) );
             }
         };
@@ -239,6 +260,9 @@ namespace ScL { namespace Feature { namespace Detail
             template < typename _Invokable, typename _Left, typename _Wrapper >
             static constexpr decltype(auto) invoke ( _Invokable && invokable, _Left && left, _Wrapper && wrapper )
             {
+                static_assert(::ScL::Feature::isWrapper< ::std::remove_reference_t<_Wrapper> >(),
+                              "_Wrapper must to be a wrapper type." );
+
                 using LeftRefer = _Left &&;
                 using WrapperRefer = _Wrapper &&;
                 using ValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< WrapperRefer >::Value, WrapperRefer >;
@@ -250,7 +274,7 @@ namespace ScL { namespace Feature { namespace Detail
                     "The type of return parameter must to be a reference type." );
 
                 using GuardTool = ::ScL::Feature::Detail::Guard::RightTool< Invokable, LeftRefer, WrapperRefer >;
-                using ResultWrapper = ::ScL::Feature::Wrapper< Returned, GuardTool >;
+                using ResultWrapper = ::ScL::Feature::Detail::Wrapper< Returned, GuardTool >;
                 return ResultWrapper( ::std::forward< InvokableRefer >( invokable ), ::std::forward< LeftRefer >( left ), ::std::forward< WrapperRefer >( wrapper ) );
             }
         };
@@ -362,7 +386,7 @@ namespace ScL { namespace Feature { namespace Detail
 
                 using LeftWrapperGuard = ::ScL::Feature::Detail::WrapperGuard< LeftWrapperRefer >;
                 using RightWrapperGuard = ::ScL::Feature::Detail::WrapperGuard< RightWrapperRefer >;
-                using ResultWrapper = ::ScL::Feature::Wrapper< Returned >;
+                using ResultWrapper = ::ScL::Feature::Detail::Wrapper< Returned, ::ScL::Feature::Inplace::Default >;
                 return ResultWrapper( invokable( LeftWrapperGuard( ::std::forward< LeftWrapperRefer >( left ) ).wrapperAccess(),
                     RightWrapperGuard( ::std::forward< RightWrapperRefer >( right ) ).wrapperAccess() ) );
             }
@@ -384,7 +408,7 @@ namespace ScL { namespace Feature { namespace Detail
                     "The type of return parameter must to be not a reference type." );
 
                 using RightWrapperGuard = ::ScL::Feature::Detail::WrapperGuard< RightWrapperRefer >;
-                using ResultWrapper = ::ScL::Feature::Wrapper< Returned >;
+                using ResultWrapper = ::ScL::Feature::Detail::Wrapper< Returned, ::ScL::Feature::Inplace::Default >;
                 return ResultWrapper( invokable( ::std::forward< LeftWrapperRefer >( left ),
                     RightWrapperGuard( ::std::forward< RightWrapperRefer >( right ) ).wrapperAccess() ) );
             }
@@ -406,7 +430,7 @@ namespace ScL { namespace Feature { namespace Detail
                     "The type of return parameter must to be not a reference type." );
 
                 using LeftWrapperGuard = ::ScL::Feature::Detail::WrapperGuard< LeftWrapperRefer >;
-                using ResultWrapper = ::ScL::Feature::Wrapper< Returned >;
+                using ResultWrapper = ::ScL::Feature::Detail::Wrapper< Returned, ::ScL::Feature::Inplace::Default >;
                 return ResultWrapper( invokable( LeftWrapperGuard( ::std::forward< LeftWrapperRefer >( left ) ).wrapperAccess(),
                     ::std::forward< RightWrapperRefer >( right ) ) );
             }
@@ -427,7 +451,7 @@ namespace ScL { namespace Feature { namespace Detail
                 using Returned = ::std::invoke_result_t< Invokable, LeftValueRefer, RightValueRefer >;
 
                 using GuardTool = ::ScL::Feature::Detail::Guard::BothTool< Invokable, LeftWrapperRefer, RightWrapperRefer >;
-                using ResultWrapper = ::ScL::Feature::Wrapper< Returned, GuardTool >;
+                using ResultWrapper = ::ScL::Feature::Detail::Wrapper< Returned, GuardTool >;
                 return ResultWrapper( ::std::forward< InvokableRefer >( invokable ), ::std::forward< LeftWrapperRefer >( left ), ::std::forward< RightWrapperRefer >( right ) );
             }
         };
@@ -446,7 +470,7 @@ namespace ScL { namespace Feature { namespace Detail
                 using Returned = ::std::invoke_result_t< Invokable, LeftWrapperRefer, RightValueRefer >;
 
                 using GuardTool = ::ScL::Feature::Detail::Guard::RightTool< Invokable, LeftWrapperRefer, RightWrapperRefer >;
-                using ResultWrapper = ::ScL::Feature::Wrapper< Returned, GuardTool >;
+                using ResultWrapper = ::ScL::Feature::Detail::Wrapper< Returned, GuardTool >;
                 return ResultWrapper( ::std::forward< InvokableRefer >( invokable ), ::std::forward< LeftWrapperRefer >( left ), ::std::forward< RightWrapperRefer >( right ) );
             }
         };
@@ -465,7 +489,7 @@ namespace ScL { namespace Feature { namespace Detail
                 using Returned = ::std::invoke_result_t< Invokable, LeftValueRefer, RightWrapperRefer >;
 
                 using GuardTool = ::ScL::Feature::Detail::Guard::LeftTool< Invokable, LeftWrapperRefer, RightWrapperRefer >;
-                using ResultWrapper = ::ScL::Feature::Wrapper< Returned, GuardTool >;
+                using ResultWrapper = ::ScL::Feature::Detail::Wrapper< Returned, GuardTool >;
                 return ResultWrapper( ::std::forward< InvokableRefer >( invokable ), ::std::forward< LeftWrapperRefer >( left ), ::std::forward< RightWrapperRefer >( right ) );
             }
         };

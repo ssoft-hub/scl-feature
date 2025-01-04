@@ -25,10 +25,8 @@ void func( _MapType & test_map )
 {
     for (size_t i = 0; i < 100000; ++i)
     {
-        // TODO: не работает рефлексия
-        // static_assert(false);
-        test_map.at("apple").second++;
-        test_map.find("potato")->second.second++;
+        test_map.at("apple")->second++;
+        test_map->find("potato")->second.second++;
     }
 }
 
@@ -49,8 +47,8 @@ void example()
     ::std::cout << "Start" << ::std::endl;
 
     _MapType test_map;
-    test_map["apple"].first = "fruit";
-    test_map["potato"].first = "vegetable";
+    test_map["apple"]->first = "fruit";
+    test_map["potato"]->first = "vegetable";
 
     ::std::vector<::std::thread> threads(::std::thread::hardware_concurrency());
     for (auto &thread : threads)
