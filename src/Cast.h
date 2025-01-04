@@ -1,3 +1,4 @@
+#pragma once
 #ifndef SCL_FEATURE_CASTER_H
 #define SCL_FEATURE_CASTER_H
 
