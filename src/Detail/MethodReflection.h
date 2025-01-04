@@ -2,16 +2,27 @@
 #ifndef SCL_FEATURE_DETAIL_METHOD_REFLECTION_H
 #define SCL_FEATURE_DETAIL_METHOD_REFLECTION_H
 
-#include <type_traits>
+#include "ResultSwitch.h"
 
 #define SCL_REFLECT_METHOD_PROTOTYPE( method, this_refer ) \
-    template < typename ... Arguments_ \
-        /*requires*/ \
-        /*, typename = ::std::void_t< decltype( ::std::declval<Self_ this_refer>()->method( ::std::declval<Arguments_ && >() ... ) ) >*/ > \
+    template < typename ... Arguments_ > \
     constexpr decltype(auto) method ( Arguments_ && ... arguments ) this_refer \
     { \
-        return static_cast< Self_ this_refer >( *this )->method( ::std::forward<Arguments_&&>(arguments) ... ); \
-    } \
+        using WrapperRefer = Self_ this_refer; \
+        using ValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< WrapperRefer >::Value, WrapperRefer >; \
+        auto invokable = [](ValueRefer && value, Arguments_ && ... arguments) \
+            -> decltype(::std::declval<ValueRefer>().method( ::std::declval<Arguments_ &&>() ... )) \
+        { \
+            return ::std::forward<ValueRefer>(value).method( ::std::forward<Arguments_>(arguments) ... ); \
+        }; \
+        using Invokable = decltype(invokable); \
+        using Returned = ::std::invoke_result_t< Invokable, ValueRefer, Arguments_ && ... >; \
+         \
+        return ::ScL::Feature::Detail::Operator::ResultSwitch< \
+            ::ScL::Feature::Detail::Operator::LeftWrapperCase, \
+            ::ScL::Feature::Detail::Operator::ResultSwitchCase< Returned, ValueRefer > > \
+                 ::invoke( ::std::forward< Invokable >( invokable ), static_cast< WrapperRefer >( *this ), ::std::forward< Arguments_ >( arguments ) ... ); \
+     } \
 
 #define SCL_REFLECT_METHOD( method ) \
     SCL_REFLECT_METHOD_PROTOTYPE( method, && ) \
