@@ -21,11 +21,8 @@ namespace ScL::Feature
     class ValueReflectionMixIn<Self_, MyData>
     {
     public:
-        template <typename ... Arguments_>
-        decltype(auto) getName (Arguments_ && ... /*arguments*/) const & { return "test"; }
-
-        template <typename ... Arguments_>
-        decltype(auto) setName (Arguments_ && ... /*arguments*/) {}
+        SCL_REFLECT_METHOD( getName )
+        SCL_REFLECT_METHOD( setName )
     };
 }
 

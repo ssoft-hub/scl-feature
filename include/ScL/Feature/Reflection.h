@@ -1,7 +1,1 @@
-#include "Reflection/list.h"
-#include "Reflection/map.h"
-#include "Reflection/set.h"
-#include "Reflection/string.h"
-#include "Reflection/unordered_map.h"
-#include "Reflection/unordered_set.h"
-#include "Reflection/vector.h"
+#include "../../../src/Reflection.h"

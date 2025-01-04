@@ -206,17 +206,66 @@ namespace ScL { namespace Feature { namespace Detail
         , public ::ScL::Feature::ToolReflectionMixIn<Self_, Tool_>
     {};
 
+    template <typename Self_, typename Value_, typename Tool_, typename Tool1_>
+    class ReflectionMixIn<Self_, Wrapper<Wrapper<Value_, Tool_> const, Tool1_>>
+        : public ReflectionMixIn<Self_, Wrapper<Wrapper<Value_, Tool_>, Tool1_>>
+    {};
+
+    template <typename Self_, typename Value_, typename Tool_, typename Tool1_>
+    class ReflectionMixIn<Self_, Wrapper<Wrapper<Value_, Tool_> volatile, Tool1_>>
+        : public ReflectionMixIn<Self_, Wrapper<Wrapper<Value_, Tool_>, Tool1_>>
+    {};
+
+    template <typename Self_, typename Value_, typename Tool_, typename Tool1_>
+    class ReflectionMixIn<Self_, Wrapper<Wrapper<Value_, Tool_> const volatile, Tool1_>>
+        : public ReflectionMixIn<Self_, Wrapper<Wrapper<Value_, Tool_>, Tool1_>>
+    {};
+
+    template <typename Self_, typename Value_, typename Tool_, typename Tool1_>
+    class ReflectionMixIn<Self_, Wrapper<Wrapper<Value_, Tool_> &, Tool1_>>
+        : public ReflectionMixIn<Self_, Wrapper<Wrapper<Value_, Tool_>, Tool1_>>
+    {};
+
+    template <typename Self_, typename Value_, typename Tool_, typename Tool1_>
+    class ReflectionMixIn<Self_, Wrapper<Wrapper<Value_, Tool_> const &, Tool1_>>
+        : public ReflectionMixIn<Self_, Wrapper<Wrapper<Value_, Tool_>, Tool1_>>
+    {};
+
+    template <typename Self_, typename Value_, typename Tool_, typename Tool1_>
+    class ReflectionMixIn<Self_, Wrapper<Wrapper<Value_, Tool_> volatile &, Tool1_>>
+        : public ReflectionMixIn<Self_, Wrapper<Wrapper<Value_, Tool_>, Tool1_>>
+    {};
+
+    template <typename Self_, typename Value_, typename Tool_, typename Tool1_>
+    class ReflectionMixIn<Self_, Wrapper<Wrapper<Value_, Tool_> const volatile &, Tool1_>>
+        : public ReflectionMixIn<Self_, Wrapper<Wrapper<Value_, Tool_>, Tool1_>>
+    {};
+
+    template <typename Self_, typename Value_, typename Tool_, typename Tool1_>
+    class ReflectionMixIn<Self_, Wrapper<Wrapper<Value_, Tool_> &&, Tool1_>>
+        : public ReflectionMixIn<Self_, Wrapper<Wrapper<Value_, Tool_>, Tool1_>>
+    {};
+
+    template <typename Self_, typename Value_, typename Tool_, typename Tool1_>
+    class ReflectionMixIn<Self_, Wrapper<Wrapper<Value_, Tool_> const &&, Tool1_>>
+        : public ReflectionMixIn<Self_, Wrapper<Wrapper<Value_, Tool_>, Tool1_>>
+    {};
+
+    template <typename Self_, typename Value_, typename Tool_, typename Tool1_>
+    class ReflectionMixIn<Self_, Wrapper<Wrapper<Value_, Tool_> volatile &&, Tool1_>>
+        : public ReflectionMixIn<Self_, Wrapper<Wrapper<Value_, Tool_>, Tool1_>>
+    {};
+
+    template <typename Self_, typename Value_, typename Tool_, typename Tool1_>
+    class ReflectionMixIn<Self_, Wrapper<Wrapper<Value_, Tool_> const volatile &&, Tool1_>>
+        : public ReflectionMixIn<Self_, Wrapper<Wrapper<Value_, Tool_>, Tool1_>>
+    {};
+
     template <typename Self_, typename Value_, typename Tool_>
     class ReflectionMixIn<Self_, Wrapper<Value_, Tool_>>
         : public ReflectionMixIn<Self_, Value_>
-        , public ::ScL::Feature::ValueReflectionMixIn<Self_, Value_>
+        , public ::ScL::Feature::ValueReflectionMixIn<Self_, ::std::remove_cv_t<::std::remove_reference_t<Value_>>>
     {};
-
-    // template <typename Self_, typename Value_, typename Tool_>
-    // class ToolReflectionMixIn<Self_, Detail::Wrapper<Value_, Tool_> >
-    //     : public ::ScL::Feature::Detail::ToolReflectionMixIn<Self_, Value_>
-    //     , public ::ScL::Feature::ToolReflectionMixIn<Self_, Tool_>
-    // {};
 }}}
 
 #endif

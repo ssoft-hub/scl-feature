@@ -54,7 +54,6 @@ int main (int, char**)
     {
         foo<::std::vector<int>>();
         foo<::std::vector<Wrapper<int>>>();
-
         foo<Wrapper<::std::vector<int>>>();
         foo<Wrapper<::std::vector<Wrapper<int>>>>();
     }

@@ -4,10 +4,13 @@
 #include <thread>
 #include <vector>
 
+#include <ScL/Feature/Reflection/Std.h>
 #include <ScL/Feature/Wrapper.h>
 #include <ScL/Feature/Tool.h>
 #include <ScL/Utility/Qualifier.h>
 
+using Key = ::std::string;
+using Value = ::std::pair<::std::string, int>;
 using Map = ::std::map<::std::string, ::std::pair<::std::string, int>>;
 
 using AtomicMutexMap = ::ScL::Feature::Wrapper<Map, ::ScL::Feature::ThreadSafe::Atomic>;
@@ -18,26 +21,15 @@ using DefaultMap = ::ScL::Feature::Wrapper<Map, ::ScL::Feature::Inplace::Default
 using ImplicitMap = ::ScL::Feature::Wrapper<Map, ::ScL::Feature::Implicit::Raw>;
 
 template <typename _MapType>
-void func()
+void func( _MapType & test_map )
 {
-    static _MapType test_map;
-
-    test_map["apple"]->first = "fruit";
-    test_map["potato"]->first = "vegetable";
-
     for (size_t i = 0; i < 100000; ++i)
     {
-        test_map->at("apple").second++;
-        test_map->find("potato")->second.second++;
+        // TODO: не работает рефлексия
+        // static_assert(false);
+        test_map.at("apple").second++;
+        test_map.find("potato")->second.second++;
     }
-
-    auto read_ptr = &::ScL::asConst(test_map);
-    ::std::cout
-        << "potato is " << read_ptr->at("potato").first
-        << " " << read_ptr->at("potato").second
-        << ", apple is " << read_ptr->at("apple").first
-        << " " << read_ptr->at("apple").second
-        << ::std::endl;
 }
 
 /*
@@ -55,19 +47,31 @@ template <typename _MapType>
 void example()
 {
     ::std::cout << "Start" << ::std::endl;
-    //::std::chrono::duration
+
+    _MapType test_map;
+    test_map["apple"].first = "fruit";
+    test_map["potato"].first = "vegetable";
 
     ::std::vector<::std::thread> threads(::std::thread::hardware_concurrency());
     for (auto &thread : threads)
-        thread = ::std::thread(func<_MapType>);
+        thread = ::std::thread(func<_MapType>, ::std::ref(test_map));
     for (auto &thread : threads)
         thread.join();
+
+    auto read_ptr = &::ScL::asConst(test_map);
+    ::std::cout
+        << "potato is " << read_ptr->at("potato").first
+        << " " << read_ptr->at("potato").second
+        << ", apple is " << read_ptr->at("apple").first
+        << " " << read_ptr->at("apple").second
+        << ::std::endl;
 
     ::std::cout << "Finish" << ::std::endl;
 }
 
 int main(int, char **)
 {
+    //example<Map>();
     // Параллельно, но не атомарно.
     example<DefaultMap>();
     // Параллельно, но не атомарно.
