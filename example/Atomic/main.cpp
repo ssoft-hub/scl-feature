@@ -26,7 +26,7 @@ void func( _MapType & test_map )
     for (size_t i = 0; i < 100000; ++i)
     {
         test_map.at("apple")->second++;
-        test_map->find("potato")->second.second++;
+        test_map.find("potato")->second.second++;
     }
 }
 
