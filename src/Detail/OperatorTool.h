@@ -4,6 +4,7 @@
 
 #include <cassert>
 #include <ScL/Feature/Access/WrapperGuard.h>
+#include <ScL/Feature/MixIn.h>
 #include <ScL/Feature/Trait.h>
 #include <ScL/Utility/SimilarRefer.h>
 
@@ -37,7 +38,7 @@ namespace ScL { namespace Feature { namespace Detail { namespace Guard
             {
             }
 
-            Holder ( ThisType && other )
+            Holder ( ThisType && other ) // TODO: = delete;
                 : m_feature_guard( ::std::forward< WrapperGuard >( other.m_feature_guard ) )
                 , m_result_refer( ::std::forward< ResultRefer >( other.m_result_refer ) )
             {
@@ -90,7 +91,7 @@ namespace ScL { namespace Feature { namespace Detail { namespace Guard
             {
             }
 
-            Holder ( ThisType && other )
+            Holder ( ThisType && other ) // TODO: = delete;
                 : m_feature_guard( ::std::forward< WrapperGuard >( other.m_feature_guard ) )
                 , m_result_refer( ::std::forward< ResultRefer >( other.m_result_refer ) )
             {
@@ -146,7 +147,7 @@ namespace ScL { namespace Feature { namespace Detail { namespace Guard
             {
             }
 
-            Holder ( ThisType && other )
+            Holder ( ThisType && other ) // TODO: = delete;
                 : m_left_feature_guard( ::std::forward< LeftWrapperGuard >( other.m_left_feature_guard ) )
                 , m_right_feature_guard( ::std::forward< RightWrapperGuard >( other.m_right_feature_guard ) )
                 , m_result_refer( ::std::forward< ResultRefer >( other.m_result_refer ) )
@@ -165,5 +166,74 @@ namespace ScL { namespace Feature { namespace Detail { namespace Guard
         };
     };
 }}}}
+
+namespace ScL::Feature
+{
+    template < typename _Value, typename _Invokable, typename _WrapperRefer, typename ... _Arguments >
+    class ToolMixIn< ::ScL::Feature::Detail::Wrapper< _Value, ::ScL::Feature::Detail::Guard::LeftTool< _Invokable, _WrapperRefer, _Arguments ... > > >
+    {
+        using MixInValue = _Value;
+        using Tool = ::ScL::Feature::Detail::Guard::LeftTool< _Invokable, _WrapperRefer, _Arguments ... >;
+        using MixInWrapper = ::ScL::Feature::Detail::Wrapper< _Value, Tool >;
+        using MixInHolder = typename Tool::template Holder< _Value >;
+
+    public:
+        constexpr operator MixInValue const & () const noexcept
+        {
+            return static_cast< MixInWrapper const & >( *this ).m_holder.m_result_refer;
+        }
+
+        constexpr operator MixInValue & () noexcept
+        {
+            return static_cast< MixInWrapper & >( *this ).m_holder.m_result_refer;
+        }
+    };
+}
+
+namespace ScL::Feature
+{
+    template < typename _Value, typename _Invokable, typename _LeftRefer, typename _WrapperRefer >
+    class ToolMixIn< ::ScL::Feature::Detail::Wrapper< _Value, ::ScL::Feature::Detail::Guard::RightTool< _Invokable, _LeftRefer, _WrapperRefer > > >
+    {
+        using MixInValue = _Value;
+        using Tool = ::ScL::Feature::Detail::Guard::RightTool< _Invokable, _LeftRefer, _WrapperRefer >;
+        using MixInWrapper = ::ScL::Feature::Detail::Wrapper< _Value, Tool >;
+        using MixInHolder = typename Tool::template Holder< _Value >;
+
+    public:
+        constexpr operator MixInValue const & () const noexcept
+        {
+            return static_cast< MixInWrapper const & >( *this ).m_holder.m_result_refer;
+        }
+
+        constexpr operator MixInValue & () noexcept
+        {
+            return static_cast< MixInWrapper & >( *this ).m_holder.m_result_refer;
+        }
+    };
+}
+
+namespace ScL::Feature
+{
+    template < typename _Value, typename _Invokable, typename _LeftWrapperRefer, typename _RightWrapperRefer >
+    class ToolMixIn< ::ScL::Feature::Detail::Wrapper< _Value, ::ScL::Feature::Detail::Guard::BothTool< _Invokable, _LeftWrapperRefer, _RightWrapperRefer > > >
+    {
+        using MixInValue = _Value;
+        using Tool = ::ScL::Feature::Detail::Guard::BothTool< _Invokable, _LeftWrapperRefer, _RightWrapperRefer >;
+        using MixInWrapper = ::ScL::Feature::Detail::Wrapper< _Value, Tool >;
+        using MixInHolder = typename Tool::template Holder< _Value >;
+
+    public:
+        constexpr operator MixInValue const & () const noexcept
+        {
+            return static_cast< MixInWrapper const & >( *this ).m_holder.m_result_refer;
+        }
+
+        constexpr operator MixInValue & () noexcept
+        {
+            return static_cast< MixInWrapper & >( *this ).m_holder.m_result_refer;
+        }
+    };
+}
 
 #endif

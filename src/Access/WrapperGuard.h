@@ -94,13 +94,17 @@ namespace ScL { namespace Feature { namespace Detail
         static_assert( ::ScL::Feature::isSimilar< HolderRefer, WrapperRefer >(), "The Refer and HolderRefer must to be similar types!" );
 
     private:
-        WrapperPointer m_pointer;
+        WrapperPointer m_pointer{};
 
     private:
-        SpecialWrapperGuard ( ThisType && other ) = delete;
         SpecialWrapperGuard ( const ThisType & other ) = delete;
 
     public:
+        constexpr SpecialWrapperGuard ( ThisType && other ) // TODO: = delete;
+        {
+            ::std::swap( m_pointer, other.m_pointer );
+        }
+
         constexpr SpecialWrapperGuard ( WrapperRefer refer ) noexcept
             : m_pointer( ::std::addressof( refer ) )
         {

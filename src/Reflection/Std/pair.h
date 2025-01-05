@@ -4,6 +4,7 @@
 
 #include <utility>
 #include <ScL/Feature/MixIn.h>
+#include <ScL/Feature/Wrapper.h>
 
 namespace ScL { namespace Feature
 {
@@ -12,12 +13,16 @@ namespace ScL { namespace Feature
     {
     public:
         // TODO: define types as Wrappers
-        using First = First_;
-        using Second = Second_;
+        using First = Wrapper<First_>;
+        using Second = Wrapper<Second_>;
+
+    private:
+        First reflected_first{};
+        Second reflected_second{};
 
     public:
-        First first;
-        Second second;
+        // First & first{reflected_first};
+        // Second & second{reflected_second};
     };
 }}
 
