@@ -69,7 +69,8 @@ void example()
 
 int main(int, char **)
 {
-    //example<Map>();
+    // Параллельно, но не атомарно.
+    // example<Map>();
     // Параллельно, но не атомарно.
     example<DefaultMap>();
     // Параллельно, но не атомарно.

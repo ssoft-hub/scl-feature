@@ -61,10 +61,8 @@ namespace ScL { namespace Feature { namespace Detail
     namespace Operator
     {
         /* Cases for operator result type */
-        struct FundamentalCase {};
-        struct ThisCase {};
-        struct DefaultCase {};
-        struct BlockedCase {};
+        struct VoidCase;
+        struct BlockedCase;
 
         template < bool, typename _Returned, typename _Refer >
         struct ResultCaseWrapperHelper;
@@ -79,7 +77,7 @@ namespace ScL { namespace Feature { namespace Detail
 
             using Type = ::std::conditional_t< ::std::is_reference< Value >{},
                 ::ScL::Feature::Detail::Operator::BlockedCase,
-                ::ScL::Feature::Detail::Operator::DefaultCase >;
+                ::ScL::Feature::Detail::Operator::BlockedCase >;
         };
 
         template < typename _Returned, typename _Refer >
@@ -88,17 +86,9 @@ namespace ScL { namespace Feature { namespace Detail
             using Returned = _Returned;
             using Value = ::std::decay_t< _Refer >;
 
-            static constexpr bool returned_is_not_wrappable = ::std::is_fundamental< Returned >{} || ::std::is_enum< Returned >{};
-            static constexpr bool returned_is_reference = ::std::is_reference< Returned >{};
-            static constexpr bool returned_is_same_value = ::std::is_same< _Returned, _Refer >{};
-
-            using Type = ::std::conditional_t< returned_is_not_wrappable,
-                ::ScL::Feature::Detail::Operator::FundamentalCase,
-                ::std::conditional_t< returned_is_same_value,
-                    ::ScL::Feature::Detail::Operator::ThisCase,
-                    ::std::conditional_t< returned_is_reference,
-                        ::ScL::Feature::Detail::Operator::BlockedCase,
-                        ::ScL::Feature::Detail::Operator::DefaultCase > > >;
+            using Type = ::std::conditional_t< ::std::is_void< Returned >::value,
+                ::ScL::Feature::Detail::Operator::VoidCase,
+                ::ScL::Feature::Detail::Operator::BlockedCase >;
         };
 
         template < typename _Returned, typename _Refer >
@@ -120,7 +110,7 @@ namespace ScL { namespace Feature { namespace Detail
         struct ResultSwitch;
 
         template <>
-        struct ResultSwitch< ::ScL::Feature::Detail::Operator::LeftWrapperCase, ::ScL::Feature::Detail::Operator::FundamentalCase >
+        struct ResultSwitch< ::ScL::Feature::Detail::Operator::LeftWrapperCase, ::ScL::Feature::Detail::Operator::VoidCase >
         {
             template < typename _Invokable, typename _Wrapper, typename ... _Arguments >
             static constexpr decltype(auto) invoke ( _Invokable && invokable, _Wrapper && wrapper, _Arguments && ... arguments )
@@ -131,45 +121,6 @@ namespace ScL { namespace Feature { namespace Detail
                 using WrapperRefer = _Wrapper &&;
                 using WrapperGuard = ::ScL::Feature::Detail::WrapperGuard< WrapperRefer >;
                 return invokable( WrapperGuard( ::std::forward< WrapperRefer >( wrapper ) ).wrapperAccess(), ::std::forward< _Arguments >( arguments ) ... );
-            }
-        };
-
-        template <>
-        struct ResultSwitch< ::ScL::Feature::Detail::Operator::LeftWrapperCase, ::ScL::Feature::Detail::Operator::ThisCase >
-        {
-            template < typename _Invokable, typename _Wrapper, typename ... _Arguments >
-            static constexpr decltype(auto) invoke ( _Invokable && invokable, _Wrapper && wrapper, _Arguments && ... arguments )
-            {
-                static_assert(::ScL::Feature::isWrapper< ::std::remove_reference_t<_Wrapper> >(),
-                              "_Wrapper must to be a wrapper type." );
-
-                using WrapperRefer = _Wrapper &&;
-                using WrapperGuard = ::ScL::Feature::Detail::WrapperGuard< WrapperRefer >;
-                invokable( WrapperGuard( ::std::forward< WrapperRefer >( wrapper ) ).wrapperAccess(), ::std::forward< _Arguments >( arguments ) ... );
-                return ::std::forward< WrapperRefer >( wrapper );
-            }
-        };
-
-        template <>
-        struct ResultSwitch< ::ScL::Feature::Detail::Operator::LeftWrapperCase, ::ScL::Feature::Detail::Operator::DefaultCase >
-        {
-            template < typename _Invokable, typename _Wrapper, typename ... _Arguments >
-            static constexpr decltype(auto) invoke ( _Invokable && invokable, _Wrapper && wrapper, _Arguments && ... arguments )
-            {
-                static_assert(::ScL::Feature::isWrapper< ::std::remove_reference_t<_Wrapper> >(),
-                              "_Wrapper must to be a wrapper type." );
-
-                using WrapperRefer = _Wrapper &&;
-                using ValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< WrapperRefer >::Value, WrapperRefer >;
-                using Invokable = _Invokable;
-                using Returned = ::std::invoke_result_t< Invokable, ValueRefer, _Arguments && ... >;
-
-                static_assert( !::std::is_reference< Returned >{},
-                    "The type of return parameter must to be not a reference type." );
-
-                using WrapperGuard = ::ScL::Feature::Detail::WrapperGuard< WrapperRefer >;
-                using ResultWrapper = ::ScL::Feature::Detail::Wrapper< Returned, ::ScL::Feature::Inplace::Default >;
-                return ResultWrapper( invokable( WrapperGuard( ::std::forward< WrapperRefer >( wrapper ) ).wrapperAccess(), ::std::forward< _Arguments >( arguments ) ... ) );
             }
         };
 
@@ -188,8 +139,8 @@ namespace ScL { namespace Feature { namespace Detail
                 using InvokableRefer = _Invokable &&;
                 using Returned = ::std::invoke_result_t< Invokable, ValueRefer, _Arguments && ... >;
 
-                static_assert( ::std::is_reference< Returned >{},
-                    "The type of return parameter must to be a reference type." );
+                // static_assert( ::std::is_reference< Returned >{},
+                //     "The type of return parameter must to be a reference type." );
 
                 using GuardTool = ::ScL::Feature::Detail::Guard::LeftTool< Invokable, WrapperRefer, _Arguments && ... >;
                 using ResultWrapper = ::ScL::Feature::Detail::Wrapper< Returned, GuardTool >;
@@ -198,7 +149,7 @@ namespace ScL { namespace Feature { namespace Detail
         };
 
         template <>
-        struct ResultSwitch< ::ScL::Feature::Detail::Operator::RightWrapperCase, ::ScL::Feature::Detail::Operator::FundamentalCase >
+        struct ResultSwitch< ::ScL::Feature::Detail::Operator::RightWrapperCase, ::ScL::Feature::Detail::Operator::VoidCase >
         {
             template < typename _Invokable, typename _Left, typename _Wrapper >
             static constexpr decltype(auto) invoke ( _Invokable && invokable, _Left && left, _Wrapper && wrapper )
@@ -210,47 +161,6 @@ namespace ScL { namespace Feature { namespace Detail
                 using WrapperRefer = _Wrapper &&;
                 using WrapperGuard = ::ScL::Feature::Detail::WrapperGuard< WrapperRefer >;
                 return invokable( ::std::forward< LeftRefer >( left ), WrapperGuard( ::std::forward< WrapperRefer >( wrapper ) ).wrapperAccess() );
-            }
-        };
-
-        template <>
-        struct ResultSwitch< ::ScL::Feature::Detail::Operator::RightWrapperCase, ::ScL::Feature::Detail::Operator::ThisCase >
-        {
-            template < typename _Invokable, typename _Left, typename _Wrapper >
-            static constexpr decltype(auto) invoke ( _Invokable && invokable, _Left && left, _Wrapper && wrapper )
-            {
-                static_assert(::ScL::Feature::isWrapper< ::std::remove_reference_t<_Wrapper> >(),
-                              "_Wrapper must to be a wrapper type." );
-
-                using LeftRefer = _Left &&;
-                using WrapperRefer = _Wrapper &&;
-                using WrapperGuard = ::ScL::Feature::Detail::WrapperGuard< WrapperRefer >;
-                invokable( ::std::forward< LeftRefer >( left ), WrapperGuard( ::std::forward< WrapperRefer >( wrapper ) ).wrapperAccess() );
-                return ::std::forward< WrapperRefer >( wrapper );
-            }
-        };
-
-        template <>
-        struct ResultSwitch< ::ScL::Feature::Detail::Operator::RightWrapperCase, ::ScL::Feature::Detail::Operator::DefaultCase >
-        {
-            template < typename _Invokable, typename _Left, typename _Wrapper >
-            static constexpr decltype(auto) invoke ( _Invokable && invokable, _Left && left, _Wrapper && wrapper )
-            {
-                static_assert(::ScL::Feature::isWrapper< ::std::remove_reference_t<_Wrapper> >(),
-                              "_Wrapper must to be a wrapper type." );
-
-                using LeftRefer = _Left &&;
-                using WrapperRefer = _Wrapper &&;
-                using ValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< WrapperRefer >::Value, WrapperRefer >;
-                using Invokable = _Invokable;
-                using Returned = ::std::invoke_result_t< Invokable, LeftRefer, ValueRefer >;
-
-                static_assert( !::std::is_reference< Returned >{},
-                    "The type of return parameter must to be not a reference type." );
-
-                using WrapperGuard = ::ScL::Feature::Detail::WrapperGuard< WrapperRefer >;
-                using ResultWrapper = ::ScL::Feature::Detail::Wrapper< Returned, ::ScL::Feature::Inplace::Default >;
-                return ResultWrapper( invokable( ::std::forward< LeftRefer >( left ), WrapperGuard( ::std::forward< WrapperRefer >( wrapper ) ).wrapperAccess() ) );
             }
         };
 
@@ -280,7 +190,7 @@ namespace ScL { namespace Feature { namespace Detail
         };
 
         template <>
-        struct ResultSwitch< ::ScL::Feature::Detail::Operator::BothExposingCase, ::ScL::Feature::Detail::Operator::FundamentalCase >
+        struct ResultSwitch< ::ScL::Feature::Detail::Operator::BothExposingCase, ::ScL::Feature::Detail::Operator::VoidCase >
         {
             template < typename _Invokable, typename _Left, typename _Right >
             static constexpr decltype(auto) invoke ( _Invokable && invokable, _Left && left, _Right && right )
@@ -295,7 +205,7 @@ namespace ScL { namespace Feature { namespace Detail
         };
 
         template <>
-        struct ResultSwitch< ::ScL::Feature::Detail::Operator::RightExposingCase, ::ScL::Feature::Detail::Operator::FundamentalCase >
+        struct ResultSwitch< ::ScL::Feature::Detail::Operator::RightExposingCase, ::ScL::Feature::Detail::Operator::VoidCase >
         {
             template < typename _Invokable, typename _Left, typename _Right >
             static constexpr decltype(auto) invoke ( _Invokable && invokable, _Left && left, _Right && right )
@@ -309,7 +219,7 @@ namespace ScL { namespace Feature { namespace Detail
         };
 
         template <>
-        struct ResultSwitch< ::ScL::Feature::Detail::Operator::LeftExposingCase, ::ScL::Feature::Detail::Operator::FundamentalCase >
+        struct ResultSwitch< ::ScL::Feature::Detail::Operator::LeftExposingCase, ::ScL::Feature::Detail::Operator::VoidCase >
         {
             template < typename _Invokable, typename _Left, typename _Right >
             static constexpr decltype(auto) invoke ( _Invokable && invokable, _Left && left, _Right && right )
@@ -319,120 +229,6 @@ namespace ScL { namespace Feature { namespace Detail
                 using LeftWrapperGuard = ::ScL::Feature::Detail::WrapperGuard< LeftWrapperRefer >;
                 return invokable( LeftWrapperGuard( ::std::forward< LeftWrapperRefer >( left ) ).wrapperAccess(),
                     ::std::forward< RightWrapperRefer >( right ) );
-            }
-        };
-
-        template <>
-        struct ResultSwitch< ::ScL::Feature::Detail::Operator::BothExposingCase, ::ScL::Feature::Detail::Operator::ThisCase >
-        {
-            template < typename _Invokable, typename _Left, typename _Right >
-            static constexpr decltype(auto) invoke ( _Invokable && invokable, _Left && left, _Right && right )
-            {
-                using LeftWrapperRefer = _Left &&;
-                using RightWrapperRefer = _Right &&;
-                using LeftWrapperGuard = ::ScL::Feature::Detail::WrapperGuard< LeftWrapperRefer >;
-                using RightWrapperGuard = ::ScL::Feature::Detail::WrapperGuard< RightWrapperRefer >;
-                invokable( LeftWrapperGuard( ::std::forward< LeftWrapperRefer >( left ) ).wrapperAccess(),
-                    RightWrapperGuard( ::std::forward< RightWrapperRefer >( right ) ).wrapperAccess() );
-                return ::std::forward< LeftWrapperRefer >( left );
-            }
-        };
-
-        template <>
-        struct ResultSwitch< ::ScL::Feature::Detail::Operator::RightExposingCase, ::ScL::Feature::Detail::Operator::ThisCase >
-        {
-            template < typename _Invokable, typename _Left, typename _Right >
-            static constexpr decltype(auto) invoke ( _Invokable && invokable, _Left && left, _Right && right )
-            {
-                using LeftWrapperRefer = _Left &&;
-                using RightWrapperRefer = _Right &&;
-                using RightWrapperGuard = ::ScL::Feature::Detail::WrapperGuard< RightWrapperRefer >;
-                invokable( ::std::forward< LeftWrapperRefer >( left ),
-                    RightWrapperGuard( ::std::forward< RightWrapperRefer >( right ) ).wrapperAccess() );
-                return ::std::forward< LeftWrapperRefer >( left );
-            }
-        };
-
-        template <>
-        struct ResultSwitch< ::ScL::Feature::Detail::Operator::LeftExposingCase, ::ScL::Feature::Detail::Operator::ThisCase >
-        {
-            template < typename _Invokable, typename _Left, typename _Right >
-            static constexpr decltype(auto) invoke ( _Invokable && invokable, _Left && left, _Right && right )
-            {
-                using LeftWrapperRefer = _Left &&;
-                using RightWrapperRefer = _Right &&;
-                using LeftWrapperGuard = ::ScL::Feature::Detail::WrapperGuard< LeftWrapperRefer >;
-                invokable( LeftWrapperGuard( ::std::forward< LeftWrapperRefer >( left ) ).wrapperAccess(),
-                    ::std::forward< RightWrapperRefer >( right ) );
-                return ::std::forward< LeftWrapperRefer >( left );
-            }
-        };
-
-        template <>
-        struct ResultSwitch< ::ScL::Feature::Detail::Operator::BothExposingCase, ::ScL::Feature::Detail::Operator::DefaultCase >
-        {
-            template < typename _Invokable, typename _Left, typename _Right >
-            static constexpr decltype(auto) invoke ( _Invokable && invokable, _Left && left, _Right && right )
-            {
-                using LeftWrapperRefer = _Left &&;
-                using LeftValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< LeftWrapperRefer >::Value, LeftWrapperRefer >;
-                using RightWrapperRefer = _Right &&;
-                using RightValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< RightWrapperRefer >::Value, RightWrapperRefer >;
-                using Invokable = _Invokable;
-                using Returned = ::std::invoke_result_t< Invokable, LeftValueRefer, RightValueRefer >;
-
-                static_assert( !::std::is_reference< Returned >{},
-                    "The type of return parameter must to be not a reference type." );
-
-                using LeftWrapperGuard = ::ScL::Feature::Detail::WrapperGuard< LeftWrapperRefer >;
-                using RightWrapperGuard = ::ScL::Feature::Detail::WrapperGuard< RightWrapperRefer >;
-                using ResultWrapper = ::ScL::Feature::Detail::Wrapper< Returned, ::ScL::Feature::Inplace::Default >;
-                return ResultWrapper( invokable( LeftWrapperGuard( ::std::forward< LeftWrapperRefer >( left ) ).wrapperAccess(),
-                    RightWrapperGuard( ::std::forward< RightWrapperRefer >( right ) ).wrapperAccess() ) );
-            }
-        };
-
-        template <>
-        struct ResultSwitch< ::ScL::Feature::Detail::Operator::RightExposingCase, ::ScL::Feature::Detail::Operator::DefaultCase >
-        {
-            template < typename _Invokable, typename _Left, typename _Right >
-            static constexpr decltype(auto) invoke ( _Invokable && invokable, _Left && left, _Right && right )
-            {
-                using LeftWrapperRefer = _Left &&;
-                using RightWrapperRefer = _Right &&;
-                using RightValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< RightWrapperRefer >::Value, RightWrapperRefer >;
-                using Invokable = _Invokable;
-                using Returned = ::std::invoke_result_t< Invokable, LeftWrapperRefer, RightValueRefer >;
-
-                static_assert( !::std::is_reference< Returned >{},
-                    "The type of return parameter must to be not a reference type." );
-
-                using RightWrapperGuard = ::ScL::Feature::Detail::WrapperGuard< RightWrapperRefer >;
-                using ResultWrapper = ::ScL::Feature::Detail::Wrapper< Returned, ::ScL::Feature::Inplace::Default >;
-                return ResultWrapper( invokable( ::std::forward< LeftWrapperRefer >( left ),
-                    RightWrapperGuard( ::std::forward< RightWrapperRefer >( right ) ).wrapperAccess() ) );
-            }
-        };
-
-        template <>
-        struct ResultSwitch< ::ScL::Feature::Detail::Operator::LeftExposingCase, ::ScL::Feature::Detail::Operator::DefaultCase >
-        {
-            template < typename _Invokable, typename _Left, typename _Right >
-            static constexpr decltype(auto) invoke ( _Invokable && invokable, _Left && left, _Right && right )
-            {
-                using LeftWrapperRefer = _Left &&;
-                using LeftValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< LeftWrapperRefer >::Value, LeftWrapperRefer >;
-                using RightWrapperRefer = _Right &&;
-                using Invokable = _Invokable;
-                using Returned = ::std::invoke_result_t< Invokable, LeftValueRefer, RightWrapperRefer >;
-
-                static_assert( !::std::is_reference< Returned >{},
-                    "The type of return parameter must to be not a reference type." );
-
-                using LeftWrapperGuard = ::ScL::Feature::Detail::WrapperGuard< LeftWrapperRefer >;
-                using ResultWrapper = ::ScL::Feature::Detail::Wrapper< Returned, ::ScL::Feature::Inplace::Default >;
-                return ResultWrapper( invokable( LeftWrapperGuard( ::std::forward< LeftWrapperRefer >( left ) ).wrapperAccess(),
-                    ::std::forward< RightWrapperRefer >( right ) ) );
             }
         };
 
