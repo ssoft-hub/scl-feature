@@ -110,15 +110,6 @@ extern void testRangeOperators ();
 
 int main ( int /*argc*/, char ** /*argv*/ )
 {
-    using Test = Wrapper< double, Heap::Unique >;
-    Test one{1};
-    Test two{2};
-
-    one = two;
-    two = Test{};
-    one = 3;
-    two = 4;
-
     testWrapperValue();
     testWrapperContainer();
 
