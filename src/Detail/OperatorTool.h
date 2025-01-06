@@ -33,8 +33,8 @@ namespace ScL { namespace Feature { namespace Detail { namespace Guard
             Result m_result;
 
             Holder (  Invokable && invokable, WrapperRefer wrapper, _Arguments && ... arguments )
-                : m_feature_guard( ::std::forward< WrapperRefer >( wrapper ) )
-                , m_result( invokable( ::std::forward< ValueRefer >( m_feature_guard.wrapperAccess() ), ::std::forward< _Arguments >( arguments ) ...  ) )
+                : m_feature_guard{ ::std::forward< WrapperRefer >( wrapper ) }
+                , m_result{ invokable( ::std::forward< ValueRefer >( m_feature_guard.wrapperAccess() ), ::std::forward< _Arguments >( arguments ) ...  ) }
             {
             }
 
@@ -80,8 +80,8 @@ namespace ScL { namespace Feature { namespace Detail { namespace Guard
             Result m_result;
 
             Holder (  Invokable && invokable, LeftRefer left, WrapperRefer wrapper )
-                : m_feature_guard( ::std::forward< WrapperRefer >( wrapper ) )
-                , m_result( invokable( ::std::forward< LeftRefer >( left ), ::std::forward< ValueRefer >( m_feature_guard.wrapperAccess() ) ) )
+                : m_feature_guard{ ::std::forward< WrapperRefer >( wrapper ) }
+                , m_result{ invokable( ::std::forward< LeftRefer >( left ), ::std::forward< ValueRefer >( m_feature_guard.wrapperAccess() ) ) }
             {
             }
 
@@ -129,20 +129,13 @@ namespace ScL { namespace Feature { namespace Detail { namespace Guard
             Result m_result;
 
             Holder (  Invokable && invokable, LeftWrapperRefer left, RightWrapperRefer right )
-                : m_left_feature_guard( ::std::forward< LeftWrapperRefer >( left ) )
-                , m_right_feature_guard( ::std::forward< RightWrapperRefer >( right ) )
-                , m_result( invokable( ::std::forward< LeftValueRefer >( m_left_feature_guard.wrapperAccess() ), ::std::forward< RightValueRefer >( m_right_feature_guard.wrapperAccess() ) ) )
+                : m_left_feature_guard{ ::std::forward< LeftWrapperRefer >( left ) }
+                , m_right_feature_guard{ ::std::forward< RightWrapperRefer >( right ) }
+                , m_result{ invokable( ::std::forward< LeftValueRefer >( m_left_feature_guard.wrapperAccess() ), ::std::forward< RightValueRefer >( m_right_feature_guard.wrapperAccess() ) ) }
             {
             }
 
-            Holder ( ThisType && other ) // TODO: = delete;
-                : m_left_feature_guard( ::std::forward< LeftWrapperGuard >( other.m_left_feature_guard ) )
-                , m_right_feature_guard( ::std::forward< RightWrapperGuard >( other.m_right_feature_guard ) )
-                , m_result( ::std::forward< Result >( other.m_result ) )
-            {
-                assert( false ); // Restricted functionality
-            }
-
+            Holder ( ThisType && other ) = delete;
             Holder ( const ThisType & other ) = delete;
 
             template < typename _HolderRefer,
