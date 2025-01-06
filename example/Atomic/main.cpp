@@ -16,6 +16,7 @@ using Map = ::std::map<::std::string, ::std::pair<::std::string, int>>;
 using AtomicMutexMap = ::ScL::Feature::Wrapper<Map, ::ScL::Feature::ThreadSafe::Atomic>;
 using RecursiveMutexMap = ::ScL::Feature::Wrapper<Map, ::ScL::Feature::ThreadSafe::RecursiveMutex>;
 using SharedMutexMap = ::ScL::Feature::Wrapper<Map, ::ScL::Feature::ThreadSafe::SharedMutex>;
+using CowRecursiveMutexMap = ::ScL::Feature::Wrapper<Map, ::ScL::Feature::Implicit::Raw, ::ScL::Feature::ThreadSafe::RecursiveMutex>;
 
 using DefaultMap = ::ScL::Feature::Wrapper<Map, ::ScL::Feature::Inplace::Default>;
 using ImplicitMap = ::ScL::Feature::Wrapper<Map, ::ScL::Feature::Implicit::Raw>;
@@ -81,5 +82,7 @@ int main(int, char **)
     example<RecursiveMutexMap>();
     // Псевдопараллельно с блокировками, атомарно.
     example<SharedMutexMap>();
+    // Псевдопараллельно с блокировками, атомарно.
+    example<CowRecursiveMutexMap>();
     return 0;
 }
