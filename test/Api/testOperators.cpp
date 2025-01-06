@@ -724,7 +724,6 @@ void testWrapperBinaryOperators ()
     // Для проверки достаточно любого
 
     testWrapperBinaryOperatorsSpec< _Left, _Right >();
-
     //testWrapperBinaryOperatorsSpec< _Left, const _Right >();
     //testWrapperBinaryOperatorsSpec< _Left, volatile _Right >();
     //testWrapperBinaryOperatorsSpec< _Left, const volatile _Right >();
@@ -741,7 +740,7 @@ void testWrapperBinaryOperators ()
     //testWrapperBinaryOperatorsSpec< const volatile _Left, volatile _Right >();
     //testWrapperBinaryOperatorsSpec< const volatile _Left, const volatile _Right >();
 
-    //testWrapperBinaryOperatorsSpec< _Right, _Left >();
+    testWrapperBinaryOperatorsSpec< _Right, _Left >();
     //testWrapperBinaryOperatorsSpec< _Right, const _Left >();
     //testWrapperBinaryOperatorsSpec< _Right, volatile _Left >();
     //testWrapperBinaryOperatorsSpec< _Right, const volatile _Left >();
@@ -779,18 +778,22 @@ void testRangeOperators ()
 {
     using Vector = Wrapper< ::std::vector< int >, ::ScL::Feature::Inplace::Debug >;
 
-    Vector values{ { 0, 1, 2, 3, 4 } };
+    Vector const values = { 0, 1, 2, 3, 4 };
 
+    // Testing value access using operator []
     size_t count = values.size();
     for ( size_t i = 0; i < count; ++i )
         ::std::cout << values[ i ] << ::std::endl;
 
+    // Testing global methods begin/end
     for ( auto iter = ::std::begin( values ); iter != ::std::end( values ); ++iter )
         ::std::cout << (*iter) << ::std::endl;
 
-    for ( auto iter = ::std::begin( values ), end_iter = ::std::end( values ); iter != end_iter; ++iter )
+    // Testing reflected methods begin/end
+    for ( auto iter = values.begin(); iter != values.end(); ++iter )
         ::std::cout << (*iter) << ::std::endl;
 
+    // Testing ranged 'for'
     for ( const auto & value : values )
         ::std::cout << value << ::std::endl;
 }
