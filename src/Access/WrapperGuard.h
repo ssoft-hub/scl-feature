@@ -98,13 +98,9 @@ namespace ScL { namespace Feature { namespace Detail
 
     private:
         SpecialWrapperGuard ( const ThisType & other ) = delete;
+        SpecialWrapperGuard ( ThisType && other ) = delete;
 
     public:
-        constexpr SpecialWrapperGuard ( ThisType && other ) // TODO: = delete;
-        {
-            ::std::swap( m_pointer, other.m_pointer );
-        }
-
         constexpr SpecialWrapperGuard ( WrapperRefer refer ) noexcept
             : m_pointer( ::std::addressof( refer ) )
         {

@@ -24,34 +24,28 @@ namespace ScL { namespace Feature { namespace Detail { namespace Guard
             using ThisType = Holder;
             using WrapperGuard = ::ScL::Feature::Detail::WrapperGuard< WrapperRefer >;
             using ValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< WrapperRefer >::Value, WrapperRefer >;
-            using ResultRefer = _Type;
+            using Result = _Type;
 
-            static_assert( ::std::is_same< ResultRefer, ::std::invoke_result_t< Invokable, ValueRefer, _Arguments && ... > >::value,
+            static_assert( ::std::is_same< Result, ::std::invoke_result_t< Invokable, ValueRefer, _Arguments && ... > >::value,
                 "The result of _Invokable( _LeftRefer, _WrapperRefer ) must to be a _Type" );
 
             WrapperGuard m_feature_guard;
-            ResultRefer m_result_refer;
+            Result m_result;
 
             Holder (  Invokable && invokable, WrapperRefer wrapper, _Arguments && ... arguments )
                 : m_feature_guard( ::std::forward< WrapperRefer >( wrapper ) )
-                , m_result_refer( ::std::forward< ResultRefer >( invokable( ::std::forward< ValueRefer >( m_feature_guard.wrapperAccess() ), ::std::forward< _Arguments >( arguments ) ...  ) ) )
+                , m_result( invokable( ::std::forward< ValueRefer >( m_feature_guard.wrapperAccess() ), ::std::forward< _Arguments >( arguments ) ...  ) )
             {
             }
 
-            Holder ( ThisType && other ) // TODO: = delete;
-                : m_feature_guard( ::std::forward< WrapperGuard >( other.m_feature_guard ) )
-                , m_result_refer( ::std::forward< ResultRefer >( other.m_result_refer ) )
-            {
-                assert( false ); // Restricted functionality
-            }
-
+            Holder ( ThisType && other ) = delete;
             Holder ( const ThisType & other ) = delete;
 
             template < typename _HolderRefer,
                 typename = ::std::enable_if_t< ::std::is_same< ThisType, ::std::decay_t< _HolderRefer > >{} > >
-            static constexpr ::ScL::SimilarRefer< ResultRefer, _HolderRefer && > value ( _HolderRefer && holder )
+            static constexpr ::ScL::SimilarRefer< Result, _HolderRefer && > value ( _HolderRefer && holder )
             {
-                return ::std::forward< ::ScL::SimilarRefer< ResultRefer, _HolderRefer && > >( holder.m_result_refer );
+                return ::std::forward< ::ScL::SimilarRefer< Result, _HolderRefer && > >( holder.m_result );
             }
         };
     };
@@ -77,34 +71,28 @@ namespace ScL { namespace Feature { namespace Detail { namespace Guard
             using ThisType = Holder;
             using WrapperGuard = ::ScL::Feature::Detail::WrapperGuard< WrapperRefer >;
             using ValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< WrapperRefer >::Value, WrapperRefer >;
-            using ResultRefer = _Type;
+            using Result = _Type;
 
-            static_assert( ::std::is_same< ResultRefer, ::std::invoke_result_t< Invokable, LeftRefer, ValueRefer > >::value,
+            static_assert( ::std::is_same< Result, ::std::invoke_result_t< Invokable, LeftRefer, ValueRefer > >::value,
                 "The result of _Invokable( _LeftRefer, _WrapperRefer ) must to be a _Type" );
 
             WrapperGuard m_feature_guard;
-            ResultRefer m_result_refer;
+            Result m_result;
 
             Holder (  Invokable && invokable, LeftRefer left, WrapperRefer wrapper )
                 : m_feature_guard( ::std::forward< WrapperRefer >( wrapper ) )
-                , m_result_refer( ::std::forward< ResultRefer >( invokable(  ::std::forward< LeftRefer >( left ), ::std::forward< ValueRefer >( m_feature_guard.wrapperAccess() ) ) ) )
+                , m_result( invokable( ::std::forward< LeftRefer >( left ), ::std::forward< ValueRefer >( m_feature_guard.wrapperAccess() ) ) )
             {
             }
 
-            Holder ( ThisType && other ) // TODO: = delete;
-                : m_feature_guard( ::std::forward< WrapperGuard >( other.m_feature_guard ) )
-                , m_result_refer( ::std::forward< ResultRefer >( other.m_result_refer ) )
-            {
-                assert( false ); // Restricted functionality
-            }
-
+            Holder ( ThisType && other ) = delete;
             Holder ( const ThisType & other ) = delete;
 
             template < typename _HolderRefer,
                 typename = ::std::enable_if_t< ::std::is_same< ThisType, ::std::decay_t< _HolderRefer > >{} > >
-            static constexpr ::ScL::SimilarRefer< ResultRefer, _HolderRefer && > value ( _HolderRefer && holder )
+            static constexpr ::ScL::SimilarRefer< Result, _HolderRefer && > value ( _HolderRefer && holder )
             {
-                return ::std::forward< ::ScL::SimilarRefer< ResultRefer, _HolderRefer && > >( holder.m_result_refer );
+                return ::std::forward< ::ScL::SimilarRefer< Result, _HolderRefer && > >( holder.m_result );
             }
         };
     };
@@ -131,26 +119,26 @@ namespace ScL { namespace Feature { namespace Detail { namespace Guard
             using RightWrapperGuard = ::ScL::Feature::Detail::WrapperGuard< RightWrapperRefer >;
             using LeftValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< LeftWrapperRefer >::Value, LeftWrapperRefer >;
             using RightValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< RightWrapperRefer >::Value, RightWrapperRefer >;
-            using ResultRefer = _Type;
+            using Result = _Type;
 
-            static_assert( ::std::is_same< ResultRefer, ::std::invoke_result_t< Invokable, LeftValueRefer, RightValueRefer > >::value,
+            static_assert( ::std::is_same< Result, ::std::invoke_result_t< Invokable, LeftValueRefer, RightValueRefer > >::value,
                 "The result of _Invokable( _LeftRefer, _WrapperRefer ) must to be a _Type" );
 
             LeftWrapperGuard m_left_feature_guard;
             RightWrapperGuard m_right_feature_guard;
-            ResultRefer m_result_refer;
+            Result m_result;
 
             Holder (  Invokable && invokable, LeftWrapperRefer left, RightWrapperRefer right )
                 : m_left_feature_guard( ::std::forward< LeftWrapperRefer >( left ) )
                 , m_right_feature_guard( ::std::forward< RightWrapperRefer >( right ) )
-                , m_result_refer( invokable( ::std::forward< LeftValueRefer >( m_left_feature_guard.wrapperAccess() ), ::std::forward< RightValueRefer >( m_right_feature_guard.wrapperAccess() ) ) )
+                , m_result( invokable( ::std::forward< LeftValueRefer >( m_left_feature_guard.wrapperAccess() ), ::std::forward< RightValueRefer >( m_right_feature_guard.wrapperAccess() ) ) )
             {
             }
 
             Holder ( ThisType && other ) // TODO: = delete;
                 : m_left_feature_guard( ::std::forward< LeftWrapperGuard >( other.m_left_feature_guard ) )
                 , m_right_feature_guard( ::std::forward< RightWrapperGuard >( other.m_right_feature_guard ) )
-                , m_result_refer( ::std::forward< ResultRefer >( other.m_result_refer ) )
+                , m_result( ::std::forward< Result >( other.m_result ) )
             {
                 assert( false ); // Restricted functionality
             }
@@ -159,9 +147,9 @@ namespace ScL { namespace Feature { namespace Detail { namespace Guard
 
             template < typename _HolderRefer,
                 typename = ::std::enable_if_t< ::std::is_same< ThisType, ::std::decay_t< _HolderRefer > >{} > >
-            static constexpr ::ScL::SimilarRefer< ResultRefer, _HolderRefer && > value ( _HolderRefer && holder )
+            static constexpr ::ScL::SimilarRefer< Result, _HolderRefer && > value ( _HolderRefer && holder )
             {
-                return ::std::forward< ::ScL::SimilarRefer< ResultRefer, _HolderRefer && > >( holder.m_result_refer );
+                return ::std::forward< ::ScL::SimilarRefer< Result, _HolderRefer && > >( holder.m_result );
             }
         };
     };
@@ -180,12 +168,12 @@ namespace ScL::Feature
     public:
         constexpr operator MixInValue const & () const noexcept
         {
-            return static_cast< MixInWrapper const & >( *this ).m_holder.m_result_refer;
+            return static_cast< MixInWrapper const & >( *this ).m_holder.m_result;
         }
 
         constexpr operator MixInValue & () noexcept
         {
-            return static_cast< MixInWrapper & >( *this ).m_holder.m_result_refer;
+            return static_cast< MixInWrapper & >( *this ).m_holder.m_result;
         }
     };
 }
@@ -203,12 +191,12 @@ namespace ScL::Feature
     public:
         constexpr operator MixInValue const & () const noexcept
         {
-            return static_cast< MixInWrapper const & >( *this ).m_holder.m_result_refer;
+            return static_cast< MixInWrapper const & >( *this ).m_holder.m_result;
         }
 
         constexpr operator MixInValue & () noexcept
         {
-            return static_cast< MixInWrapper & >( *this ).m_holder.m_result_refer;
+            return static_cast< MixInWrapper & >( *this ).m_holder.m_result;
         }
     };
 }
@@ -226,12 +214,12 @@ namespace ScL::Feature
     public:
         constexpr operator MixInValue const & () const noexcept
         {
-            return static_cast< MixInWrapper const & >( *this ).m_holder.m_result_refer;
+            return static_cast< MixInWrapper const & >( *this ).m_holder.m_result;
         }
 
         constexpr operator MixInValue & () noexcept
         {
-            return static_cast< MixInWrapper & >( *this ).m_holder.m_result_refer;
+            return static_cast< MixInWrapper & >( *this ).m_holder.m_result;
         }
     };
 }

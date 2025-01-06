@@ -139,9 +139,6 @@ namespace ScL { namespace Feature { namespace Detail
                 using InvokableRefer = _Invokable &&;
                 using Returned = ::std::invoke_result_t< Invokable, ValueRefer, _Arguments && ... >;
 
-                // static_assert( ::std::is_reference< Returned >{},
-                //     "The type of return parameter must to be a reference type." );
-
                 using GuardTool = ::ScL::Feature::Detail::Guard::LeftTool< Invokable, WrapperRefer, _Arguments && ... >;
                 using ResultWrapper = ::ScL::Feature::Detail::Wrapper< Returned, GuardTool >;
                 return ResultWrapper( ::std::forward< InvokableRefer >( invokable ), ::std::forward< WrapperRefer >( wrapper ), ::std::forward< _Arguments && >( arguments ) ... );
