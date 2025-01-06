@@ -1,5 +1,5 @@
 cdTEMPLATE = app
-TARGET = scl-feature-example-cast
+TARGET = scl-feature-test-cast
 CONFIG *= console
 
 DEPENDS *= \
@@ -8,4 +8,4 @@ DEPENDS *= \
 
 !load( module_depends ) : error( Can not find feature \"module_depends\" )
 !load( include_files ) : error( Can not find feature \"include_files\" )
-includeFiles( $${PWD}/../../../../example/Cast )
+includeFiles( $${PWD}/../../../../test/Cast )
