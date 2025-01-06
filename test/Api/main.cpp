@@ -158,7 +158,7 @@ void testWrapperContainer ()
     {
         Wrapper< Container > container;
         for ( int i = 0; i < 10; ++i )
-            container->push_back( i );
+            container.push_back( i );
 
         for ( auto value : container )
             value *= 2;

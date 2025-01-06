@@ -781,7 +781,7 @@ void testRangeOperators ()
 
     Vector values{ { 0, 1, 2, 3, 4 } };
 
-    size_t count = values->size();
+    size_t count = values.size();
     for ( size_t i = 0; i < count; ++i )
         ::std::cout << values[ i ] << ::std::endl;
 
