@@ -23,7 +23,7 @@ namespace ScL::Feature
 namespace ScL::Feature::Detail
 {
     /*!
-     * @brief This is specialization WrapperGuard for non wrapped value.
+     * @brief This is the WrapperGuard specialization for non wrapped value.
      * It does nothing around a value.
      */
     template < typename _Refer >
@@ -69,7 +69,7 @@ namespace ScL::Feature::Detail
 namespace ScL::Feature::Detail
 {
     /*!
-     * @brief This is specialization WrapperGuard for wrapped value.
+     * @brief This is the WrapperGuard specialization for wrapped value.
      * It activates a feature in the constructor and deactivate it in the destructor.
      */
     template < typename _Refer >

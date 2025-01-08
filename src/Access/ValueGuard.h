@@ -6,28 +6,30 @@
 #include <ScL/Feature/Trait.h>
 #include <ScL/Utility/SimilarRefer.h>
 
-namespace ScL { namespace Feature { namespace Detail { template < typename _Value, typename _Tool > class Wrapper; }}}
-namespace ScL { namespace Feature { namespace Detail { template < typename > struct ValueGuardHelper; }}}
+namespace ScL::Feature::Detail { template < typename _Value, typename _Tool > class Wrapper; }
+namespace ScL::Feature::Detail { template < typename > struct ValueGuardHelper; }
 
-namespace ScL { namespace Feature
-{
-    //! Указатель на экземпляр вложенного в Wrapper базового значения, к которому применены
-    /// все особенности, реализуемые посредством используемых Wrapper.
-    template < typename _Refer >
-    using ValueGuard = typename ::ScL::Feature::Detail::ValueGuardHelper< _Refer >::Type;
-}}
-
-namespace ScL { namespace Feature { namespace Detail
+namespace ScL::Feature
 {
     /*!
-     * Указатель на экземпляр вложенного в Wrapper базового значения, к которому применены
-     * все особенности, реализуемые посредством используемых Wrapper. Данный указатель применяется, если
-     * тип вложенного экземпляра значения сам не является Wrapper.
+     * @brief This type activates all features for the multi wrapped value when
+     * it is constructed, and deactivates a feature when it is destroyed.
+     * This type does nothing for non wrapped values.
      */
     template < typename _Refer >
-    class DefaultValueGuard
+    using ValueGuard = typename ::ScL::Feature::Detail::ValueGuardHelper< _Refer >::Type;
+}
+
+namespace ScL::Feature::Detail
+{
+    /*!
+     * @brief This is the WrapperGuard specialization for non wrapped value.
+     * It does nothing around a value.
+     */
+    template < typename _Refer >
+    class ValueGuardForNonWrapped
     {
-        using ThisType = DefaultValueGuard< _Refer >;
+        using ThisType = ValueGuardForNonWrapped< _Refer >;
 
     public:
         using Refer = _Refer;
@@ -42,59 +44,43 @@ namespace ScL { namespace Feature { namespace Detail
     private:
         WrapperGuard m_wrapper_guard;
 
+    private:
+        ValueGuardForNonWrapped ( ThisType && other ) = delete;
+        ValueGuardForNonWrapped ( ThisType const & other ) = delete;
+
     public:
-        DefaultValueGuard ( Refer refer )
+        constexpr ValueGuardForNonWrapped ( Refer refer )
             : m_wrapper_guard( ::std::forward< Refer >( refer ) )
         {
         }
 
-        DefaultValueGuard ( WrapperGuard && other )
+        constexpr ValueGuardForNonWrapped ( WrapperGuard && other )
             : m_wrapper_guard( ::std::forward< WrapperGuard >( other ) )
         {
         }
 
-        DefaultValueGuard ( ThisType && other )
-            : m_wrapper_guard( ::std::forward< WrapperGuard >( other.m_wrapper_guard ) )
-        {
-        }
-
-        ValueAccess valueAccess () const
+        constexpr ValueAccess valueAccess () const
         {
             return m_wrapper_guard.valueAccess();
         }
 
-        PointerAccess pointerAccess () const
+        constexpr PointerAccess pointerAccess () const
         {
             return m_wrapper_guard.pointerAccess();
         }
-
-        operator ValueAccess () const
-        {
-            return valueAccess();
-        }
     };
-}}}
+}
 
-namespace ScL { namespace Feature { namespace Detail
+namespace ScL::Feature::Detail
 {
-    template < typename _Refer >
-    struct ValueGuardHelper
-    {
-        using Type = DefaultValueGuard< _Refer >;
-    };
-}}}
-
-namespace ScL { namespace Feature { namespace Detail
-{
-    /*
-     * Указатель на экземпляр вложенного в Wrapper базового значения, к которому применены
-     * все особенности, реализуемые посредством используемых Wrapper. Данный указатель применяется, если
-     * тип вложенного экземпляра значения сам является Wrapper.
+    /*!
+     * @brief This is the ValueGuard specialization for multi wrapped value.
+     * It activates all features in the constructor and deactivate them in the destructor.
      */
     template < typename _Refer >
-    class SpecialValueGuard
+    class ValueGuardForWrapped
     {
-        using ThisType = SpecialValueGuard< _Refer >;
+        using ThisType = ValueGuardForWrapped< _Refer >;
 
     public:
         using WrapperRefer = _Refer;
@@ -120,107 +106,73 @@ namespace ScL { namespace Feature { namespace Detail
         WrapperGuard m_wrapper_guard;
         ValueGuard m_value_guard;
 
+    private:
+        ValueGuardForWrapped ( ThisType && other ) = delete;
+        ValueGuardForWrapped ( ThisType const & other ) = delete;
+
     public:
-        SpecialValueGuard ( WrapperRefer refer )
+        constexpr ValueGuardForWrapped ( WrapperRefer refer )
             : m_wrapper_guard( ::std::forward< WrapperRefer >( refer ) )
             , m_value_guard( ::ScL::Feature::Detail::HolderInterface::value< HolderRefer >( m_wrapper_guard.holderAccess() ) )
         {
         }
 
-        SpecialValueGuard ( WrapperGuard && other )
+        constexpr ValueGuardForWrapped ( WrapperGuard && other )
             : m_wrapper_guard( ::std::forward< WrapperGuard >( other ) )
             , m_value_guard( ::ScL::Feature::Detail::HolderInterface::value< HolderRefer >( m_wrapper_guard.holderAccess() ) )
         {
         }
 
-        SpecialValueGuard ( ThisType && other )
-            : m_wrapper_guard( ::std::forward< WrapperGuard >( other.m_wrapper_guard ) )
-            , m_value_guard( ::std::forward< ValueGuard >( other.m_value_guard ) )
-        {
-        }
-
-        WrapperAccess wrapperAccess () const
+        constexpr WrapperAccess wrapperAccess () const
         {
             return m_wrapper_guard.wrapperAccess();
         }
 
-        ValueAccess valueAccess () const
+        constexpr ValueAccess valueAccess () const
         {
             return m_value_guard.valueAccess();
         }
 
-        PointerAccess pointerAccess () const
+        constexpr PointerAccess pointerAccess () const
         {
             return m_value_guard.pointerAccess();
         }
-
-        operator ValueAccess () const
-        {
-            return valueAccess();
-        }
     };
-}}}
+}
 
-namespace ScL { namespace Feature { namespace Detail
+namespace ScL::Feature::Detail
 {
-    template < typename _Value, typename _Tool >
-    struct ValueGuardHelper< ::ScL::Feature::Detail::Wrapper< _Value, _Tool > & >
+    // Case tags
+    struct NonWrappedCase;
+    struct WrappedCase;
+
+    // Choice of a case
+    template < typename _Refer >
+    using ValueGuardSwitchCase = ::std::conditional_t< ::ScL::Feature::isWrapper< ::std::remove_reference_t< _Refer > >(),
+                                                        WrappedCase,
+                                                        NonWrappedCase >;
+
+    template < typename, typename >
+    struct ValueGuardSwitch;
+
+    template < typename _Refer >
+    struct ValueGuardSwitch< NonWrappedCase, _Refer >
     {
-        using Type = ::ScL::Feature::Detail::SpecialValueGuard< ::ScL::Feature::Detail::Wrapper< _Value, _Tool > & >;
+        using Type = ::ScL::Feature::Detail::ValueGuardForNonWrapped< _Refer >;
     };
 
-    template < typename _Value, typename _Tool >
-    struct ValueGuardHelper< ::ScL::Feature::Detail::Wrapper< _Value, _Tool > && >
+    template < typename _Refer >
+    struct ValueGuardSwitch< WrappedCase, _Refer >
     {
-        using Type = ::ScL::Feature::Detail::SpecialValueGuard< ::ScL::Feature::Detail::Wrapper< _Value, _Tool > && >;
+        using Type = ::ScL::Feature::Detail::ValueGuardForWrapped< _Refer >;
     };
 
-    template < typename _Value, typename _Tool >
-    struct ValueGuardHelper< const ::ScL::Feature::Detail::Wrapper< _Value, _Tool > & >
+    template < typename _Refer >
+    struct ValueGuardHelper
     {
-        using Type = ::ScL::Feature::Detail::SpecialValueGuard< const ::ScL::Feature::Detail::Wrapper< _Value, _Tool > & >;
+        static_assert( ::std::is_reference< _Refer >::value, "The template parameter _Refer must to be a reference type." );
+        using Type = typename ValueGuardSwitch< ValueGuardSwitchCase< _Refer >, _Refer >::Type;
     };
-
-    template < typename _Value, typename _Tool >
-    struct ValueGuardHelper< const ::ScL::Feature::Detail::Wrapper< _Value, _Tool > && >
-    {
-        using Type = ::ScL::Feature::Detail::SpecialValueGuard< const ::ScL::Feature::Detail::Wrapper< _Value, _Tool > && >;
-    };
-
-    template < typename _Value, typename _Tool >
-    struct ValueGuardHelper< volatile ::ScL::Feature::Detail::Wrapper< _Value, _Tool > & >
-    {
-        using Type = ::ScL::Feature::Detail::SpecialValueGuard< volatile ::ScL::Feature::Detail::Wrapper< _Value, _Tool > & >;
-    };
-
-    template < typename _Value, typename _Tool >
-    struct ValueGuardHelper< volatile ::ScL::Feature::Detail::Wrapper< _Value, _Tool > && >
-    {
-        using Type = ::ScL::Feature::Detail::SpecialValueGuard< volatile ::ScL::Feature::Detail::Wrapper< _Value, _Tool > && >;
-    };
-
-    template < typename _Value, typename _Tool >
-    struct ValueGuardHelper< const volatile ::ScL::Feature::Detail::Wrapper< _Value, _Tool > & >
-    {
-        using Type = ::ScL::Feature::Detail::SpecialValueGuard< const volatile ::ScL::Feature::Detail::Wrapper< _Value, _Tool > & >;
-    };
-
-    template < typename _Value, typename _Tool >
-    struct ValueGuardHelper< const volatile ::ScL::Feature::Detail::Wrapper< _Value, _Tool > && >
-    {
-        using Type = ::ScL::Feature::Detail::SpecialValueGuard< const volatile ::ScL::Feature::Detail::Wrapper< _Value, _Tool > && >;
-    };
-
-
-    // disabled
-    template < typename _Value, typename _Tool >
-    struct ValueGuardHelper< ::ScL::Feature::Detail::Wrapper< _Value, _Tool > > {};
-    template < typename _Value, typename _Tool >
-    struct ValueGuardHelper< const ::ScL::Feature::Detail::Wrapper< _Value, _Tool > > {};
-    template < typename _Value, typename _Tool >
-    struct ValueGuardHelper< volatile ::ScL::Feature::Detail::Wrapper< _Value, _Tool > > {};
-    template < typename _Value, typename _Tool >
-    struct ValueGuardHelper< const volatile ::ScL::Feature::Detail::Wrapper< _Value, _Tool > > {};
-}}}
+}
 
 #endif
