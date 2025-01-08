@@ -22,7 +22,7 @@ namespace ScL { namespace Feature { namespace Detail { namespace Guard
         struct Holder
         {
             using ThisType = Holder;
-            using WrapperGuard = ::ScL::Feature::Detail::WrapperGuard< WrapperRefer >;
+            using WrapperGuard = ::ScL::Feature::WrapperGuard< WrapperRefer >;
             using ValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< WrapperRefer >::Value, WrapperRefer >;
             using Result = _Type;
 
@@ -69,7 +69,7 @@ namespace ScL { namespace Feature { namespace Detail { namespace Guard
         struct Holder
         {
             using ThisType = Holder;
-            using WrapperGuard = ::ScL::Feature::Detail::WrapperGuard< WrapperRefer >;
+            using WrapperGuard = ::ScL::Feature::WrapperGuard< WrapperRefer >;
             using ValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< WrapperRefer >::Value, WrapperRefer >;
             using Result = _Type;
 
@@ -115,8 +115,8 @@ namespace ScL { namespace Feature { namespace Detail { namespace Guard
         struct Holder
         {
             using ThisType = Holder;
-            using LeftWrapperGuard = ::ScL::Feature::Detail::WrapperGuard< LeftWrapperRefer >;
-            using RightWrapperGuard = ::ScL::Feature::Detail::WrapperGuard< RightWrapperRefer >;
+            using LeftWrapperGuard = ::ScL::Feature::WrapperGuard< LeftWrapperRefer >;
+            using RightWrapperGuard = ::ScL::Feature::WrapperGuard< RightWrapperRefer >;
             using LeftValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< LeftWrapperRefer >::Value, LeftWrapperRefer >;
             using RightValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< RightWrapperRefer >::Value, RightWrapperRefer >;
             using Result = _Type;

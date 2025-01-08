@@ -31,7 +31,7 @@ namespace ScL { namespace Feature { namespace Detail
 
     public:
         using Refer = _Refer;
-        using WrapperGuard = ::ScL::Feature::Detail::WrapperGuard< _Refer >;
+        using WrapperGuard = ::ScL::Feature::WrapperGuard< _Refer >;
 
         using ValueAccess = typename WrapperGuard::ValueAccess;
         using PointerAccess = typename WrapperGuard::PointerAccess;
@@ -104,7 +104,7 @@ namespace ScL { namespace Feature { namespace Detail
         using Holder = typename Wrapper::Holder;
         using HolderRefer = ::ScL::SimilarRefer< Holder, WrapperRefer >;
 
-        using WrapperGuard = ::ScL::Feature::Detail::WrapperGuard< WrapperRefer >;
+        using WrapperGuard = ::ScL::Feature::WrapperGuard< WrapperRefer >;
         using ValueGuard = ::ScL::Feature::ValueGuard< ValueRefer >;
 
         using WrapperAccess = typename WrapperGuard::WrapperAccess;

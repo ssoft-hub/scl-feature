@@ -1,32 +1,35 @@
 #pragma once
-#ifndef SCL_GUARD_FEATURE_POINTER_H
-#define SCL_GUARD_FEATURE_POINTER_H
+#ifndef SCL_FEATURE_WRAPPER_GUARD_H
+#define SCL_FEATURE_WRAPPER_GUARD_H
 
 #include <cassert>
 #include <ScL/Utility/SimilarRefer.h>
-
 #include "Detail/HolderInterface.h"
 
-namespace ScL { namespace Feature { namespace Detail { template < typename _Value, typename _Tool > class Wrapper; }}}
-namespace ScL { namespace Feature { namespace Detail { template < typename _Refer > struct WrapperGuardHelper; }}}
+namespace ScL::Feature::Detail { template < typename _Value, typename _Tool > class Wrapper; }
+namespace ScL::Feature::Detail { template < typename _Refer > struct WrapperGuardHelper; }
 
-namespace ScL { namespace Feature { namespace Detail
-{
-    template < typename _Refer >
-    using WrapperGuard = typename ::ScL::Feature::Detail::WrapperGuardHelper< _Refer >::Type;
-}}}
-
-namespace ScL { namespace Feature { namespace Detail
+namespace ScL::Feature
 {
     /*!
-     * Указатель на экземпляр вложенного в Wrapper значения, к которому применена
-     * особенность, реализуемая данным Wrapper. Данный указатель применяется, если
-     * тип вложенного экземпляра значения сам не является Wrapper.
+     * @brief This type activates a feature for the wrapped value when
+     * it is constructed, and deactivates a feature when it is destroyed.
+     * This type does nothing for non wrapped values.
      */
     template < typename _Refer >
-    class DefaultWrapperGuard
+    using WrapperGuard = typename ::ScL::Feature::Detail::WrapperGuardHelper< _Refer >::Type;
+}
+
+namespace ScL::Feature::Detail
+{
+    /*!
+     * @brief This is specialization WrapperGuard for non wrapped value.
+     * It does nothing around a value.
+     */
+    template < typename _Refer >
+    class WrapperGuardForNonWrapped
     {
-        using ThisType = DefaultWrapperGuard< _Refer >;
+        using ThisType = WrapperGuardForNonWrapped< _Refer >;
 
     public:
         using Refer = _Refer;
@@ -39,40 +42,40 @@ namespace ScL { namespace Feature { namespace Detail
         static_assert( !::ScL::Feature::isWrapper< ::std::decay_t< Refer > >(), "The template parameter _Refer must to be a not Wrapper type reference!" );
 
     private:
-        Pointer m_pointer;
+        Refer m_refer;
 
     private:
-        DefaultWrapperGuard ( ThisType && other ) = delete;
-        DefaultWrapperGuard ( const ThisType & other ) = delete;
+        WrapperGuardForNonWrapped ( ThisType && other ) = delete;
+        WrapperGuardForNonWrapped ( const ThisType & other ) = delete;
 
     public:
-        constexpr DefaultWrapperGuard ( Refer refer )
-            : m_pointer( ::std::addressof( refer ) )
+        constexpr WrapperGuardForNonWrapped ( Refer refer )
+            : m_refer(::std::forward<Refer>(refer))
         {
         }
 
         constexpr ValueAccess valueAccess () const
         {
-            return ::std::forward< ValueAccess >( *m_pointer );
+            return ::std::forward< ValueAccess >( m_refer );
         }
 
         constexpr PointerAccess pointerAccess () const
         {
-            return m_pointer;
+            return ::std::addressof(m_refer);
         }
     };
-}}}
+}
 
-namespace ScL { namespace Feature { namespace Detail
+namespace ScL::Feature::Detail
 {
     /*!
-     * Гарант применения особенностей к экземпляру вложенного в Wrapper значения.
-     * Данный вариант применяется, если тип вложенного экземпляра значения сам является Wrapper.
+     * @brief This is specialization WrapperGuard for wrapped value.
+     * It activates a feature in the constructor and deactivate it in the destructor.
      */
     template < typename _Refer >
-    class SpecialWrapperGuard
+    class WrapperGuardForWrapped
     {
-        using ThisType = SpecialWrapperGuard< _Refer >;
+        using ThisType = WrapperGuardForWrapped< _Refer >;
 
     public:
         using WrapperRefer = _Refer;
@@ -81,7 +84,6 @@ namespace ScL { namespace Feature { namespace Detail
         using ValueRefer = ::ScL::SimilarRefer< Value, WrapperRefer >;
         using Holder = typename Wrapper::Holder;
         using HolderRefer = ::ScL::SimilarRefer< Holder, WrapperRefer >;
-        using WrapperPointer = ::std::add_pointer_t< ::std::remove_reference_t< WrapperRefer > >;
 
         //using ReferPointer = ::ScL::Feature::Detail::ReferPointer< WrapperRefer >;
 
@@ -94,22 +96,22 @@ namespace ScL { namespace Feature { namespace Detail
         static_assert( ::ScL::Feature::isSimilar< HolderRefer, WrapperRefer >(), "The Refer and HolderRefer must to be similar types!" );
 
     private:
-        WrapperPointer m_pointer{};
+        WrapperRefer m_refer;
 
     private:
-        SpecialWrapperGuard ( const ThisType & other ) = delete;
-        SpecialWrapperGuard ( ThisType && other ) = delete;
+        WrapperGuardForWrapped ( const ThisType & other ) = delete;
+        WrapperGuardForWrapped ( ThisType && other ) = delete;
 
     public:
-        constexpr SpecialWrapperGuard ( WrapperRefer refer ) noexcept
-            : m_pointer( ::std::addressof( refer ) )
+        constexpr WrapperGuardForWrapped ( WrapperRefer refer ) noexcept
+            : m_refer( ::std::forward<WrapperRefer>( refer ) )
         {
             static_assert( ::ScL::Feature::Detail::HolderInterface::doesValueStaticMethodExist< Holder, HolderRefer >()
                 , "There are no appropriate access methods for Holder." );
             ::ScL::Feature::Detail::HolderInterface::guard< HolderRefer >( holderAccess() );
         }
 
-        ~SpecialWrapperGuard ()
+        ~WrapperGuardForWrapped ()
         {
             ::ScL::Feature::Detail::HolderInterface::unguard< HolderRefer >( holderAccess() );
         }
@@ -121,48 +123,44 @@ namespace ScL { namespace Feature { namespace Detail
 
         constexpr HolderAccess holderAccess () const noexcept
         {
-            return ::ScL::Feature::Detail::wrapperHolder< WrapperRefer >( ::std::forward< WrapperRefer >( *m_pointer ) );
+            return ::ScL::Feature::Detail::wrapperHolder< WrapperRefer >( ::std::forward< WrapperRefer >( m_refer ) );
         }
     };
-}}}
+}
 
-namespace ScL { namespace Feature { namespace Detail
+namespace ScL::Feature::Detail
 {
-    struct ValueCase;
-    struct WrapperCase;
+    // Case tags
+    struct NonWrappedCase;
+    struct WrappedCase;
 
+    // Choice of a case
     template < typename _Refer >
-    struct WrapperGuardCaseHelper
-    {
-        using Type = ::std::conditional_t< ::ScL::Feature::isWrapper< ::std::decay_t< _Refer > >(),
-            WrapperCase,
-            ValueCase >;
-    };
-
-    template < typename _Refer >
-    using WrapperGuardSwitchCase = typename WrapperGuardCaseHelper< _Refer >::Type;
+    using WrapperGuardSwitchCase = ::std::conditional_t< ::ScL::Feature::isWrapper< ::std::remove_reference_t< _Refer > >(),
+                                                         WrappedCase,
+                                                         NonWrappedCase >;
 
     template < typename, typename >
-    struct WrapperSwith;
+    struct WrapperGuardSwitch;
 
     template < typename _Refer >
-    struct WrapperSwith< ValueCase, _Refer >
+    struct WrapperGuardSwitch< NonWrappedCase, _Refer >
     {
-        using Type = ::ScL::Feature::Detail::DefaultWrapperGuard< _Refer >;
+        using Type = ::ScL::Feature::Detail::WrapperGuardForNonWrapped< _Refer >;
     };
 
     template < typename _Refer >
-    struct WrapperSwith< WrapperCase, _Refer >
+    struct WrapperGuardSwitch< WrappedCase, _Refer >
     {
-        using Type = ::ScL::Feature::Detail::SpecialWrapperGuard< _Refer >;
+        using Type = ::ScL::Feature::Detail::WrapperGuardForWrapped< _Refer >;
     };
 
     template < typename _Refer >
     struct WrapperGuardHelper
     {
         static_assert( ::std::is_reference< _Refer >::value, "The template parameter _Refer must to be a reference type." );
-        using Type = typename WrapperSwith< WrapperGuardSwitchCase< _Refer >, _Refer >::Type;
+        using Type = typename WrapperGuardSwitch< WrapperGuardSwitchCase< _Refer >, _Refer >::Type;
     };
-}}}
+}
 
 #endif
