@@ -30,10 +30,10 @@ void testCast ()
 {
     using ::ScL::Feature::cast;
 
-    Type_ data;
-    Type_ const c_data;
-    Type_ volatile v_data;
-    Type_ const volatile cv_data;
+    Type_ data = MyData{};
+    Type_ const c_data = MyData{};
+    Type_ volatile v_data = MyData{};
+    Type_ const volatile cv_data = MyData{};
 
     CHECK( foo( cast( data ) )                  == Result::LValue );
     CHECK( foo( cast( ::std::move( data ) ) )   == Result::RValue );
@@ -62,6 +62,6 @@ TEST_CASE("Testing ::ScL::Feature::cast function with different types")
 
     testCast<MyData>();
     testCast<Wrapper<MyData, Inplace::Optional>>();
-    testCast<Wrapper<MyData, Inplace::Optional, Implicit::Raw>>();
-    testCast<Wrapper<MyData, Inplace::Debug, Inplace::Optional, Implicit::Raw>>();
+    testCast<Wrapper<MyData, Inplace::Optional, Inplace::Default>>();
+    testCast<Wrapper<MyData, Inplace::Debug, Inplace::Optional, Inplace::Default>>();
 }
