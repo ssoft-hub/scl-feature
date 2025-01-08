@@ -3,5 +3,6 @@
 #define SCL_FEATURE_REFLECTION_H
 
 #include "Detail/MethodReflection.h"
+#include "Detail/PropertyReflection.h"
 
 #endif

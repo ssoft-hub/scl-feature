@@ -4,6 +4,8 @@
 #include <thread>
 #include <vector>
 
+#include <ScL/Feature/Cast.h>
+#include <ScL/Feature/Guard.h>
 #include <ScL/Feature/Reflection/Std.h>
 #include <ScL/Feature/Wrapper.h>
 #include <ScL/Feature/Tool.h>
@@ -26,7 +28,7 @@ void func( _MapType & test_map )
 {
     for (size_t i = 0; i < 100000; ++i)
     {
-        test_map.at("apple")->second++;
+        test_map.at("apple").second++;
         test_map.find("potato")->second.second++;
     }
 }
@@ -48,8 +50,8 @@ void example()
     ::std::cout << "Start" << ::std::endl;
 
     _MapType test_map;
-    test_map["apple"]->first = "fruit";
-    test_map["potato"]->first = "vegetable";
+    test_map["apple"].first = "fruit";
+    test_map["potato"].first = "vegetable";
 
     ::std::vector<::std::thread> threads(::std::thread::hardware_concurrency());
     for (auto &thread : threads)
@@ -57,12 +59,12 @@ void example()
     for (auto &thread : threads)
         thread.join();
 
-    auto read_ptr = &::ScL::asConst(test_map);
+    auto readonly = ::ScL::Feature::guarded(::std::as_const(test_map));
     ::std::cout
-        << "potato is " << read_ptr->at("potato").first
-        << " " << read_ptr->at("potato").second
-        << ", apple is " << read_ptr->at("apple").first
-        << " " << read_ptr->at("apple").second
+        << "potato is " << readonly.at("potato")->first
+        << " " << readonly.at("potato").second
+        << ", apple is " << readonly.at("apple")->first
+        << " " << readonly.at("apple").second
         << ::std::endl;
 
     ::std::cout << "Finish" << ::std::endl;
@@ -71,7 +73,7 @@ void example()
 int main(int, char **)
 {
     // Параллельно, но не атомарно.
-    // example<Map>();
+    example<Map>();
     // Параллельно, но не атомарно.
     example<DefaultMap>();
     // Параллельно, но не атомарно.

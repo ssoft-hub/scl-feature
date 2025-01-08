@@ -4,25 +4,18 @@
 
 #include <utility>
 #include <ScL/Feature/MixIn.h>
-#include <ScL/Feature/Wrapper.h>
+#include <ScL/Feature/Reflection.h>
 
 namespace ScL { namespace Feature
 {
     template <typename Self_, typename First_, typename Second_>
     class ValueReflectionMixIn<Self_, ::std::pair<First_, Second_>>
     {
-    public:
-        // TODO: define types as Wrappers
-        using First = Wrapper<First_>;
-        using Second = Wrapper<Second_>;
+        SCL_REFLECT_PROPERTY(First_, first);
+        SCL_REFLECT_PROPERTY(Second_, second);
 
-    private:
-        First reflected_first{};
-        Second reflected_second{};
-
-    public:
-        // First & first{reflected_first};
-        // Second & second{reflected_second};
+        using first_type = SCL_PROPERTY_DECLTYPE(first);
+        using second_type = SCL_PROPERTY_DECLTYPE(second);
     };
 }}
 
