@@ -1,5 +1,6 @@
 #include "Access/HolderGuard.h"
 #include "Access/ValueGuard.h"
+#include "Access/ValueLock.h"
 #include "Access/ValuePointer.h"
 #include "Access/WrapperGuard.h"
 #include "Access/WrapperLock.h"
