@@ -2,6 +2,7 @@
 #ifndef SCL_FEATURE_CASTER_H
 #define SCL_FEATURE_CASTER_H
 
+#include <ScL/Feature/Access/ValueLock.h>
 #include <ScL/Feature/Trait.h>
 #include <ScL/Feature/Wrapper.h>
 #include <ScL/Utility/SimilarRefer.h>
@@ -52,15 +53,17 @@ namespace ScL::Feature::Detail
         static_assert( ::std::is_reference_v<Ref_>, "Ref_ must be a reference type." );
 
         using Refer = Ref_;
+        using Locker = ::ScL::Feature::ValueLock<Refer>;
 
-        Caster ( Ref_ ) {};
+        Locker m_locker;
+
+        Caster ( Refer refer ) : m_locker{::std::forward<Refer>(refer)} {}
 
         template <ConceptReference Type_>
         Type_ reference () &&
         {
-            // TODO: guard / unguard
-            static ::std::decay_t<Type_> value;
-            return ::std::forward<Type_>(value);
+            m_locker.template lockFor<Type_>();
+            return m_locker.template valueAccessFor<Type_>();
         }
     };
 }

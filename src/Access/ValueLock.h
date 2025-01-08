@@ -72,7 +72,7 @@ namespace ScL::Feature::Detail
         {
             using ExpectedType = ::std::decay_t<Refer>;
             using TestType = ::std::decay_t<Type_>;
-            static_assert(::std::is_same_v<ExpectedType, TestType> );
+            static_assert( ::std::is_same_v<ExpectedType, TestType> );
         }
 
         constexpr ValueAccess valueAccess () const
@@ -83,6 +83,16 @@ namespace ScL::Feature::Detail
         constexpr PointerAccess pointerAccess () const
         {
             return m_wrapper_lock.pointerAccess();
+        }
+
+        template <typename Type_>
+        constexpr Type_ valueAccessFor () const
+        {
+            using ExpectedType = ::std::decay_t<Refer>;
+            using TestType = ::std::decay_t<Type_>;
+
+            static_assert( ::std::is_same_v<ExpectedType, TestType> );
+            return valueAccess();
         }
     };
 }
@@ -162,7 +172,7 @@ namespace ScL::Feature::Detail
             using ExpectedType = ::std::decay_t<WrapperRefer>;
             using TestType = ::std::decay_t<Type_>;
 
-            if constexpr ( ::std::is_same_v<ExpectedType, TestType>())
+            if constexpr ( ::std::is_same_v<ExpectedType, TestType> )
                 return;
 
             m_wrapper_lock.lock();
@@ -182,6 +192,18 @@ namespace ScL::Feature::Detail
         constexpr PointerAccess pointerAccess () const
         {
             return m_value_lock.pointerAccess();
+        }
+
+        template <typename Type_>
+        constexpr Type_ valueAccessFor () const
+        {
+            using ExpectedType = ::std::decay_t<WrapperRefer>;
+            using TestType = ::std::decay_t<Type_>;
+
+            if constexpr ( ::std::is_same_v<ExpectedType, TestType> )
+                return valueAccess();
+
+            return m_value_lock.template valueAccessFor<Type_>();
         }
     };
 }
