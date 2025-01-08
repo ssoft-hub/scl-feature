@@ -146,7 +146,7 @@ namespace ScL { namespace Feature { namespace Detail
     public:
         using LeftWrapper = _LeftWrapper;
         using RightRefer = _RightRefer;
-        using RightWrapperGuard = ::ScL::Feature::Detail::WrapperGuard< RightRefer >;
+        using RightWrapperGuard = ::ScL::Feature::WrapperGuard< RightRefer >;
         using RightWrapper = ::std::remove_reference_t< RightRefer >;
         using RightValue = typename RightWrapper::Value;
         using RightValueRefer = ::ScL::SimilarRefer< RightValue, RightRefer >;
