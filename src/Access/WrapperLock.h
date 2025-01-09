@@ -138,6 +138,11 @@ namespace ScL::Feature::Detail
         {
             return ::ScL::Feature::Detail::wrapperHolder< WrapperRefer >( ::std::forward< WrapperRefer >( m_refer ) );
         }
+
+        constexpr WrapperRefer valueAccess () const noexcept
+        {
+            return ::std::forward<WrapperRefer>( m_refer );
+        }
     };
 }
 

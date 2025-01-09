@@ -1,4 +1,4 @@
-cdTEMPLATE = app
+TEMPLATE = app
 TARGET = scl-feature-test-cast
 CONFIG *= console
 

@@ -112,7 +112,7 @@ TEST_CASE("Testing ::ScL::Feature::cast function with different wrapped types")
 {
     using namespace ::ScL::Feature;
 
-    // testCastForBar<Wrapper<MyData, Inplace::Optional>>();
-    // testCastForBar<Wrapper<MyData, Inplace::Optional, Inplace::Default>>();
-    // testCastForBar<Wrapper<MyData, Inplace::Optional, Inplace::Debug, Inplace::Default>>();
+    testCastForBar<Wrapper<MyData, Inplace::Optional>>();
+    testCastForBar<Wrapper<MyData, Inplace::Optional, Inplace::Default>>();
+    testCastForBar<Wrapper<MyData, Inplace::Optional, Inplace::Debug, Inplace::Default>>();
 }
