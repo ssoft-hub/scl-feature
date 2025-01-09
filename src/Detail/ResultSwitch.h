@@ -75,7 +75,7 @@ namespace ScL { namespace Feature { namespace Detail
             static_assert( ::ScL::Feature::isWrapper< Wrapper >(), "" );
             using Value = typename Wrapper::Value;
 
-            using Type = ::std::conditional_t< ::std::is_reference< Value >{},
+            using Type = ::std::conditional_t< ::std::is_reference< Value >::value,
                 ::ScL::Feature::Detail::Operator::BlockedCase,
                 ::ScL::Feature::Detail::Operator::BlockedCase >;
         };
@@ -177,7 +177,7 @@ namespace ScL { namespace Feature { namespace Detail
                 using InvokableRefer = _Invokable &&;
                 using Returned = ::std::invoke_result_t< Invokable, LeftRefer, ValueRefer >;
 
-                static_assert( ::std::is_reference< Returned >{},
+                static_assert( ::std::is_reference< Returned >::value,
                     "The type of return parameter must to be a reference type." );
 
                 using GuardTool = ::ScL::Feature::Detail::Guard::RightTool< Invokable, LeftRefer, WrapperRefer >;
