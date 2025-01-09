@@ -31,7 +31,7 @@ namespace ScL::Feature::Detail
         : public CastMixIn< Caster_, Type_ ref > \
     { \
         operator Wrapper< Type_, Tool_ > ref () && { \
-            return static_cast<Caster_ &&>(*this).template reference<Type_ ref>(); \
+            return static_cast<Caster_ &&>(*this).template reference<Wrapper< Type_, Tool_ > ref>(); \
         } \
     }; \
 

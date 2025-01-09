@@ -6,7 +6,7 @@
 #include <ScL/Feature/Trait.h>
 #include <ScL/Utility/SimilarRefer.h>
 
-namespace ScL::Feature::Detail { template < typename _Value, typename _Tool > class Wrapper; }
+namespace ScL::Feature::Detail { template < typename, typename > class Wrapper; }
 namespace ScL::Feature::Detail { template < typename > struct ValueLockHelper; }
 
 namespace ScL::Feature
@@ -16,8 +16,8 @@ namespace ScL::Feature
      * it is constructed, and deactivates a feature when it is destroyed.
      * This type does nothing for non wrapped values.
      */
-    template < typename _Refer >
-    using ValueLock = typename ::ScL::Feature::Detail::ValueLockHelper< _Refer >::Type;
+    template < typename Refer_ >
+    using ValueLock = typename ::ScL::Feature::Detail::ValueLockHelper< Refer_ >::Type;
 }
 
 namespace ScL::Feature::Detail
@@ -26,20 +26,20 @@ namespace ScL::Feature::Detail
      * @brief This is the WrapperLock specialization for non wrapped value.
      * It does nothing around a value.
      */
-    template < typename _Refer >
+    template < typename Refer_ >
     class ValueLockForNonWrapped
     {
-        using ThisType = ValueLockForNonWrapped< _Refer >;
+        using ThisType = ValueLockForNonWrapped< Refer_ >;
 
     public:
-        using Refer = _Refer;
-        using WrapperLock = ::ScL::Feature::WrapperLock< _Refer >;
+        using Refer = Refer_;
+        using WrapperLock = ::ScL::Feature::WrapperLock< Refer_ >;
 
         using ValueAccess = typename WrapperLock::ValueAccess;
         using PointerAccess = typename WrapperLock::PointerAccess;
 
-        static_assert( ::std::is_reference< Refer >::value, "The template parameter _Refer must to be a reference type." );
-        static_assert( !::ScL::Feature::isWrapper< ::std::decay_t< Refer > >(), "The template parameter _Refer must to be a not Wrapper type reference!" );
+        static_assert( ::std::is_reference< Refer >::value, "The template parameter Refer_ must to be a reference type." );
+        static_assert( !::ScL::Feature::isWrapper< ::std::decay_t< Refer > >(), "The template parameter Refer_ must to be a not Wrapper type reference!" );
 
     private:
         WrapperLock m_wrapper_lock;
@@ -68,11 +68,9 @@ namespace ScL::Feature::Detail
         constexpr void  unlock () noexcept {}
 
         template <typename Type_>
-        constexpr void  lockFor ()
+        constexpr auto lockFor ()
+            -> ::std::enable_if_t<::std::is_same_v<Refer_, Type_>, void>
         {
-            using ExpectedType = ::std::decay_t<Refer>;
-            using TestType = ::std::decay_t<Type_>;
-            static_assert( ::std::is_same_v<ExpectedType, TestType> );
         }
 
         constexpr ValueAccess valueAccess () const
@@ -86,12 +84,9 @@ namespace ScL::Feature::Detail
         }
 
         template <typename Type_>
-        constexpr Type_ valueAccessFor () const
+        constexpr auto valueAccessFor () const noexcept
+            -> ::std::enable_if_t< ::std::is_same_v<Refer_, Type_>, Type_ >
         {
-            using ExpectedType = ::std::decay_t<Refer>;
-            using TestType = ::std::decay_t<Type_>;
-
-            static_assert( ::std::is_same_v<ExpectedType, TestType> );
             return valueAccess();
         }
     };
@@ -103,13 +98,13 @@ namespace ScL::Feature::Detail
      * @brief This is the ValueLock specialization for multi wrapped value.
      * It activates all features in the constructor and deactivate them in the destructor.
      */
-    template < typename _Refer >
+    template < typename Refer_ >
     class ValueLockForWrapped
     {
-        using ThisType = ValueLockForWrapped< _Refer >;
+        using ThisType = ValueLockForWrapped< Refer_ >;
 
     public:
-        using WrapperRefer = _Refer;
+        using WrapperRefer = Refer_;
         using Wrapper = ::std::decay_t< WrapperRefer >;
         using Value = typename Wrapper::Value;
         using ValueRefer = ::ScL::SimilarRefer< Value, WrapperRefer >;
@@ -123,8 +118,8 @@ namespace ScL::Feature::Detail
         using ValueAccess =  typename ValueLock::ValueAccess;
         using PointerAccess = typename ValueLock::PointerAccess;
 
-        static_assert( ::std::is_reference< WrapperRefer >::value, "The template parameter _Refer must to be a reference type." );
-        static_assert( ::ScL::Feature::isWrapper< Wrapper >(), "The template parameter _Refer must to be a Wrapper type reference!" );
+        static_assert( ::std::is_reference< WrapperRefer >::value, "The template parameter Refer_ must to be a reference type." );
+        static_assert( ::ScL::Feature::isWrapper< Wrapper >(), "The template parameter Refer_ must to be a Wrapper type reference!" );
         //static_assert( ::ScL::Feature::isSimilar< ValueRefer, WrapperRefer >(), "The Refer and ValueRefer must to be similar types!" );
         static_assert( ::ScL::Feature::isSimilar< HolderRefer, WrapperRefer >(), "The Refer and HolderRefer must to be similar types!" );
 
@@ -169,14 +164,11 @@ namespace ScL::Feature::Detail
         template <typename Type_>
         constexpr void  lockFor ()
         {
-            using ExpectedType = ::std::decay_t<WrapperRefer>;
-            using TestType = ::std::decay_t<Type_>;
-
-            if constexpr ( ::std::is_same_v<ExpectedType, TestType> )
-                return;
-
-            m_wrapper_lock.lock();
-            m_value_lock.template lockFor<Type_>();
+            if constexpr ( !::std::is_same_v<Refer_, Type_> )
+            {
+                m_wrapper_lock.lock();
+                m_value_lock.template lockFor<Type_>();
+            }
         }
 
         constexpr WrapperAccess wrapperAccess () const
@@ -197,13 +189,10 @@ namespace ScL::Feature::Detail
         template <typename Type_>
         constexpr Type_ valueAccessFor () const
         {
-            using ExpectedType = ::std::decay_t<WrapperRefer>;
-            using TestType = ::std::decay_t<Type_>;
-
-            if constexpr ( ::std::is_same_v<ExpectedType, TestType> )
-                return valueAccess();
-
-            return m_value_lock.template valueAccessFor<Type_>();
+            if constexpr ( ::std::is_same_v<Refer_, Type_> )
+                return m_wrapper_lock.valueAccess();
+            else
+                return m_value_lock.template valueAccessFor<Type_>();
         }
     };
 }
@@ -215,31 +204,31 @@ namespace ScL::Feature::Detail
     struct WrappedCase;
 
     // Choice of a case
-    template < typename _Refer >
-    using ValueLockSwitchCase = ::std::conditional_t< ::ScL::Feature::isWrapper< ::std::remove_reference_t< _Refer > >(),
+    template < typename Refer_ >
+    using ValueLockSwitchCase = ::std::conditional_t< ::ScL::Feature::isWrapper< ::std::remove_reference_t< Refer_ > >(),
                                                         WrappedCase,
                                                         NonWrappedCase >;
 
     template < typename, typename >
     struct ValueLockSwitch;
 
-    template < typename _Refer >
-    struct ValueLockSwitch< NonWrappedCase, _Refer >
+    template < typename Refer_ >
+    struct ValueLockSwitch< NonWrappedCase, Refer_ >
     {
-        using Type = ::ScL::Feature::Detail::ValueLockForNonWrapped< _Refer >;
+        using Type = ::ScL::Feature::Detail::ValueLockForNonWrapped< Refer_ >;
     };
 
-    template < typename _Refer >
-    struct ValueLockSwitch< WrappedCase, _Refer >
+    template < typename Refer_ >
+    struct ValueLockSwitch< WrappedCase, Refer_ >
     {
-        using Type = ::ScL::Feature::Detail::ValueLockForWrapped< _Refer >;
+        using Type = ::ScL::Feature::Detail::ValueLockForWrapped< Refer_ >;
     };
 
-    template < typename _Refer >
+    template < typename Refer_ >
     struct ValueLockHelper
     {
-        static_assert( ::std::is_reference< _Refer >::value, "The template parameter _Refer must to be a reference type." );
-        using Type = typename ValueLockSwitch< ValueLockSwitchCase< _Refer >, _Refer >::Type;
+        static_assert( ::std::is_reference< Refer_ >::value, "The template parameter Refer_ must to be a reference type." );
+        using Type = typename ValueLockSwitch< ValueLockSwitchCase< Refer_ >, Refer_ >::Type;
     };
 }
 
