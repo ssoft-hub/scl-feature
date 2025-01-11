@@ -4,35 +4,40 @@
 
 #include <type_traits>
 
-namespace ScL { namespace Feature { namespace Detail
+namespace ScL::Feature::Detail
 {
     template <typename Self_, typename Value_>
     class ReflectionMixIn
     {};
-}}}
 
-namespace ScL { namespace Feature
+    template <typename Self_, typename Value_>
+    class CastingMixIn
+    {};
+}
+
+namespace ScL::Feature
 {
     template <typename Self_, typename Value_>
     class ValueReflectionMixIn {};
 
     template <typename Self_, typename Value_>
     class ToolReflectionMixIn {};
-}}
+}
 
-namespace ScL { namespace Feature
+namespace ScL::Feature
 {
     template <typename Self_>
-    class ToolMixIn {};
-}}
+    class ToolAdditionMixIn {};
+}
 
-namespace ScL { namespace Feature
+namespace ScL::Feature
 {
     template <typename Self_>
     class MixIn
-        : public ::ScL::Feature::ToolMixIn<::std::decay_t<Self_>>
-        , public ::ScL::Feature::Detail::ReflectionMixIn<Self_, ::std::decay_t<Self_>>
+        : public ::ScL::Feature::ToolAdditionMixIn<Self_>
+        , public ::ScL::Feature::Detail::CastingMixIn<Self_, ::std::remove_cv_t<::std::remove_reference_t<Self_>>>
+        , public ::ScL::Feature::Detail::ReflectionMixIn<Self_, ::std::remove_cv_t<::std::remove_reference_t<Self_>>>
     {};
-}}
+}
 
 #endif

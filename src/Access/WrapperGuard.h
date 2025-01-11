@@ -2,7 +2,7 @@
 #ifndef SCL_FEATURE_WRAPPER_GUARD_H
 #define SCL_FEATURE_WRAPPER_GUARD_H
 
-#include <cassert>
+#include <utility>
 #include <ScL/Utility/SimilarRefer.h>
 #include "Detail/HolderInterface.h"
 

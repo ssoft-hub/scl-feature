@@ -2,7 +2,7 @@
 #ifndef SCL_ACCESS_HOLDER_INTERFACE_H
 #define SCL_ACCESS_HOLDER_INTERFACE_H
 
-#include <memory>
+#include <utility>
 #include <ScL/Feature/Trait.h>
 #include <ScL/Meta/Trait/Detection/Method.h>
 #include <ScL/Utility/SimilarRefer.h>

@@ -418,7 +418,7 @@ namespace ScL { namespace Feature { namespace Implicit
 namespace ScL { namespace Feature
 {
     template < typename _Type >
-    class ToolMixIn< ::ScL::Feature::Detail::Wrapper< _Type, ::ScL::Feature::Implicit::Raw > >
+    class ToolAdditionMixIn< ::ScL::Feature::Detail::Wrapper< _Type, ::ScL::Feature::Implicit::Raw > >
     {
         using Extended = ::ScL::Feature::Detail::Wrapper< _Type, ::ScL::Feature::Implicit::Raw >;
         auto & self () const { return *static_cast< Extended const * >( this ); }

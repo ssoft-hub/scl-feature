@@ -29,7 +29,7 @@ namespace ScL { namespace Feature { namespace Detail
         template < typename, typename >
         friend class ::ScL::Feature::ToolReflectionMixIn;
         template < typename >
-        friend class ::ScL::Feature::ToolMixIn;
+        friend class ::ScL::Feature::ToolAdditionMixIn;
         template < typename >
         friend struct ::ScL::Feature::Detail::WrapperAccess;
 
@@ -139,9 +139,6 @@ namespace ScL { namespace Feature { namespace Detail
             using RightRefer = Function &&;
             return ::ScL::Feature::Detail::Operator::Binary::LeftShiftHelper< LeftRefer, RightRefer >::invoke( ::std::forward< LeftRefer >( *this ), ::std::forward< RightRefer >( right ) );
         }
-
-        /* Type-casting */
-        SCL_CAST_OPERATOR
     };
 }}}
 
@@ -197,7 +194,7 @@ namespace std
     };
 }
 
-namespace ScL { namespace Feature { namespace Detail
+namespace ScL::Feature::Detail
 {
     template <typename Self_, typename Value_, typename Tool_, typename Tool1_>
     class ReflectionMixIn<Self_, Wrapper<Wrapper<Value_, Tool_>, Tool1_>>
@@ -266,6 +263,131 @@ namespace ScL { namespace Feature { namespace Detail
         : public ReflectionMixIn<Self_, Value_>
         , public ::ScL::Feature::ValueReflectionMixIn<Self_, ::std::remove_cv_t<::std::remove_reference_t<Value_>>>
     {};
-}}}
+}
+
+#include <ScL/Feature/Access/ValueLock.h>
+
+#define SCL_CAST_OPERATOR_PROTOTYPE( refer ) \
+    operator ::std::conditional_t< !HolderInterface::doesUnguardStaticMethodExist<typename Tool_:: template Holder<Value_>, typename Tool_::template Holder<Value_> refer>() \
+            && ::std::is_same_v<Value_ refer, Value refer>, \
+        Value refer, void> () refer \
+    /*TODO: requires*/ \
+    { \
+        if constexpr ( !HolderInterface::doesUnguardStaticMethodExist<typename Tool_::template Holder<Value_>, typename Tool_::template Holder<Value_> refer>()) \
+        { \
+            using Locker = ::ScL::Feature::ValueLock<Self_ refer>; \
+            Locker locker{ static_cast<Self_ refer>(*this) }; \
+            locker.template lockFor<Value refer>(); \
+            return locker.template valueAccessFor<Value refer>(); \
+        } \
+    } \
+
+#define SCL_CAST_OPERATOR \
+    SCL_CAST_OPERATOR_PROTOTYPE( && ) \
+    SCL_CAST_OPERATOR_PROTOTYPE( const && ) \
+    /*SCL_CAST_OPERATOR_PROTOTYPE( volatile && )*/ \
+    /*SCL_CAST_OPERATOR_PROTOTYPE( const volatile && )*/ \
+    SCL_CAST_OPERATOR_PROTOTYPE( & ) \
+    SCL_CAST_OPERATOR_PROTOTYPE( const & ) \
+    /*SCL_CAST_OPERATOR_PROTOTYPE( volatile & )*/ \
+    /*SCL_CAST_OPERATOR_PROTOTYPE( const volatile & )*/ \
+
+namespace ScL::Feature::Detail
+{
+
+#define SCL_FEATURE_CASTING_MIXIN( MixIn, refer ) \
+    template < typename, typename > class MixIn ## Empty {}; \
+     \
+    template < typename Self_, typename Value_> \
+    class MixIn \
+    { \
+        using Value = ::std::remove_cv_t<::std::remove_reference_t<Value_>>; \
+    public: \
+        operator ::std::conditional_t<::std::is_same_v<Value_ refer, Value refer>, \
+            Value refer, void> () refer \
+        /*TODO: requires*/ \
+        { \
+            if constexpr(::std::is_same_v<Value_ refer, Value refer>) \
+            { \
+                using Locker = ::ScL::Feature::ValueLock<Self_ refer>; \
+                Locker locker{static_cast<Self_ refer>(*this)}; \
+                locker.template lockFor<Value refer>(); \
+                return locker.template valueAccessFor<Value refer>(); \
+            } \
+        } \
+    }; \
+     \
+    template < typename Self_, typename Value_, typename Tool_> \
+    class MixIn<Self_, ::ScL::Feature::Detail::Wrapper<Value_, Tool_>> \
+        : public ::std::conditional_t<!::ScL::Feature::Detail::HolderInterface::doesUnguardStaticMethodExist< typename Tool_::template Holder<Value_>, typename Tool_::template Holder<Value_> refer>() \
+                && ::std::is_same_v< Value_ refer, ::std::remove_cv_t<::std::remove_reference_t<Value_>> refer>, \
+            MixIn<Self_, Value_>, \
+            MixIn ## Empty<Self_, Value_>> \
+    { \
+        using Value = ::std::remove_cv_t<::std::remove_reference_t<Value_>>; \
+    public: \
+        operator ::std::conditional_t<!::ScL::Feature::Detail::HolderInterface::doesUnguardStaticMethodExist<typename Tool_:: template Holder<Value_>, typename Tool_::template Holder<Value_> refer>() \
+                && ::std::is_same_v<Value_ refer, Value refer>, \
+            Value refer, void> () refer \
+        /*TODO: requires*/ \
+        { \
+            if constexpr (!::ScL::Feature::Detail::HolderInterface::doesUnguardStaticMethodExist<typename Tool_:: template Holder<Value_>, typename Tool_::template Holder<Value_> refer>() \
+                && ::std::is_same_v<Value_ refer, Value refer>) \
+            { \
+                using Locker = ::ScL::Feature::ValueLock<Self_ refer>; \
+                Locker locker{ static_cast<Self_ refer>(*this) }; \
+                locker.template lockFor<Value refer>(); \
+                return locker.template valueAccessFor<Value refer>(); \
+            } \
+        } \
+    }; \
+
+
+    SCL_FEATURE_CASTING_MIXIN( CastingLValue, & )
+    SCL_FEATURE_CASTING_MIXIN( CastingLValueConst, const & )
+    SCL_FEATURE_CASTING_MIXIN( CastingLValueVolatile, volatile & )
+    SCL_FEATURE_CASTING_MIXIN( CastingLValueConstVolatile, const volatile & )
+    SCL_FEATURE_CASTING_MIXIN( CastingRValue, && )
+    SCL_FEATURE_CASTING_MIXIN( CastingRValueConst, const && )
+    SCL_FEATURE_CASTING_MIXIN( CastingRValueVolatile, volatile && )
+    SCL_FEATURE_CASTING_MIXIN( CastingRValueConstVolatile, const volatile && )
+
+    template <typename Self_, typename Value_, typename Tool_>
+    class CastingMixIn<Self_, Wrapper<Value_, Tool_>>
+        : public ::std::conditional_t<!::ScL::Feature::Detail::HolderInterface::doesUnguardStaticMethodExist< typename Tool_::template Holder<Value_>, typename Tool_::template Holder<Value_> &>()
+                && ::std::is_same_v< Value_ &, ::std::remove_cv_t<::std::remove_reference_t<Value_>> &>,
+            CastingLValue<Self_, Value_>,
+            CastingLValueEmpty<Self_, Value_>>
+        , public ::std::conditional_t<!::ScL::Feature::Detail::HolderInterface::doesUnguardStaticMethodExist< typename Tool_::template Holder<Value_>, typename Tool_::template Holder<Value_> const &>()
+                && ::std::is_same_v< Value_ const &, ::std::remove_cv_t<::std::remove_reference_t<Value_>> const &>,
+            CastingLValueConst<Self_, Value_>,
+            CastingLValueConstEmpty<Self_, Value_>>
+        // , public ::std::conditional_t<!::ScL::Feature::Detail::HolderInterface::doesUnguardStaticMethodExist< typename Tool_::template Holder<Value_>, typename Tool_::template Holder<Value_> volatile &>()
+        //         && ::std::is_same_v< Value_ volatile &, ::std::remove_cv_t<::std::remove_reference_t<Value_>> volatile &>,
+        //     CastingLValueVolatile<Self_, Value_>,
+        //     CastingLValueVolatileEmpty<Self_, Value_>>
+        // , public ::std::conditional_t<!::ScL::Feature::Detail::HolderInterface::doesUnguardStaticMethodExist< typename Tool_::template Holder<Value_>, typename Tool_::template Holder<Value_> const volatile &>()
+        //         && ::std::is_same_v< Value_ const volatile &, ::std::remove_cv_t<::std::remove_reference_t<Value_>> const volatile &>,
+        //     CastingLValueConstVolatile<Self_, Value_>,
+        //     CastingLValueConstVolatileEmpty<Self_, Value_>>
+        , public ::std::conditional_t<!::ScL::Feature::Detail::HolderInterface::doesUnguardStaticMethodExist< typename Tool_::template Holder<Value_>, typename Tool_::template Holder<Value_> &&>()
+                && ::std::is_same_v< Value_ &&, ::std::remove_cv_t<::std::remove_reference_t<Value_>> &&>,
+            CastingRValue<Self_, Value_>,
+            CastingRValueEmpty<Self_, Value_>>
+        , public ::std::conditional_t<!::ScL::Feature::Detail::HolderInterface::doesUnguardStaticMethodExist< typename Tool_::template Holder<Value_>, typename Tool_::template Holder<Value_> const &&>()
+                && ::std::is_same_v< Value_ const &&, ::std::remove_cv_t<::std::remove_reference_t<Value_>> const &&>,
+            CastingRValueConst<Self_, Value_>,
+            CastingRValueConstEmpty<Self_, Value_>>
+        // , public ::std::conditional_t<!::ScL::Feature::Detail::HolderInterface::doesUnguardStaticMethodExist< typename Tool_::template Holder<Value_>, typename Tool_::template Holder<Value_> volatile &&>()
+        //         && ::std::is_same_v< Value_ volatile &&, ::std::remove_cv_t<::std::remove_reference_t<Value_>> volatile &&>,
+        //     CastingRValueVolatile<Self_, Value_>,
+        //     CastingRValueVolatileEmpty<Self_, Value_>>
+        // , public ::std::conditional_t<!::ScL::Feature::Detail::HolderInterface::doesUnguardStaticMethodExist< typename Tool_::template Holder<Value_>, typename Tool_::template Holder<Value_> const volatile &&>()
+        //         && ::std::is_same_v< Value_ const volatile &&, ::std::remove_cv_t<::std::remove_reference_t<Value_>> const volatile &&>,
+        //     CastingRValueConstVolatile<Self_, Value_>,
+        //     CastingRValueConstVolatileEmpty<Self_, Value_>>
+    {
+    };
+}
 
 #endif
