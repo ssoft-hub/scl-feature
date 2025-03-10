@@ -1,7 +1,4 @@
-#include <iostream>
 #include <map>
-#include <thread>
-#include <vector>
 #include <ScL/Feature/Wrapper.h>
 #include <ScL/Feature/Tool.h>
 

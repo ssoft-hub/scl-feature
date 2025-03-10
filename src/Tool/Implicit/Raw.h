@@ -53,7 +53,7 @@ namespace ScL { namespace Feature { namespace Implicit
             template < typename ... _Arguments >
             Counted ( _Arguments && ... arguments )
                 : BaseCounted{}
-                , m_value{ ::std::forward< _Arguments >( arguments ) ... }
+                , m_value( ::std::forward< _Arguments >( arguments ) ... )
             {
             }
 
@@ -119,74 +119,74 @@ namespace ScL { namespace Feature { namespace Implicit
 
             template < typename ... _Arguments >
             Holder ( _Arguments && ... arguments )
-                : m_pointer( ConstructHelper< ThisType, ::std::is_abstract< Value >::value >::makePointer( ::std::forward< _Arguments >( arguments ) ... ) )
-                , m_access( ConstructHelper< ThisType, ::std::is_abstract< Value >::value >::access( m_pointer ) )
+                : m_pointer{ ConstructHelper< ThisType, ::std::is_abstract< Value >::value >::makePointer( ::std::forward< _Arguments >( arguments ) ... ) }
+                , m_access{ ConstructHelper< ThisType, ::std::is_abstract< Value >::value >::access( m_pointer ) }
             {
                 increment();
             }
 
             Holder ( ThisType && other )
-                : m_pointer( ::std::forward< CountedPointer >( other.m_pointer ) )
-                , m_access( ::std::forward< Access >( other.m_access ) )
+                : m_pointer{ ::std::forward< CountedPointer >( other.m_pointer ) }
+                , m_access{ ::std::forward< Access >( other.m_access ) }
             {
                 other.m_pointer = nullptr;
                 other.m_access = nullptr;
             }
 
             Holder ( const ThisType && other )
-                : m_pointer( other.m_pointer )
-                , m_access( other.m_access )
+                : m_pointer{ other.m_pointer }
+                , m_access{ other.m_access }
             {
                 increment();
             }
 
             Holder ( volatile ThisType && other )
-                : m_pointer( ::std::forward< volatile CountedPointer >( other.m_pointer ) )
-                , m_access( ::std::forward< volatile Access >( other.m_access ) )
+                : m_pointer{ ::std::forward< volatile CountedPointer >( other.m_pointer ) }
+                , m_access{ ::std::forward< volatile Access >( other.m_access ) }
             {
                 other.m_pointer = nullptr;
                 other.m_access = nullptr;
             }
 
             Holder ( const volatile ThisType && other )
-                : m_pointer( other.m_pointer )
-                , m_access( other.m_access )
+                : m_pointer{ other.m_pointer }
+                , m_access{ other.m_access }
             {
                 increment();
             }
 
             Holder ( ThisType & other )
-                : m_pointer( other.m_pointer )
-                , m_access( other.m_access )
+                : m_pointer{ other.m_pointer }
+                , m_access{ other.m_access }
             {
                 increment();
             }
 
             Holder ( const ThisType & other )
-                : m_pointer( other.m_pointer )
-                , m_access( other.m_access )
+                : m_pointer{ other.m_pointer }
+                , m_access{ other.m_access }
             {
                 increment();
             }
 
             Holder ( volatile ThisType & other )
-                : m_pointer( other.m_pointer )
-                , m_access( other.m_access )
+                : m_pointer{ other.m_pointer }
+                , m_access{ other.m_access }
             {
                 increment();
             }
 
             Holder ( const volatile ThisType & other )
-                : m_pointer( other.m_pointer )
-                , m_access( other.m_access )
+                : m_pointer{ other.m_pointer }
+                , m_access{ other.m_access }
             {
                 increment();
             }
 
             template < typename _OtherValue >
             Holder ( Holder< _OtherValue > && other )
-                : m_pointer( ::std::forward< typename Holder< _OtherValue >::CountedPointer >( other.m_pointer ) )
-                , m_access( ::std::forward< typename Holder< _OtherValue >::Access >( other.m_access ) )
+                : m_pointer{ ::std::forward< typename Holder< _OtherValue >::CountedPointer >( other.m_pointer ) }
+                , m_access{ ::std::forward< typename Holder< _OtherValue >::Access >( other.m_access ) }
             {
                 other.m_pointer = nullptr;
                 other.m_access = nullptr;
@@ -194,16 +194,16 @@ namespace ScL { namespace Feature { namespace Implicit
 
             template < typename _OtherValue >
             Holder ( const Holder< _OtherValue > && other )
-                : m_pointer( other.m_pointer )
-                , m_access( other.m_access )
+                : m_pointer{ other.m_pointer }
+                , m_access{ other.m_access }
             {
                 increment();
             }
 
             template < typename _OtherValue >
             Holder ( volatile Holder< _OtherValue > && other )
-                : m_pointer( ::std::forward< volatile typename Holder< _OtherValue >::CountedPointer >( other.m_pointer ) )
-                , m_access( ::std::forward< volatile typename Holder< _OtherValue >::Access >( other.m_access ) )
+                : m_pointer{ ::std::forward< volatile typename Holder< _OtherValue >::CountedPointer >( other.m_pointer ) }
+                , m_access{ ::std::forward< volatile typename Holder< _OtherValue >::Access >( other.m_access ) }
             {
                 other.m_pointer = nullptr;
                 other.m_access = nullptr;
@@ -211,40 +211,40 @@ namespace ScL { namespace Feature { namespace Implicit
 
             template < typename _OtherValue >
             Holder ( const volatile Holder< _OtherValue > && other )
-                : m_pointer( other.m_pointer )
-                , m_access( other.m_access )
+                : m_pointer{ other.m_pointer }
+                , m_access{ other.m_access }
             {
                 increment();
             }
 
             template < typename _OtherValue >
             Holder ( Holder< _OtherValue > & other )
-                : m_pointer( other.m_pointer )
-                , m_access( other.m_access )
+                : m_pointer{ other.m_pointer }
+                , m_access{ other.m_access }
             {
                 increment();
             }
 
             template < typename _OtherValue >
             Holder ( const Holder< _OtherValue > & other )
-                : m_pointer( other.m_pointer )
-                , m_access( other.m_access )
+                : m_pointer{ other.m_pointer }
+                , m_access{ other.m_access }
             {
                 increment();
             }
 
             template < typename _OtherValue >
             Holder ( volatile Holder< _OtherValue > & other )
-                : m_pointer( other.m_pointer )
-                , m_access( other.m_access )
+                : m_pointer{ other.m_pointer }
+                , m_access{ other.m_access }
             {
                 increment();
             }
 
             template < typename _OtherValue >
             Holder ( const volatile Holder< _OtherValue > & other )
-                : m_pointer( other.m_pointer )
-                , m_access( other.m_access )
+                : m_pointer{ other.m_pointer }
+                , m_access{ other.m_access }
             {
                 increment();
             }

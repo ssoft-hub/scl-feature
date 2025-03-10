@@ -39,17 +39,17 @@ namespace ScL { namespace Feature { namespace Heap
             }
 
             Holder ( const ThisType && other )
-                : Holder( *other.m_pointer.get() )
+                : Holder{ *other.m_pointer.get() }
             {
             }
 
             Holder ( ThisType & other )
-                : Holder( *other.m_pointer.get() )
+                : Holder{ *other.m_pointer.get() }
             {
             }
 
             Holder ( const ThisType & other )
-                : Holder( *other.m_pointer.get() )
+                : Holder{ *other.m_pointer.get() }
             {
             }
 
@@ -61,19 +61,19 @@ namespace ScL { namespace Feature { namespace Heap
 
             template < typename _OtherValue >
             Holder ( const Holder< _OtherValue > && other )
-                : Holder( *other.m_pointer.get() )
+                : Holder{ *other.m_pointer.get() }
             {
             }
 
             template < typename _OtherValue >
             Holder ( Holder< _OtherValue > & other )
-                : Holder( *other.m_pointer.get() )
+                : Holder{ *other.m_pointer.get() }
             {
             }
 
             template < typename _OtherValue >
             Holder ( const Holder< _OtherValue > & other )
-                : Holder( *other.m_pointer.get() )
+                : Holder{ *other.m_pointer.get() }
             {
             }
 

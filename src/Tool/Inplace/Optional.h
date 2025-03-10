@@ -3,8 +3,11 @@
 #define SCL_WRAPPER_TOOL_INPLACE_OPTIONAL_H
 
 #include <exception>
+#include <memory>
+#include <string>
 #include <utility>
 #include <type_traits>
+#include <ScL/Feature/Access/HolderGuard.h>
 #include <ScL/Feature/MixIn.h>
 #include <ScL/Utility/SimilarRefer.h>
 
@@ -50,7 +53,7 @@ namespace ScL { namespace Feature { namespace Inplace
             }
 
             constexpr Holder ( ThisType && other )
-            noexcept( ::std::is_nothrow_constructible< Value, Value && >() )
+            noexcept( ::std::is_nothrow_constructible_v< Value, Value && > )
             {
                 if ( other.m_is_exists )
                 {
@@ -60,13 +63,13 @@ namespace ScL { namespace Feature { namespace Inplace
             }
 
             constexpr Holder ( const ThisType && other )
-            noexcept( ::std::is_nothrow_constructible< Value, const Value && >() )
+            noexcept( ::std::is_nothrow_constructible_v< Value, const Value && > )
             {
                 construct( ::std::forward< const Value >( other.m_value ) );
             }
 
             constexpr Holder ( volatile ThisType && other )
-            noexcept( ::std::is_nothrow_constructible< Value, volatile Value && >() )
+            noexcept( ::std::is_nothrow_constructible_v< Value, volatile Value && > )
             {
                 if ( other.m_is_exists )
                 {
@@ -76,38 +79,38 @@ namespace ScL { namespace Feature { namespace Inplace
             }
 
             constexpr Holder ( const volatile ThisType && other )
-            noexcept( ::std::is_nothrow_constructible< Value, const volatile Value && >() )
+            noexcept( ::std::is_nothrow_constructible_v< Value, const volatile Value && > )
             {
                 construct( ::std::forward< const volatile Value >( other.m_value ) );
             }
 
             constexpr Holder ( ThisType & other )
-            noexcept( ::std::is_nothrow_constructible< Value, Value & >() )
+            noexcept( ::std::is_nothrow_constructible_v< Value, Value & > )
             {
                 construct( other.m_value );
             }
 
             constexpr Holder ( const ThisType & other )
-            noexcept( ::std::is_nothrow_constructible< Value, const Value & >() )
+            noexcept( ::std::is_nothrow_constructible_v< Value, const Value & > )
             {
                 construct( other.m_value );
             }
 
             constexpr Holder ( volatile ThisType & other )
-            noexcept( ::std::is_nothrow_constructible< Value, volatile Value & >() )
+            noexcept( ::std::is_nothrow_constructible_v< Value, volatile Value & > )
             {
                 construct( other.m_value );
             }
 
             constexpr Holder ( const volatile ThisType & other )
-            noexcept( ::std::is_nothrow_constructible< Value, const volatile Value & >() )
+            noexcept( ::std::is_nothrow_constructible_v< Value, const volatile Value & > )
             {
                 construct( other.m_value );
             }
 
             template < typename _OtherValue >
             constexpr Holder ( Holder< _OtherValue > && other )
-            noexcept( ::std::is_nothrow_constructible< Value, _OtherValue && >() )
+            noexcept( ::std::is_nothrow_constructible_v< Value, _OtherValue && > )
             {
                 if ( other.m_is_exists )
                 {
@@ -118,14 +121,14 @@ namespace ScL { namespace Feature { namespace Inplace
 
             template < typename _OtherValue >
             constexpr Holder ( const Holder< _OtherValue > && other )
-            noexcept( ::std::is_nothrow_constructible< Value, const _OtherValue  && >() )
+            noexcept( ::std::is_nothrow_constructible_v< Value, const _OtherValue  && > )
             {
                 construct( ::std::forward< typename Holder< const _OtherValue >::Value >( other.m_value ) );
             }
 
             template < typename _OtherValue >
             constexpr Holder ( volatile Holder< _OtherValue > && other )
-            noexcept( ::std::is_nothrow_constructible< Value, volatile _OtherValue && >() )
+            noexcept( ::std::is_nothrow_constructible_v< Value, volatile _OtherValue && > )
             {
                 if ( other.m_is_exists )
                 {
@@ -136,35 +139,35 @@ namespace ScL { namespace Feature { namespace Inplace
 
             template < typename _OtherValue >
             constexpr Holder ( const volatile Holder< _OtherValue > && other )
-            noexcept( ::std::is_nothrow_constructible< Value, const volatile _OtherValue && >() )
+            noexcept( ::std::is_nothrow_constructible_v< Value, const volatile _OtherValue && > )
             {
                 construct( ::std::forward< typename Holder< const volatile _OtherValue >::Value >( other.m_value ) );
             }
 
             template < typename _OtherValue >
             constexpr Holder ( Holder< _OtherValue > & other )
-            noexcept( ::std::is_nothrow_constructible< Value, _OtherValue & >() )
+            noexcept( ::std::is_nothrow_constructible_v< Value, _OtherValue & > )
             {
                 construct( other.m_value );
             }
 
             template < typename _OtherValue >
             constexpr Holder ( const Holder< _OtherValue > & other )
-            noexcept( ::std::is_nothrow_constructible< Value, const _OtherValue & >() )
+            noexcept( ::std::is_nothrow_constructible_v< Value, const _OtherValue & > )
             {
                 construct( other.m_value );
             }
 
             template < typename _OtherValue >
             constexpr Holder ( volatile Holder< _OtherValue > & other )
-            noexcept( ::std::is_nothrow_constructible< Value, volatile _OtherValue & >() )
+            noexcept( ::std::is_nothrow_constructible_v< Value, volatile _OtherValue & > )
             {
                 construct( other.m_value );
             }
 
             template < typename _OtherValue >
             constexpr Holder ( const volatile Holder< _OtherValue > & other )
-            noexcept( ::std::is_nothrow_constructible< Value, const volatile _OtherValue & >() )
+            noexcept( ::std::is_nothrow_constructible_v< Value, const volatile _OtherValue & > )
             {
                 construct( other.m_value );
             }
@@ -175,15 +178,23 @@ namespace ScL { namespace Feature { namespace Inplace
             }
 
             template < typename ... _Arguments >
-            void construct( _Arguments && ... _arguments )
-            noexcept( ::std::is_nothrow_constructible< Value, _Arguments ... >() )
+            auto construct( _Arguments && ... _arguments )
+            noexcept( ::std::is_nothrow_constructible_v< Value, _Arguments && ... >)
+                -> ::std::enable_if_t<::std::is_constructible_v< Value, _Arguments ... >, void>
             {
-                ::new ( (void *) ::std::addressof( m_value ) )Value{ ::std::forward< _Arguments >( _arguments ) ... };
+                static_assert(!::std::is_aggregate_v<::std::string>);
+                if constexpr (::std::is_aggregate_v<_Value>)
+                    ::new (static_cast<void*>(::std::addressof( m_value ))) Value{ ::std::forward< _Arguments >( _arguments ) ... };
+                else
+                    ::new (static_cast<void*>(::std::addressof( m_value ))) Value( ::std::forward< _Arguments >( _arguments ) ... );
+
+                //::std::construct_at<Value>( ::std::addressof( m_value ), ::std::forward< _Arguments >( _arguments ) ... );
                 m_is_exists = true;
             }
 
-            void reset()
-            noexcept
+            auto reset()
+                noexcept( ::std::is_nothrow_destructible_v<Value> )
+                -> ::std::enable_if_t<::std::is_destructible_v< Value>, void>
             {
                 if ( m_is_exists )
                 {
@@ -337,8 +348,8 @@ namespace ScL { namespace Feature
 
 namespace ScL::Feature
 {
-    template <typename Self_>
-    class ToolReflectionMixIn<Self_, Inplace::Optional>
+    template <typename Self_, typename SelfHolder_>
+    class ToolReflectionMixIn<Self_, SelfHolder_, Inplace::Optional>
     {
     public:
         template <typename ... Args_>

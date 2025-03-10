@@ -59,11 +59,11 @@ void example()
     for (auto &thread : threads)
         thread.join();
 
-    auto readonly = ::ScL::Feature::guarded(::std::as_const(test_map));
+    auto readonly = ::ScL::Feature::guarded(/*::std::as_const*/(test_map));
     ::std::cout
-        << "potato is " << readonly.at("potato")->first
+        << "potato is " << readonly.at("potato").first
         << " " << readonly.at("potato").second
-        << ", apple is " << readonly.at("apple")->first
+        << ", apple is " << readonly.at("apple").first
         << " " << readonly.at("apple").second
         << ::std::endl;
 
@@ -85,6 +85,6 @@ int main(int, char **)
     // Псевдопараллельно с блокировками, атомарно.
     example<SharedMutexMap>();
     // Псевдопараллельно с блокировками, атомарно.
-    example<CowRecursiveMutexMap>();
+    // example<CowRecursiveMutexMap>();
     return 0;
 }

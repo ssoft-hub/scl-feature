@@ -8,14 +8,14 @@
 
 namespace ScL { namespace Feature
 {
-    template <typename Self_, typename First_, typename Second_>
-    class ValueReflectionMixIn<Self_, ::std::pair<First_, Second_>>
+    template <typename Self_, typename SelfHolder_, typename First_, typename Second_>
+    class ValueReflectionMixIn<Self_, SelfHolder_, ::std::pair<First_, Second_>>
     {
-        SCL_REFLECT_PROPERTY(First_, first);
-        SCL_REFLECT_PROPERTY(Second_, second);
+        SCL_REFLECT_PROPERTY(first);
+        SCL_REFLECT_PROPERTY(second);
 
-        using first_type = SCL_PROPERTY_DECLTYPE(first);
-        using second_type = SCL_PROPERTY_DECLTYPE(second);
+        // using first_type = SCL_DECLTYPE_PROPERTY(first);
+        // using second_type = SCL_DECLTYPE_PROPERTY(second);
     };
 }}
 

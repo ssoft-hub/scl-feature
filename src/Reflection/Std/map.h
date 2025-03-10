@@ -9,8 +9,8 @@
 
 namespace ScL { namespace Feature
 {
-    template <typename Self_, typename Key_, typename Value_, typename Compare_, typename Allocator_>
-    class ValueReflectionMixIn<Self_, ::std::map<Key_, Value_, Compare_, Allocator_>>
+    template <typename Self_, typename SelfHolder_, typename Key_, typename Value_, typename Compare_, typename Allocator_>
+    class ValueReflectionMixIn<Self_, SelfHolder_, ::std::map<Key_, Value_, Compare_, Allocator_>>
     {
     public:
         SCL_REFLECT_METHOD( get_allocator )

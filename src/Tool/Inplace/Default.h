@@ -25,7 +25,7 @@ namespace ScL { namespace Feature { namespace Inplace
             template < typename ... _Arguments >
             constexpr Holder ( _Arguments && ... arguments )
             noexcept( ::std::is_nothrow_constructible< Value, _Arguments && ... >() )
-                : m_value{ ::std::forward< _Arguments >( arguments ) ... }
+                : m_value( ::std::forward< _Arguments >( arguments ) ... )
             {
             }
 

@@ -17,8 +17,8 @@ public:
 
 namespace ScL::Feature
 {
-    template <typename Self_>
-    class ValueReflectionMixIn<Self_, MyData>
+    template <typename Self_, typename SelfHolder_>
+    class ValueReflectionMixIn<Self_, SelfHolder_, MyData>
     {
     public:
         SCL_REFLECT_METHOD( getName )

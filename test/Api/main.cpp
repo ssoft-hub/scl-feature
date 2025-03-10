@@ -144,8 +144,8 @@ void testWrapperContainer ()
     { [[maybe_unused]] Wrapper< Container > value; }
     { [[maybe_unused]] Wrapper< Container > value{{ 0.0, 1.0, 2.0, 3.0, 4.0 }}; }
     { [[maybe_unused]] Wrapper< Container > value = {{ 0.0, 1.0, 2.0, 3.0, 4.0 }}; }
-    { [[maybe_unused]] Wrapper< Container > value{ Container() }; }
-    { [[maybe_unused]] Wrapper< Container > value = Container(); }
+    { [[maybe_unused]] Wrapper< Container > value{ Container{} }; }
+    { [[maybe_unused]] Wrapper< Container > value = Container{}; }
     {
         Wrapper< Container > container;
         for ( int i = 0; i < 10; ++i )
