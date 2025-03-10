@@ -4,18 +4,87 @@
 
 #include <ScL/Feature/Wrapper.h>
 
-namespace ScL::Feature
+#include <utility>
+#include <ScL/Utility/SimilarRefer.h>
+#include <ScL/Feature/Access/WrapperLock.h>
+
+namespace ScL::Feature::Tool
 {
-    using PropertyTool = Inplace::Default;
+    template <typename WrapperHolder_>
+    struct PropertyReflection
+    {
+        template <typename Value_>
+        struct Holder
+        {
+            using ThisType = Holder<Value_>;
+            using Value = Value_;
+
+            using WrapperHolder = WrapperHolder_;
+            using WrappedValue = typename WrapperHolder::Value;
+            using Type = ::std::remove_reference_t<Value>;
+            using WrappedType = ::std::remove_reference_t<WrappedValue>;
+            using WrapperHolderPointer = WrapperHolder*;
+            using Property = Type WrappedType::*;
+
+            WrapperHolderPointer m_holder;
+            Property m_property;
+
+            constexpr Holder ( WrapperHolderPointer holder, Property property )
+                : m_holder{holder}
+                , m_property{property}
+            {
+            }
+
+            template < typename _HolderRefer >
+            static constexpr void guard ( _HolderRefer && holder )
+            {
+                using HolderRefer = _HolderRefer &&;
+                using WrapperHolderRefer = ::ScL::SimilarRefer< WrapperHolder, HolderRefer >;
+                using HolderInterface = ::ScL::Feature::Detail::HolderInterface;
+                HolderInterface::guard<WrapperHolderRefer>( ::std::forward< WrapperHolderRefer >( *holder.m_holder ) );
+            }
+
+            template < typename _HolderRefer >
+            static constexpr void unguard ( _HolderRefer && holder )
+            {
+                using HolderRefer = _HolderRefer &&;
+                using WrapperHolderRefer = ::ScL::SimilarRefer< WrapperHolder, HolderRefer >;
+                using HolderInterface = ::ScL::Feature::Detail::HolderInterface;
+                HolderInterface::unguard<WrapperHolderRefer>( ::std::forward< WrapperHolderRefer >( *holder.m_holder ) );
+            }
+
+            template < typename _HolderRefer >
+            static constexpr decltype(auto) baseValue ( _HolderRefer && holder )
+            {
+                using HolderRefer = _HolderRefer &&;
+                using WrapperHolderRefer = ::ScL::SimilarRefer< WrapperHolder, HolderRefer >;
+                using HolderInterface = ::ScL::Feature::Detail::HolderInterface;
+                return HolderInterface::value<WrapperHolderRefer>( ::std::forward< WrapperHolderRefer >( *holder.m_holder ) );
+            }
+
+            template < typename _HolderRefer >
+            static constexpr decltype(auto) value ( _HolderRefer && holder )
+            {
+                using HolderRefer = _HolderRefer &&;
+                using WrappedValueRefer = ::ScL::SimilarRefer< WrappedValue, HolderRefer >;
+                using ValueRefer = ::ScL::SimilarRefer< Value, WrappedValueRefer >;
+                return ::std::forward<ValueRefer>( baseValue( ::std::forward< _HolderRefer >( holder ) ).*holder.m_property );
+            }
+        };
+    };
 }
 
-#define SCL_REFLECT_PROPERTY( Type, property ) \
-    private: \
-        Wrapper<Type> dlhf_ ## property ## _ljhp; \
-    public: \
-        Wrapper<Type> & property{ dlhf_ ## property ## _ljhp }; \
+#define SCL_DECLTYPE_PROPERTY(property) \
+::ScL::Feature::Wrapper<decltype(::std::declval<typename SelfHolder_::Value>().property), ::ScL::Feature::Tool::PropertyReflection<SelfHolder_>> \
 
-#define SCL_PROPERTY_DECLTYPE( property ) \
-    decltype(dlhf_ ## property ## _ljhp) \
+
+#define SCL_REFLECT_PROPERTY(property) \
+    private: \
+        SCL_DECLTYPE_PROPERTY(property) ___private_ ## property ## ___{ std::addressof(static_cast<Self_*>(this)->m_holder),  \
+            &::std::remove_reference_t<typename SelfHolder_::Value>::property }; \
+    public: \
+        SCL_DECLTYPE_PROPERTY(property) & property{ ___private_ ## property ## ___ }; \
+//*/
+
 
 #endif

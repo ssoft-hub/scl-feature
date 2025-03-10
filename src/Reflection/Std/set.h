@@ -7,8 +7,8 @@
 
 namespace ScL { namespace Feature
 {
-    template <typename Self_, typename Key_, typename Compare_, typename Allocator_>
-    class ValueReflectionMixIn<Self_, ::std::set<Key_, Compare_, Allocator_>>
+    template <typename Self_, typename SelfHolder_, typename Key_, typename Compare_, typename Allocator_>
+    class ValueReflectionMixIn<Self_, SelfHolder_, ::std::set<Key_, Compare_, Allocator_>>
     {
     };
 }}

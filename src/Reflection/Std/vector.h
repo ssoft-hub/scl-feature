@@ -8,9 +8,12 @@
 
 namespace ScL { namespace Feature
 {
-    template <typename Self_, typename Value_, typename Allocator_>
-    class ValueReflectionMixIn<Self_, ::std::vector<Value_, Allocator_>>
+    template <typename Self_, typename SelfHolder_, typename Value_, typename Allocator_>
+    class ValueReflectionMixIn<Self_, SelfHolder_, ::std::vector<Value_, Allocator_>>
     {
+        // using Adaptee =::std::vector<Value_, Allocator_>;
+        // using Adaptor =ValueReflectionMixIn<Self_, Adaptee>;
+
     public:
         SCL_REFLECT_METHOD( assign )
         SCL_REFLECT_METHOD( assign_range )
@@ -44,6 +47,20 @@ namespace ScL { namespace Feature
         SCL_REFLECT_METHOD( pop_back )
         SCL_REFLECT_METHOD( resize )
         SCL_REFLECT_METHOD( swap )
+
+    public:
+        // using value_type = typename Adaptee::value_type;
+        // using allocator_type = typename Adaptee::allocator_type;
+        // using size_type = decltype(::std::declval<Adaptor>().size());
+        // using difference_type = decltype(::std::declval<Adaptor>().begin() - ::std::declval<Adaptor>().begin());
+        // using reference = decltype(::std::declval<Adaptor>().front());
+        // using const_reference = decltype(::std::declval<Adaptor const>().front());
+        // using pointer = decltype(&::std::declval<Adaptor>().front());
+        // using const_pointer = decltype(&::std::declval<Adaptor const>().front());
+        // using iterator = decltype(::std::declval<Adaptor>().begin());
+        // using const_iterator = decltype(::std::declval<Adaptor const>().begin());
+        // using reverse_iterator = decltype(::std::declval<Adaptor>().rbegin());
+        // using const_reverse_iterator = decltype(::std::declval<Adaptor const>().rbegin());
     };
 }}
 

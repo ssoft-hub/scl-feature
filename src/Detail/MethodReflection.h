@@ -9,7 +9,7 @@
     constexpr decltype(auto) method ( Arguments_ && ... arguments ) this_refer \
     { \
         using WrapperRefer = Self_ this_refer; \
-        using ValueRefer = ::ScL::SimilarRefer< typename ::std::decay_t< WrapperRefer >::Value, WrapperRefer >; \
+        using ValueRefer = ::ScL::SimilarRefer< typename Self_::Value, WrapperRefer >; \
         auto invokable = [](ValueRefer && value, Arguments_ && ... arguments) \
             -> decltype(::std::declval<ValueRefer>().method( ::std::declval<Arguments_ &&>() ... )) \
         { \

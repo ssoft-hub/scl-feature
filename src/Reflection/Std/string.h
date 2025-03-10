@@ -8,7 +8,7 @@
 namespace ScL { namespace Feature
 {
     template <typename Self_>
-    class ValueReflectionMixIn<Self_, ::std::string>
+    class ValueReflectionMixIn<Self_, SelfHolder_, ::std::string>
     {
     public:
         template <typename ... Args_>

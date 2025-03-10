@@ -7,8 +7,8 @@
 
 namespace ScL { namespace Feature
 {
-    template <typename Self_, typename Value_, typename Allocator_>
-    class ValueReflectionMixIn<Self_, ::std::list<Value_, Allocator_>>
+    template <typename Self_, typename SelfHolder_, typename Value_, typename Allocator_>
+    class ValueReflectionMixIn<Self_, SelfHolder_, ::std::list<Value_, Allocator_>>
     {
     };
 }}

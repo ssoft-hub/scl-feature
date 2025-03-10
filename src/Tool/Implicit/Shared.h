@@ -59,7 +59,7 @@ namespace ScL { namespace Feature { namespace Implicit
 
             template < typename _OtherValue >
             Holder ( Holder< _OtherValue > && other )
-                : m_pointer( ::std::forward< typename Holder< _OtherValue >::Pointer >( other.m_pointer ) )
+                : m_pointer{ ::std::forward< typename Holder< _OtherValue >::Pointer >( other.m_pointer ) }
             {
             }
 

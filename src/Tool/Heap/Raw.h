@@ -47,27 +47,27 @@ namespace ScL { namespace Feature { namespace Heap
             }
 
             Holder ( const volatile ThisType && other )
-                : Holder( ::std::forward< const volatile Value >( *other.m_pointer ) )
+                : Holder{ ::std::forward< const volatile Value >( *other.m_pointer ) }
             {
             }
 
             Holder ( ThisType & other )
-                : Holder( *other.m_pointer )
+                : Holder{ *other.m_pointer }
             {
             }
 
             Holder ( const ThisType & other )
-                : Holder( *other.m_pointer )
+                : Holder{ *other.m_pointer }
             {
             }
 
             Holder ( volatile ThisType & other )
-                : Holder( *other.m_pointer )
+                : Holder{ *other.m_pointer }
             {
             }
 
             Holder ( const volatile ThisType & other )
-                : Holder( *other.m_pointer )
+                : Holder{ *other.m_pointer }
             {
             }
 
@@ -80,7 +80,7 @@ namespace ScL { namespace Feature { namespace Heap
 
             template < typename _OtherValue >
             Holder ( const Holder< _OtherValue > && other )
-                : Holder( *other.m_pointer )
+                : Holder{ *other.m_pointer }
             {
             }
 
@@ -93,31 +93,31 @@ namespace ScL { namespace Feature { namespace Heap
 
             template < typename _OtherValue >
             Holder ( const volatile Holder< _OtherValue > && other )
-                : Holder( *other.m_pointer )
+                : Holder{ *other.m_pointer }
             {
             }
 
             template < typename _OtherValue >
             Holder ( Holder< _OtherValue > & other )
-                : Holder( *other.m_pointer )
+                : Holder{ *other.m_pointer }
             {
             }
 
             template < typename _OtherValue >
             Holder ( const Holder< _OtherValue > & other )
-                : Holder( *other.m_pointer )
+                : Holder{ *other.m_pointer }
             {
             }
 
             template < typename _OtherValue >
             Holder ( volatile Holder< _OtherValue > & other )
-                : Holder( *other.m_pointer )
+                : Holder{ *other.m_pointer }
             {
             }
 
             template < typename _OtherValue >
             Holder ( const volatile Holder< _OtherValue > & other )
-                : Holder( *other.m_pointer )
+                : Holder{ *other.m_pointer }
             {
             }
 

@@ -6,7 +6,7 @@
 
 namespace ScL::Feature::Detail
 {
-    template <typename Self_, typename Value_>
+    template <typename Self_, typename SelfHolder_, typename Value_>
     class ReflectionMixIn
     {};
 
@@ -17,10 +17,10 @@ namespace ScL::Feature::Detail
 
 namespace ScL::Feature
 {
-    template <typename Self_, typename Value_>
+    template <typename Self_, typename SelfHolder_, typename Value_>
     class ValueReflectionMixIn {};
 
-    template <typename Self_, typename Value_>
+    template <typename Self_, typename SelfHolder_, typename Value_>
     class ToolReflectionMixIn {};
 }
 
@@ -32,12 +32,15 @@ namespace ScL::Feature
 
 namespace ScL::Feature
 {
-    template <typename Self_>
+    template <typename Self_, typename SelfHolder_>
     class MixIn
         : public ::ScL::Feature::ToolAdditionMixIn<Self_>
-        , public ::ScL::Feature::Detail::CastingMixIn<Self_, ::std::remove_cv_t<::std::remove_reference_t<Self_>>>
-        , public ::ScL::Feature::Detail::ReflectionMixIn<Self_, ::std::remove_cv_t<::std::remove_reference_t<Self_>>>
-    {};
+        , public ::ScL::Feature::Detail::CastingMixIn<Self_, Self_>
+        , public ::ScL::Feature::Detail::ReflectionMixIn<Self_, SelfHolder_, Self_>
+    {
+        static_assert(!::std::is_reference_v<Self_>);
+        static_assert(!::std::is_reference_v<SelfHolder_>);
+    };
 }
 
 #endif
