@@ -30,7 +30,7 @@ namespace ScL::Feature
                 return ::ScL::Feature::Detail::Operator::ResultSwitch<
                     ::ScL::Feature::Detail::Operator::LeftWrapperCase,
                     ::ScL::Feature::Detail::Operator::ResultSwitchCase< Returned, ValueRefer > >
-                        ::invoke( ::std::forward< Invokable >( invokable ), static_cast< WrapperRefer >( value) );
+                        ::invoke( ::std::forward< Invokable >( invokable ), ::std::forward< WrapperRefer >(value) );
             }
             else
             {
@@ -45,7 +45,7 @@ namespace ScL::Feature
                 return ::ScL::Feature::Detail::Operator::ResultSwitch<
                     ::ScL::Feature::Detail::Operator::LeftWrapperCase,
                     ::ScL::Feature::Detail::Operator::ResultSwitchCase< Returned, ValueRefer > >
-                        ::invoke( ::std::forward< Invokable >( invokable ), static_cast< WrapperRefer >( value) );
+                        ::invoke( ::std::forward< Invokable >( invokable ), ::std::forward< WrapperRefer >(value) );
             }
         }
         else

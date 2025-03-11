@@ -59,7 +59,8 @@ void example()
     for (auto &thread : threads)
         thread.join();
 
-    auto readonly = ::ScL::Feature::guarded(/*::std::as_const*/(test_map));
+    auto readonly = ::ScL::Feature::guarded(::std::as_const(test_map));
+
     ::std::cout
         << "potato is " << readonly.at("potato").first
         << " " << readonly.at("potato").second

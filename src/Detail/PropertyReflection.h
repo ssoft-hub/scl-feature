@@ -74,9 +74,24 @@ namespace ScL::Feature::Tool
     };
 }
 
-#define SCL_DECLTYPE_PROPERTY(property) \
-::ScL::Feature::Wrapper<decltype(::std::declval<typename SelfHolder_::Value>().property), ::ScL::Feature::Tool::PropertyReflection<SelfHolder_>> \
+#define SCL_DECLTYPE_PROPERTY_P(property) \
+    ::ScL::Feature::Wrapper<decltype(::std::declval<typename SelfHolder_::Value>().property), \
+        ::ScL::Feature::Tool::PropertyReflection<SelfHolder_>> \
 
+#define SCL_DECLTYPE_PROPERTY(property) \
+    ::std::conditional_t< \
+        ::std::is_const_v<::std::remove_reference_t<typename SelfHolder_::Value>>, \
+        ::std::conditional_t< \
+            ::std::is_volatile_v<::std::remove_reference_t<typename SelfHolder_::Value>>, \
+            ::std::add_cv_t<SCL_DECLTYPE_PROPERTY_P(property)>, \
+            ::std::add_const_t<SCL_DECLTYPE_PROPERTY_P(property)> \
+        >, \
+        ::std::conditional_t< \
+            ::std::is_volatile_v<::std::remove_reference_t<typename SelfHolder_::Value>>, \
+            ::std::add_volatile_t<SCL_DECLTYPE_PROPERTY_P(property)>, \
+            SCL_DECLTYPE_PROPERTY_P(property) \
+        > \
+    > \
 
 #define SCL_REFLECT_PROPERTY(property) \
     private: \
