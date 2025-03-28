@@ -94,6 +94,32 @@ namespace ScL::Feature::Tool
     > \
 
 #define SCL_REFLECT_PROPERTY(property) \
+public: \
+    template <typename ___> \
+    static constexpr ::std::enable_if_t<::ScL::Feature::is_wrapper_v<___>, \
+    decltype(&___::___private_ ## property ## ___) > \
+        ___addressof___ ## property ## ___() \
+    { \
+        return &___::___private_ ## property ## ___; \
+    } \
+    \
+    template <typename ___> \
+    static constexpr ::std::enable_if_t<!::ScL::Feature::is_wrapper_v<___>, \
+    decltype(&___::property) > \
+         ___addressof___ ## property ## ___() \
+    { \
+        return &___::property; \
+    } \
+     \
+    SCL_DECLTYPE_PROPERTY(property) \
+    ___private_ ## property ## ___{std::addressof(static_cast<Self_ *>(this)->m_holder), \
+        ___addressof___ ## property ## ___<::std::remove_reference_t<typename SelfHolder_::Value>>()}; \
+     \
+    SCL_DECLTYPE_PROPERTY(property) &  property{ ___private_ ## property ## ___ }; \
+
+
+/*
+#define SCL_REFLECT_PROPERTY(property) \
     private: \
         SCL_DECLTYPE_PROPERTY(property) ___private_ ## property ## ___{ std::addressof(static_cast<Self_*>(this)->m_holder),  \
             &::std::remove_reference_t<typename SelfHolder_::Value>::property }; \
