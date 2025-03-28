@@ -66,7 +66,7 @@ void example()
         << " " << readonly.at("potato").second
         << ", apple is " << readonly.at("apple").first
         << " " << readonly.at("apple").second
-        << ::std::endl;
+        << "\n"; // ::std::endl;
 
     ::std::cout << "Finish" << ::std::endl;
 }
@@ -86,6 +86,6 @@ int main(int, char **)
     // Псевдопараллельно с блокировками, атомарно.
     example<SharedMutexMap>();
     // Псевдопараллельно с блокировками, атомарно.
-    // example<CowRecursiveMutexMap>();
+    example<CowRecursiveMutexMap>();
     return 0;
 }
