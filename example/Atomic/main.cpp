@@ -7,27 +7,28 @@
 #include <ScL/Feature/Cast.h>
 #include <ScL/Feature/Guard.h>
 #include <ScL/Feature/Reflection/Std.h>
-#include <ScL/Feature/Wrapper.h>
 #include <ScL/Feature/Tool.h>
+#include <ScL/Feature/Wrapper.h>
 #include <ScL/Utility/Qualifier.h>
+
+using namespace ::ScL::Feature;
 
 using Key = ::std::string;
 using Value = ::std::pair<::std::string, int>;
 using Map = ::std::map<::std::string, ::std::pair<::std::string, int>>;
 
-using AtomicMutexMap = ::ScL::Feature::Wrapper<Map, ::ScL::Feature::ThreadSafe::Atomic>;
-using RecursiveMutexMap = ::ScL::Feature::Wrapper<Map, ::ScL::Feature::ThreadSafe::RecursiveMutex>;
-using SharedMutexMap = ::ScL::Feature::Wrapper<Map, ::ScL::Feature::ThreadSafe::SharedMutex>;
-using CowRecursiveMutexMap = ::ScL::Feature::Wrapper<Map, ::ScL::Feature::Implicit::Raw, ::ScL::Feature::ThreadSafe::RecursiveMutex>;
+using AtomicMutexMap = Wrapper<Map, ThreadSafe::Atomic>;
+using RecursiveMutexMap = Wrapper<Map, ThreadSafe::RecursiveMutex>;
+using SharedMutexMap = Wrapper<Map, ThreadSafe::SharedMutex>;
+using CowRecursiveMutexMap = Wrapper<Map, Implicit::Raw, ThreadSafe::RecursiveMutex>;
 
-using DefaultMap = ::ScL::Feature::Wrapper<Map, ::ScL::Feature::Inplace::Default>;
-using ImplicitMap = ::ScL::Feature::Wrapper<Map, ::ScL::Feature::Implicit::Raw>;
+using DefaultMap = Wrapper<Map, Inplace::Default>;
+using ImplicitMap = Wrapper<Map, Implicit::Raw>;
 
 template <typename _MapType>
-void func( _MapType & test_map )
+void func(_MapType & test_map)
 {
-    for (size_t i = 0; i < 100000; ++i)
-    {
+    for (size_t i = 0; i < 100000; ++i) {
         test_map.at("apple").second++;
         test_map.find("potato")->second.second++;
     }
@@ -54,19 +55,16 @@ void example()
     test_map["potato"].first = "vegetable";
 
     ::std::vector<::std::thread> threads(::std::thread::hardware_concurrency());
-    for (auto &thread : threads)
+    for (auto & thread : threads)
         thread = ::std::thread(func<_MapType>, ::std::ref(test_map));
-    for (auto &thread : threads)
+    for (auto & thread : threads)
         thread.join();
 
-    auto readonly = ::ScL::Feature::guarded(::std::as_const(test_map));
+    auto readonly = guarded(::std::as_const(test_map));
 
-    ::std::cout
-        << "potato is " << readonly.at("potato").first
-        << " " << readonly.at("potato").second
-        << ", apple is " << readonly.at("apple").first
-        << " " << readonly.at("apple").second
-        << "\n"; // ::std::endl;
+    ::std::cout << "potato is " << readonly.at("potato").first << " "
+                << readonly.at("potato").second << ", apple is " << readonly.at("apple").first
+                << " " << readonly.at("apple").second << "\n"; // ::std::endl;
 
     ::std::cout << "Finish" << ::std::endl;
 }

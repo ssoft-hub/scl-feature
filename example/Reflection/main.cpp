@@ -11,31 +11,32 @@ private:
     Text m_name{};
 
 public:
-    TextView getName () const & { return m_name; }
-    void setName (TextView name) { m_name = name; }
+    TextView getName() const & { return m_name; }
+    void setName(TextView name) { m_name = name; }
 };
 
-namespace ScL::Feature
+namespace ScL::Feature {
+
+template <typename Self_, typename SelfHolder_>
+class ValueReflectionMixIn<Self_, SelfHolder_, MyData>
 {
-    template <typename Self_, typename SelfHolder_>
-    class ValueReflectionMixIn<Self_, SelfHolder_, MyData>
-    {
-    public:
-        SCL_REFLECT_METHOD( getName )
-        SCL_REFLECT_METHOD( setName )
-    };
-}
+public:
+    SCL_REFLECT_METHOD(getName)
+    SCL_REFLECT_METHOD(setName)
+};
+
+} // namespace ScL::Feature
 
 template <typename Type_>
-void foo ()
+void foo()
 {
     Type_ data{};
 
-    data.setName( "TEST" );
+    data.setName("TEST");
     data.getName();
 }
 
-int main (int, char**)
+int main(int, char **)
 {
     using namespace ::ScL::Feature;
 

@@ -9,7 +9,7 @@
 #include <ScL/Feature/Trait.h>
 #include <ScL/Utility/SimilarRefer.h>
 
-namespace ScL { namespace Feature { namespace Implicit
+namespace ScL::Feature::Implicit
 {
     /*!
      * Инструмент для формирования неявно обобщенного значения на основе
@@ -20,117 +20,115 @@ namespace ScL { namespace Feature { namespace Implicit
      */
     struct Shared
     {
-        template < typename _Value >
+        template <typename _Value>
         struct Holder
         {
-            using ThisType = Holder< _Value >;
+            using ThisType = Holder<_Value>;
             using Value = _Value;
 
-            using Pointer = ::std::shared_ptr< Value >;
-            using WritableGuard = ::ScL::Feature::HolderGuard< ThisType & >;
+            using Pointer = ::std::shared_ptr<Value>;
+            using WritableGuard = ::ScL::Feature::HolderGuard<ThisType &>;
 
             Pointer m_pointer;
 
-            template < typename ... _Arguments >
-            Holder ( _Arguments && ... arguments )
-                : m_pointer{ ::std::make_shared< Value >( ::std::forward< _Arguments >( arguments ) ... ) }
-            {
-            }
+            template <typename... _Arguments>
+            Holder(_Arguments &&... arguments)
+                : m_pointer{::std::make_shared<Value>(::std::forward<_Arguments>(arguments)...)}
+            {}
 
-            Holder ( ThisType && other )
-                : m_pointer{ ::std::forward< Pointer >( other.m_pointer ) }
-            {
-            }
+            Holder(ThisType && other)
+                : m_pointer{::std::forward<Pointer>(other.m_pointer)}
+            {}
 
-            Holder ( const ThisType && other )
-                : m_pointer{ other.m_pointer }
-            {
-            }
+            Holder(ThisType const && other)
+                : m_pointer{other.m_pointer}
+            {}
 
-            Holder ( ThisType & other )
-                : m_pointer{ other.m_pointer }
-            {
-            }
+            Holder(ThisType & other)
+                : m_pointer{other.m_pointer}
+            {}
 
-            Holder ( const ThisType & other )
-                : m_pointer{ other.m_pointer }
-            {
-            }
+            Holder(ThisType const & other)
+                : m_pointer{other.m_pointer}
+            {}
 
-            template < typename _OtherValue >
-            Holder ( Holder< _OtherValue > && other )
-                : m_pointer{ ::std::forward< typename Holder< _OtherValue >::Pointer >( other.m_pointer ) }
-            {
-            }
+            template <typename _OtherValue>
+            Holder(Holder<_OtherValue> && other)
+                : m_pointer{::std::forward<typename Holder<_OtherValue>::Pointer>(other.m_pointer)}
+            {}
 
-            template < typename _OtherValue >
-            Holder ( const Holder< _OtherValue > && other )
-                : m_pointer{ other.m_pointer }
-            {
-            }
+            template <typename _OtherValue>
+            Holder(Holder<_OtherValue> const && other)
+                : m_pointer{other.m_pointer}
+            {}
 
-            template < typename _OtherValue >
-            Holder ( Holder< _OtherValue > & other )
-                : m_pointer{ other.m_pointer }
-            {
-            }
+            template <typename _OtherValue>
+            Holder(Holder<_OtherValue> & other)
+                : m_pointer{other.m_pointer}
+            {}
 
-            template < typename _OtherValue >
-            Holder ( Holder< _OtherValue > const  & other )
-                : m_pointer{ other.m_pointer }
-            {
-            }
+            template <typename _OtherValue>
+            Holder(Holder<_OtherValue> const & other)
+                : m_pointer{other.m_pointer}
+            {}
 
-            ~Holder ()
-            {
-                m_pointer.reset();
-            }
+            ~Holder() { m_pointer.reset(); }
 
             /*!
              * Assignment operation between compatible Holders. Specialization
              * of operation enabled if left is not constant reference and any
              * kind of right.
              */
-            template < typename _LeftWrapperRefer, typename _RightWrapperRefer,
-                typename = ::std::enable_if_t< !::std::is_const< ::std::remove_reference_t< _LeftWrapperRefer > >::value
-                    && ::ScL::Feature::IsThisCompatibleWithOther< ::std::decay_t< _RightWrapperRefer >, ::std::decay_t< _LeftWrapperRefer > >::value
-                    && ( ::std::is_volatile< ::std::remove_reference_t< _LeftWrapperRefer > >::value == ::std::is_volatile< ::std::remove_reference_t< _RightWrapperRefer > >::value ) > >
-            static decltype(auto) operatorAssignment ( _LeftWrapperRefer && left, _RightWrapperRefer && right )
+            template <typename _LeftWrapperRefer,
+                typename _RightWrapperRefer,
+                typename = ::std::enable_if_t<
+                    !::std::is_const< ::std::remove_reference_t<_LeftWrapperRefer> >::value
+                    && ::ScL::Feature::IsThisCompatibleWithOther<
+                        ::std::decay_t<_RightWrapperRefer>,
+                        ::std::decay_t<_LeftWrapperRefer> >::value
+                    && (::std::is_volatile< ::std::remove_reference_t<_LeftWrapperRefer> >::value
+                        == ::std::is_volatile<
+                            ::std::remove_reference_t<_RightWrapperRefer> >::value)> >
+            static decltype(auto) operatorAssignment(
+                _LeftWrapperRefer && left, _RightWrapperRefer && right)
             {
                 using RightWrapperRefer = _RightWrapperRefer &&;
-                using RightHolder = typename ::std::decay_t< RightWrapperRefer >::Holder;
-                using RightPointerRefer = ::ScL::SimilarRefer< typename RightHolder::Pointer, RightWrapperRefer >;
-                ::ScL::Feature::Detail::wrapperHolder( left ).m_pointer
-                    = ::std::forward< RightPointerRefer >( ::ScL::Feature::Detail::wrapperHolder( right ).m_pointer );
+                using RightHolder = typename ::std::decay_t<RightWrapperRefer>::Holder;
+                using RightPointerRefer = ::ScL::SimilarRefer<typename RightHolder::Pointer,
+                    RightWrapperRefer>;
+                ::ScL::Feature::Detail::wrapperHolder(left)
+                    .m_pointer = ::std::forward<RightPointerRefer>(
+                    ::ScL::Feature::Detail::wrapperHolder(right).m_pointer);
             }
 
             /*!
              * Guard internal value of Holder for any not constant referencies.
              */
-            template < typename _HolderRefer,
+            template <typename _HolderRefer,
                 typename = ::std::enable_if_t<
-                    !::std::is_const< ::std::remove_reference_t< _HolderRefer > >::value > >
-            static constexpr void guard ( _HolderRefer && holder )
+                    !::std::is_const< ::std::remove_reference_t<_HolderRefer> >::value> >
+            static constexpr void guard(_HolderRefer && holder)
             {
-                if ( !!holder.m_pointer && holder.m_pointer.use_count() != 1 )
-                    holder.m_pointer = ::std::make_shared< Value >( *holder.m_pointer.get() );
+                if (!!holder.m_pointer && holder.m_pointer.use_count() != 1)
+                    holder.m_pointer = ::std::make_shared<Value>(*holder.m_pointer.get());
             }
 
             /*!
              * Access to internal value of Holder for any king of referencies
              * (except volatile).
              */
-            template < typename _HolderRefer,
-                typename = ::std::enable_if_t< !::std::is_volatile< ::std::remove_reference_t< _HolderRefer > >::value > >
-            static constexpr decltype(auto) value ( _HolderRefer && holder )
+            template <typename _HolderRefer,
+                typename = ::std::enable_if_t<
+                    !::std::is_volatile< ::std::remove_reference_t<_HolderRefer> >::value> >
+            static constexpr decltype(auto) value(_HolderRefer && holder)
             {
                 using HolderRefer = _HolderRefer &&;
-                using ValueRefer = ::ScL::SimilarRefer< _Value, HolderRefer >;
+                using ValueRefer = ::ScL::SimilarRefer<_Value, HolderRefer>;
                 // NOTE: Functionality ::std::shared_ptr has a limitation for volatile case.
-                return ::std::forward< ValueRefer >( *holder.m_pointer.get() );
+                return ::std::forward<ValueRefer>(*holder.m_pointer.get());
             }
         };
     };
-}}}
+} // namespace ScL::Feature::Implicit
 
 #endif

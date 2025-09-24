@@ -44,7 +44,11 @@ using namespace ::ScL::Feature;
     DATA_UNARY_OPERATOR_PROTOTYPE(SCL_SINGLE_ARG(symbol), const volatile &)
 
 #define DATA_BINARY_OPERATOR_PROTOTYPE(symbol, refer) \
-    template <typename _Right> void operator symbol(_Right &&) refer { ::std::cout << DATA_FUNC_INFO << ::std::endl; }
+    template <typename _Right>                        \
+    void operator symbol(_Right &&) refer             \
+    {                                                 \
+        ::std::cout << DATA_FUNC_INFO << ::std::endl; \
+    }
 
 #define DATA_BINARY_OPERATOR(symbol)                                          \
     DATA_BINARY_OPERATOR_PROTOTYPE(SCL_SINGLE_ARG(symbol), &&)                \
@@ -57,73 +61,82 @@ using namespace ::ScL::Feature;
     DATA_BINARY_OPERATOR_PROTOTYPE(SCL_SINGLE_ARG(symbol), const volatile &)
 
 #define DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(symbol, this_refer, other_refer) \
-    void operator symbol(ThisType other_refer) this_refer { ::std::cout << DATA_FUNC_INFO << ::std::endl; }
+    void operator symbol(ThisType other_refer) this_refer                        \
+    {                                                                            \
+        ::std::cout << DATA_FUNC_INFO << ::std::endl;                            \
+    }
 
-#define DATA_BINARY_OPERATOR_FOR_THIS(symbol)                                                             \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), &&, &&)                               \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), &&, const &&)                         \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), &&, volatile &&)                      \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), &&, const volatile &&)                \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), &&, &)                                \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), &&, const &)                          \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), &&, volatile &)                       \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), &&, const volatile &)                 \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const &&, &&)                         \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const &&, const &&)                   \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const &&, volatile &&)                \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const &&, const volatile &&)          \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const &&, &)                          \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const &&, const &)                    \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const &&, volatile &)                 \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const &&, const volatile &)           \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), volatile &&, &&)                      \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), volatile &&, const &&)                \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), volatile &&, volatile &&)             \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), volatile &&, const volatile &&)       \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), volatile &&, &)                       \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), volatile &&, const &)                 \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), volatile &&, volatile &)              \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), volatile &&, const volatile &)        \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const volatile &&, &&)                \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const volatile &&, const &&)          \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const volatile &&, volatile &&)       \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const volatile &&, const volatile &&) \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const volatile &&, &)                 \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const volatile &&, const &)           \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const volatile &&, volatile &)        \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const volatile &&, const volatile &)  \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), &, &&)                                \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), &, const &&)                          \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), &, volatile &&)                       \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), &, const volatile &&)                 \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), &, &)                                 \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), &, const &)                           \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), &, volatile &)                        \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), &, const volatile &)                  \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const &, &&)                          \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const &, const &&)                    \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const &, volatile &&)                 \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const &, const volatile &&)           \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const &, &)                           \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const &, const &)                     \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const &, volatile &)                  \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const &, const volatile &)            \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), volatile &, &&)                       \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), volatile &, const &&)                 \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), volatile &, volatile &&)              \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), volatile &, const volatile &&)        \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), volatile &, &)                        \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), volatile &, const &)                  \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), volatile &, volatile &)               \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), volatile &, const volatile &)         \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const volatile &, &&)                 \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const volatile &, const &&)           \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const volatile &, volatile &&)        \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const volatile &, const volatile &&)  \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const volatile &, &)                  \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const volatile &, const &)            \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const volatile &, volatile &)         \
-    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const volatile &, const volatile &)
+#define DATA_BINARY_OPERATOR_FOR_THIS(symbol)                                                      \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), &&, &&)                        \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), &&, const &&)                  \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), &&, volatile &&)               \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), &&, const volatile &&)         \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), &&, &)                         \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), &&, const &)                   \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), &&, volatile &)                \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), &&, const volatile &)          \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const &&, &&)                  \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const &&, const &&)            \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const &&, volatile &&)         \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const &&, const volatile &&)   \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const &&, &)                   \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const &&, const &)             \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const &&, volatile &)          \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const &&, const volatile &)    \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), volatile &&, &&)               \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), volatile &&, const &&)         \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), volatile &&, volatile &&)      \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(                                                       \
+        SCL_SINGLE_ARG(symbol), volatile &&, const volatile &&)                                    \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), volatile &&, &)                \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), volatile &&, const &)          \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), volatile &&, volatile &)       \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), volatile &&, const volatile &) \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const volatile &&, &&)         \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const volatile &&, const &&)   \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(                                                       \
+        SCL_SINGLE_ARG(symbol), const volatile &&, volatile &&)                                    \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(                                                       \
+        SCL_SINGLE_ARG(symbol), const volatile &&, const volatile &&)                              \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const volatile &&, &)          \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const volatile &&, const &)    \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const volatile &&, volatile &) \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(                                                       \
+        SCL_SINGLE_ARG(symbol), const volatile &&, const volatile &)                               \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), &, &&)                         \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), &, const &&)                   \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), &, volatile &&)                \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), &, const volatile &&)          \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), &, &)                          \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), &, const &)                    \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), &, volatile &)                 \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), &, const volatile &)           \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const &, &&)                   \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const &, const &&)             \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const &, volatile &&)          \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const &, const volatile &&)    \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const &, &)                    \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const &, const &)              \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const &, volatile &)           \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const &, const volatile &)     \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), volatile &, &&)                \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), volatile &, const &&)          \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), volatile &, volatile &&)       \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), volatile &, const volatile &&) \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), volatile &, &)                 \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), volatile &, const &)           \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), volatile &, volatile &)        \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), volatile &, const volatile &)  \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const volatile &, &&)          \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const volatile &, const &&)    \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const volatile &, volatile &&) \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(                                                       \
+        SCL_SINGLE_ARG(symbol), const volatile &, const volatile &&)                               \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const volatile &, &)           \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const volatile &, const &)     \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(SCL_SINGLE_ARG(symbol), const volatile &, volatile &)  \
+    DATA_BINARY_OPERATOR_PROTOTYPE_FOR_THIS(                                                       \
+        SCL_SINGLE_ARG(symbol), const volatile &, const volatile &)
 
 // Visual Studio limitation
 #define DATA_GLOBAL_BINARY_OPERATOR_PROTOTYPE(symbol, right_refer)
@@ -144,9 +157,12 @@ using namespace ::ScL::Feature;
     DATA_GLOBAL_BINARY_OPERATOR_PROTOTYPE(SCL_SINGLE_ARG(symbol), volatile &)        \
     DATA_GLOBAL_BINARY_OPERATOR_PROTOTYPE(SCL_SINGLE_ARG(symbol), const volatile &)
 
-class Dummy {};
+class Dummy
+{};
 
-template <typename _Type> class Data {
+template <typename _Type>
+class Data
+{
     static_assert(!::std::is_reference<_Type>{}, "_Type must to be a not reference.");
     using ThisType = Data<_Type>;
 
@@ -155,53 +171,101 @@ public:
 
 public:
     template <typename... _Arguments>
-    Data(_Arguments &&... arguments) : m_value(::std::forward<_Arguments>(arguments)...) {
+    Data(_Arguments &&... arguments)
+        : m_value(::std::forward<_Arguments>(arguments)...)
+    {
         ::std::cout << DATA_FUNC_INFO << ::std::endl;
     }
 
-    template <typename _Other> Data(Data<_Other> && other) : m_value(::std::forward<_Other>(other.m_value)) {
+    template <typename _Other>
+    Data(Data<_Other> && other)
+        : m_value(::std::forward<_Other>(other.m_value))
+    {
         ::std::cout << DATA_FUNC_INFO << ::std::endl;
     }
     template <typename _Other>
-    Data(const Data<_Other> && other) : m_value(::std::forward<const _Other>(other.m_value)) {
-        ::std::cout << DATA_FUNC_INFO << ::std::endl;
-    }
-    template <typename _Other> Data(volatile Data<_Other> && other) : m_value(::std::forward<_Other>(other.m_value)) {
+    Data(Data<_Other> const && other)
+        : m_value(::std::forward<_Other const>(other.m_value))
+    {
         ::std::cout << DATA_FUNC_INFO << ::std::endl;
     }
     template <typename _Other>
-    Data(const volatile Data<_Other> && other) : m_value(::std::forward<const _Other>(other.m_value)) {
+    Data(Data<_Other> volatile && other)
+        : m_value(::std::forward<_Other>(other.m_value))
+    {
         ::std::cout << DATA_FUNC_INFO << ::std::endl;
     }
-    template <typename _Other> Data(Data<_Other> & other) : m_value(other.m_value) {
+    template <typename _Other>
+    Data(Data<_Other> const volatile && other)
+        : m_value(::std::forward<_Other const>(other.m_value))
+    {
         ::std::cout << DATA_FUNC_INFO << ::std::endl;
     }
-    template <typename _Other> Data(const Data<_Other> & other) : m_value(other.m_value) {
+    template <typename _Other>
+    Data(Data<_Other> & other)
+        : m_value(other.m_value)
+    {
         ::std::cout << DATA_FUNC_INFO << ::std::endl;
     }
-    template <typename _Other> Data(volatile Data<_Other> & other) : m_value(other.m_value) {
+    template <typename _Other>
+    Data(Data<_Other> const & other)
+        : m_value(other.m_value)
+    {
         ::std::cout << DATA_FUNC_INFO << ::std::endl;
     }
-    template <typename _Other> Data(const volatile Data<_Other> & other) : m_value(other.m_value) {
+    template <typename _Other>
+    Data(Data<_Other> volatile & other)
+        : m_value(other.m_value)
+    {
+        ::std::cout << DATA_FUNC_INFO << ::std::endl;
+    }
+    template <typename _Other>
+    Data(Data<_Other> const volatile & other)
+        : m_value(other.m_value)
+    {
         ::std::cout << DATA_FUNC_INFO << ::std::endl;
     }
 
-    Data(ThisType && other) : m_value(::std::forward<_Type>(other.m_value)) {
+    Data(ThisType && other)
+        : m_value(::std::forward<_Type>(other.m_value))
+    {
         ::std::cout << DATA_FUNC_INFO << ::std::endl;
     }
-    Data(const ThisType && other) : m_value(::std::forward<const _Type>(other.m_value)) {
+    Data(ThisType const && other)
+        : m_value(::std::forward<_Type const>(other.m_value))
+    {
         ::std::cout << DATA_FUNC_INFO << ::std::endl;
     }
-    Data(volatile ThisType && other) : m_value(::std::forward<volatile _Type>(other.m_value)) {
+    Data(ThisType volatile && other)
+        : m_value(::std::forward<_Type volatile>(other.m_value))
+    {
         ::std::cout << DATA_FUNC_INFO << ::std::endl;
     }
-    Data(const volatile ThisType && other) : m_value(::std::forward<const volatile _Type>(other.m_value)) {
+    Data(ThisType const volatile && other)
+        : m_value(::std::forward<_Type const volatile>(other.m_value))
+    {
         ::std::cout << DATA_FUNC_INFO << ::std::endl;
     }
-    Data(ThisType & other) : m_value(other.m_value) { ::std::cout << DATA_FUNC_INFO << ::std::endl; }
-    Data(const ThisType & other) : m_value(other.m_value) { ::std::cout << DATA_FUNC_INFO << ::std::endl; }
-    Data(volatile ThisType & other) : m_value(other.m_value) { ::std::cout << DATA_FUNC_INFO << ::std::endl; }
-    Data(const volatile ThisType & other) : m_value(other.m_value) { ::std::cout << DATA_FUNC_INFO << ::std::endl; }
+    Data(ThisType & other)
+        : m_value(other.m_value)
+    {
+        ::std::cout << DATA_FUNC_INFO << ::std::endl;
+    }
+    Data(ThisType const & other)
+        : m_value(other.m_value)
+    {
+        ::std::cout << DATA_FUNC_INFO << ::std::endl;
+    }
+    Data(ThisType volatile & other)
+        : m_value(other.m_value)
+    {
+        ::std::cout << DATA_FUNC_INFO << ::std::endl;
+    }
+    Data(ThisType const volatile & other)
+        : m_value(other.m_value)
+    {
+        ::std::cout << DATA_FUNC_INFO << ::std::endl;
+    }
 
     ~Data() { ::std::cout << DATA_FUNC_INFO << ::std::endl; }
 
@@ -213,48 +277,98 @@ public:
     void rvalueMethod() && { ::std::cout << DATA_FUNC_INFO << ::std::endl; }
     void rvalueConstMethod() const && { ::std::cout << DATA_FUNC_INFO << ::std::endl; }
     void rvalueVolatileMethod() volatile && { ::std::cout << DATA_FUNC_INFO << ::std::endl; }
-    void rvalueConstVolatileMethod() const volatile && { ::std::cout << DATA_FUNC_INFO << ::std::endl; }
+    void rvalueConstVolatileMethod() const volatile &&
+    {
+        ::std::cout << DATA_FUNC_INFO << ::std::endl;
+    }
 
     void lvalueMethod() & { ::std::cout << DATA_FUNC_INFO << ::std::endl; }
     void lvalueConstMethod() const & { ::std::cout << DATA_FUNC_INFO << ::std::endl; }
     void lvalueVolatileMethod() volatile & { ::std::cout << DATA_FUNC_INFO << ::std::endl; }
-    void lvalueConstVolatileMethod() const volatile & { ::std::cout << DATA_FUNC_INFO << ::std::endl; }
-
-    template <typename _Index> void operator[](_Index &&) && { ::std::cout << DATA_FUNC_INFO << ::std::endl; }
-    template <typename _Index> void operator[](_Index &&) const && { ::std::cout << DATA_FUNC_INFO << ::std::endl; }
-    template <typename _Index> void operator[](_Index &&) volatile && { ::std::cout << DATA_FUNC_INFO << ::std::endl; }
-    template <typename _Index> void operator[](_Index &&) const volatile && {
-        ::std::cout << DATA_FUNC_INFO << ::std::endl;
-    }
-    template <typename _Index> void operator[](_Index &&) & { ::std::cout << DATA_FUNC_INFO << ::std::endl; }
-    template <typename _Index> void operator[](_Index &&) const & { ::std::cout << DATA_FUNC_INFO << ::std::endl; }
-    template <typename _Index> void operator[](_Index &&) volatile & { ::std::cout << DATA_FUNC_INFO << ::std::endl; }
-    template <typename _Index> void operator[](_Index &&) const volatile & {
+    void lvalueConstVolatileMethod() const volatile &
+    {
         ::std::cout << DATA_FUNC_INFO << ::std::endl;
     }
 
-    template <typename... _Arguments> void operator()(_Arguments &&...) && {
+    template <typename _Index>
+    void operator[](_Index &&) &&
+    {
         ::std::cout << DATA_FUNC_INFO << ::std::endl;
     }
-    template <typename... _Arguments> void operator()(_Arguments &&...) const && {
+    template <typename _Index>
+    void operator[](_Index &&) const &&
+    {
         ::std::cout << DATA_FUNC_INFO << ::std::endl;
     }
-    template <typename... _Arguments> void operator()(_Arguments &&...) volatile && {
+    template <typename _Index>
+    void operator[](_Index &&) volatile &&
+    {
         ::std::cout << DATA_FUNC_INFO << ::std::endl;
     }
-    template <typename... _Arguments> void operator()(_Arguments &&...) const volatile && {
+    template <typename _Index>
+    void operator[](_Index &&) const volatile &&
+    {
         ::std::cout << DATA_FUNC_INFO << ::std::endl;
     }
-    template <typename... _Arguments> void operator()(_Arguments &&...) & {
+    template <typename _Index>
+    void operator[](_Index &&) &
+    {
         ::std::cout << DATA_FUNC_INFO << ::std::endl;
     }
-    template <typename... _Arguments> void operator()(_Arguments &&...) const & {
+    template <typename _Index>
+    void operator[](_Index &&) const &
+    {
         ::std::cout << DATA_FUNC_INFO << ::std::endl;
     }
-    template <typename... _Arguments> void operator()(_Arguments &&...) volatile & {
+    template <typename _Index>
+    void operator[](_Index &&) volatile &
+    {
         ::std::cout << DATA_FUNC_INFO << ::std::endl;
     }
-    template <typename... _Arguments> void operator()(_Arguments &&...) const volatile & {
+    template <typename _Index>
+    void operator[](_Index &&) const volatile &
+    {
+        ::std::cout << DATA_FUNC_INFO << ::std::endl;
+    }
+
+    template <typename... _Arguments>
+    void operator()(_Arguments &&...) &&
+    {
+        ::std::cout << DATA_FUNC_INFO << ::std::endl;
+    }
+    template <typename... _Arguments>
+    void operator()(_Arguments &&...) const &&
+    {
+        ::std::cout << DATA_FUNC_INFO << ::std::endl;
+    }
+    template <typename... _Arguments>
+    void operator()(_Arguments &&...) volatile &&
+    {
+        ::std::cout << DATA_FUNC_INFO << ::std::endl;
+    }
+    template <typename... _Arguments>
+    void operator()(_Arguments &&...) const volatile &&
+    {
+        ::std::cout << DATA_FUNC_INFO << ::std::endl;
+    }
+    template <typename... _Arguments>
+    void operator()(_Arguments &&...) &
+    {
+        ::std::cout << DATA_FUNC_INFO << ::std::endl;
+    }
+    template <typename... _Arguments>
+    void operator()(_Arguments &&...) const &
+    {
+        ::std::cout << DATA_FUNC_INFO << ::std::endl;
+    }
+    template <typename... _Arguments>
+    void operator()(_Arguments &&...) volatile &
+    {
+        ::std::cout << DATA_FUNC_INFO << ::std::endl;
+    }
+    template <typename... _Arguments>
+    void operator()(_Arguments &&...) const volatile &
+    {
         ::std::cout << DATA_FUNC_INFO << ::std::endl;
     }
 
@@ -310,7 +424,9 @@ public:
     DATA_BINARY_OPERATOR(<<)
     DATA_BINARY_OPERATOR(>>)
 
-    template <typename... _Arguments> static ThisType make(_Arguments &&... arguments) {
+    template <typename... _Arguments>
+    static ThisType make(_Arguments &&... arguments)
+    {
         return Data(::std::forward<_Arguments>(arguments)...);
     }
 };
@@ -351,7 +467,8 @@ DATA_GLOBAL_BINARY_OPERATOR(|)
 DATA_GLOBAL_BINARY_OPERATOR(<<)
 DATA_GLOBAL_BINARY_OPERATOR(>>)
 
-void testConstructors() {
+void testConstructors()
+{
     using TestData = Wrapper<Data<double> >;
 
     TestData one;
@@ -374,7 +491,8 @@ void testConstructors() {
     (maybe_unused) seven;
 }
 
-void testSameToolConstructors() {
+void testSameToolConstructors()
+{
     using TestData = Wrapper<Data<double> >;
     using SameData = Wrapper<Data<int> >;
 
@@ -391,7 +509,8 @@ void testSameToolConstructors() {
     (maybe_unused) seven;
 }
 
-void testDiffToolConstructors() {
+void testDiffToolConstructors()
+{
     using TestData = Wrapper<Data<double> >;
     using SameData = Wrapper<Data<int>, Implicit::Shared>;
 
@@ -408,7 +527,8 @@ void testDiffToolConstructors() {
     (maybe_unused) seven;
 }
 
-void testAccess() {
+void testAccess()
+{
     using Key = Wrapper< ::std::string, Implicit::Raw>;
     using Value = Wrapper< ::std::string, Heap::Raw>;
     // using Value = Wrapper< Data< int > >;
@@ -420,11 +540,13 @@ void testAccess() {
     map[key] = "World!";
 
     std::cout << "Iterate and print keys and values of unordered_map, using auto:\n";
-    for (const auto & n : map)
-        std::cout << "Key:[" << n->first << "] Value:[" << n->second << "]\n";
+    for (auto const & n : map)
+        std::cout << "Key:[" << n.first << "] Value:[" << n.second << "]\n";
 }
 
-template <typename _Data, typename _Other> void testAssignmentOperator() {
+template <typename _Data, typename _Other>
+void testAssignmentOperator()
+{
     using Data = _Data;
     using Other = _Other;
 
@@ -450,7 +572,9 @@ template <typename _Data, typename _Other> void testAssignmentOperator() {
     ::std::move(data) = asConstVolatile(::std::move(other));
 }
 
-template <typename _Data> void testWrapperUnaryOperators() {
+template <typename _Data>
+void testWrapperUnaryOperators()
+{
     using TestData = _Data;
 
     TestData data;
@@ -559,7 +683,9 @@ template <typename _Data> void testWrapperUnaryOperators() {
     ~asConstVolatile(::std::move(lvalue));
 }
 
-template <typename _Left, typename _Right> void testWrapperBinaryOperatorsSpec() {
+template <typename _Left, typename _Right>
+void testWrapperBinaryOperatorsSpec()
+{
     using ::std::move;
 
     _Left left;
@@ -694,7 +820,9 @@ template <typename _Left, typename _Right> void testWrapperBinaryOperatorsSpec()
     ::std::move(left) <<= ::std::move(right);
 }
 
-template <typename _Left, typename _Right> void testWrapperBinaryOperators() {
+template <typename _Left, typename _Right>
+void testWrapperBinaryOperators()
+{
     // NOTE: Можно проверить любой.
     // Все вместе могут выдать testOperators.o: 'File too big'
     // Для проверки достаточно любого
@@ -736,20 +864,24 @@ template <typename _Left, typename _Right> void testWrapperBinaryOperators() {
     // volatile _Left >();
 }
 
-template <typename _Type, typename _Other> void testAllOperators() {
+template <typename _Type, typename _Other>
+void testAllOperators()
+{
     testAssignmentOperator<_Type, _Other>();
     testWrapperUnaryOperators<_Type>();
     testWrapperBinaryOperators<_Type, _Other>();
 }
 
-void testFeature() {
+void testFeature()
+{
     using WrapperInt = Wrapper<Data<int> >;
     using WrapperDouble = Wrapper<Data<double>, Inplace::Uninitialized>;
 
     testAllOperators<WrapperInt, WrapperDouble>();
 }
 
-void testRangeOperators() {
+void testRangeOperators()
+{
     using Vector = Wrapper< ::std::vector<int>, ::ScL::Feature::Inplace::Debug>;
 
     Vector const values = {0, 1, 2, 3, 4};
@@ -768,6 +900,6 @@ void testRangeOperators() {
         ::std::cout << (*iter) << ::std::endl;
 
     // Testing ranged 'for'
-    for (const auto & value : values)
+    for (auto const & value : values)
         ::std::cout << value << ::std::endl;
 }

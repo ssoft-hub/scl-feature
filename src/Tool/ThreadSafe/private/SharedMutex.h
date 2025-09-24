@@ -2,11 +2,10 @@
 #ifndef SCL_TOOL_PRIVATE_SHATED_MUTEX_H
 #define SCL_TOOL_PRIVATE_SHATED_MUTEX_H
 
-#   include <atomic>
-#   include <condition_variable>
-#   include <mutex>
+#include <condition_variable>
+#include <mutex>
 
-namespace ScL { namespace Feature { namespace Detail
+namespace ScL::Feature::Detail
 {
     /*
      * Copied implementation from Boost library
@@ -21,7 +20,7 @@ namespace ScL { namespace Feature { namespace Detail
             bool m_upgrade;
             bool m_exclusive_waiting_blocked;
 
-            StateData ()
+            StateData()
                 : m_shared_count()
                 , m_exclusive()
                 , m_upgrade()
@@ -41,38 +40,35 @@ namespace ScL { namespace Feature { namespace Detail
         }
 
     public:
-        SharedMutex ()
+        SharedMutex()
             : m_state()
-        {
-        }
+        {}
 
-        ~SharedMutex ()
-        {
-        }
+        ~SharedMutex() {}
 
-        void lock_shared ()
+        void lock_shared()
         {
-            ::std::unique_lock< ::std::mutex > locker( m_mutex );
-            while ( m_state.m_exclusive || m_state.m_exclusive_waiting_blocked )
-                m_shared_condition.wait( locker );
+            ::std::unique_lock< ::std::mutex> locker(m_mutex);
+            while (m_state.m_exclusive || m_state.m_exclusive_waiting_blocked)
+                m_shared_condition.wait(locker);
             ++m_state.m_shared_count;
         }
 
-        bool try_lock_shared ()
+        bool try_lock_shared()
         {
-            ::std::unique_lock< ::std::mutex > locker( m_mutex );
-            if ( m_state.m_exclusive || m_state.m_exclusive_waiting_blocked )
+            ::std::unique_lock< ::std::mutex> locker(m_mutex);
+            if (m_state.m_exclusive || m_state.m_exclusive_waiting_blocked)
                 return false;
             ++m_state.m_shared_count;
             return true;
         }
 
-        void unlock_shared ()
+        void unlock_shared()
         {
-            ::std::unique_lock< ::std::mutex > locker( m_mutex );
-            if ( --m_state.m_shared_count == 0  )
+            ::std::unique_lock< ::std::mutex> locker(m_mutex);
+            if (--m_state.m_shared_count == 0)
             {
-                if ( m_state.m_upgrade )
+                if (m_state.m_upgrade)
                 {
                     m_state.m_upgrade = false;
                     m_state.m_exclusive = true;
@@ -85,21 +81,21 @@ namespace ScL { namespace Feature { namespace Detail
             }
         }
 
-        void lock ()
+        void lock()
         {
-            ::std::unique_lock< ::std::mutex > locker( m_mutex );
-            while ( m_state.m_shared_count || m_state.m_exclusive )
+            ::std::unique_lock< ::std::mutex> locker(m_mutex);
+            while (m_state.m_shared_count || m_state.m_exclusive)
             {
                 m_state.m_exclusive_waiting_blocked = true;
-                m_exclusive_condition.wait( locker );
+                m_exclusive_condition.wait(locker);
             }
             m_state.m_exclusive = true;
         }
 
-        bool try_lock ()
+        bool try_lock()
         {
-            ::std::unique_lock< ::std::mutex > locker( m_mutex );
-            if ( m_state.m_shared_count || m_state.m_exclusive )
+            ::std::unique_lock< ::std::mutex> locker(m_mutex);
+            if (m_state.m_shared_count || m_state.m_exclusive)
             {
                 return false;
             }
@@ -110,14 +106,14 @@ namespace ScL { namespace Feature { namespace Detail
             }
         }
 
-        void unlock ()
+        void unlock()
         {
-            ::std::unique_lock< ::std::mutex > locker( m_mutex );
+            ::std::unique_lock< ::std::mutex> locker(m_mutex);
             m_state.m_exclusive = false;
             m_state.m_exclusive_waiting_blocked = false;
             release_waiters();
         }
     };
-}}}
+} // namespace ScL::Feature::Detail
 
 #endif

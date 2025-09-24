@@ -7,26 +7,27 @@ using namespace ::ScL::Feature;
 using namespace ::std;
 
 // Unworkable case
-//using Filename = string;
-//using Url      = string;
+// using Filename = string;
+// using Url      = string;
 
 // Strong typedef case
-using Filename = Wrapper< string, Inplace::Typedef< class Filename_tag > >;
-using Url      = Wrapper< string, Inplace::Typedef< class Url_tag > >;
+using Filename = Wrapper<string, Inplace::Typedef<class Filename_tag> >;
+using Url = Wrapper<string, Inplace::Typedef<class Url_tag> >;
 
-auto read ( Filename filename ) { /*read from disk*/ return filename; }
-auto read ( Url url )           { /*read from internet*/ return url;  }
+auto read(Filename filename) { /*read from disk*/ return filename; }
 
-auto test ()
+auto read(Url url) { /*read from internet*/ return url; }
+
+auto test()
 {
-  auto filename = Filename{ "foobar.txt" };
-  auto url = Url{ "http://foobar.com/" };
+    auto filename = Filename{"foobar.txt"};
+    auto url = Url{"http://foobar.com/"};
 
-  cout << "From disk [" << filename << "]: " << read( filename ) << ::std::endl;
-  cout << "From web  [" << url      << "]: " << read( url ) << ::std::endl;
+    cout << "From disk [" << filename << "]: " << read(filename) << ::std::endl;
+    cout << "From web  [" << url << "]: " << read(url) << ::std::endl;
 }
 
-int main ( int, char ** )
+int main(int, char **)
 {
     test();
     return 0;

@@ -21,7 +21,7 @@ namespace ScL
     ;
 }
 
-namespace ScL { namespace Feature { namespace ThreadSafe
+namespace ScL::Feature::ThreadSafe
 {
     template < typename _Holder >
     struct Locking< ::ScL::SharedMutex, _Holder >
@@ -58,11 +58,11 @@ namespace ScL { namespace Feature { namespace ThreadSafe
             ::std::forward< LockRefer >( lock ).unlock_shared();
         }
     };
-}}}
+}
 
-namespace ScL { namespace Feature { namespace ThreadSafe
+namespace ScL::Feature::ThreadSafe
 {
     using SharedMutex = ::ScL::Feature::ThreadSafe::Lock< ::ScL::SharedMutex >;
-}}}
+}
 
 #endif
