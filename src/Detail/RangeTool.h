@@ -7,7 +7,7 @@
 #include <ScL/Feature/Trait.h>
 #include <ScL/Utility/SimilarRefer.h>
 
-namespace ScL { namespace Feature { namespace Detail { namespace Guard
+namespace ScL::Feature::Detail::Guard
 {
     template < typename _RangeRefer >
     struct RangeTool
@@ -51,6 +51,6 @@ namespace ScL { namespace Feature { namespace Detail { namespace Guard
             }
         };
     };
-}}}}
+} // namespace ScL::Feature::Detail::Guard
 
 #endif

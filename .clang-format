@@ -1,0 +1,368 @@
+# yaml-language-server: $schema=https://json.schemastore.org/clang-format.json
+---
+
+Language: Cpp
+Standard: Auto
+
+# common settings
+ColumnLimit: 100
+IndentWidth: 4
+ContinuationIndentWidth: 4
+TabWidth: 4
+UseTab: Never
+
+# include directives
+IncludeBlocks: Preserve
+IndentPPDirectives: None
+SortIncludes: CaseSensitive
+# IncludeCategories:
+IncludeIsMainRegex: '^.*$'
+
+# we use main include character as quote
+MainIncludeChar: Quote
+
+# namespaces
+CompactNamespaces: true
+FixNamespaceComments: true
+NamespaceIndentation: All
+ShortNamespaceLines: 0
+
+# we align input parameters always with break
+AlignAfterOpenBracket: DontAlign
+AllowAllArgumentsOnNextLine: true
+AllowAllParametersOfDeclarationOnNextLine: true
+AllowBreakBeforeNoexceptSpecifier: OnlyWithParen
+BinPackArguments: false
+BinPackParameters: false
+
+# we align array definition to right
+AlignArrayOfStructures: Right
+
+# offset for access modifiers (public/protected/private)
+AccessModifierOffset: -4
+# we never use empty lines after access modifiers
+EmptyLineAfterAccessModifier: Never
+# we use empty lines before access modifiers only in logical blocks
+EmptyLineBeforeAccessModifier: LogicalBlock
+# we use empty lines between definition blocks
+SeparateDefinitionBlocks: Leave
+# we do not use extra indentation for access modifiers
+IndentAccessModifiers: false
+
+# we dont align assigments
+AlignConsecutiveAssignments:
+  Enabled: false
+  AcrossEmptyLines: false
+  AcrossComments: false
+  AlignCompound: false
+  AlignFunctionPointers: false
+  PadOperators: false
+
+# we dont align bit fields
+AlignConsecutiveBitFields:
+  Enabled: false
+  AcrossEmptyLines: false
+  AcrossComments: false
+  AlignCompound: false
+  AlignFunctionPointers: false
+  PadOperators: false
+
+# we dont align consecutive declarations
+AlignConsecutiveDeclarations:
+  Enabled: false
+  AcrossEmptyLines: false
+  AcrossComments: false
+  AlignCompound: false
+  AlignFunctionPointers: false
+  PadOperators: false
+
+# we dont align consecutive macros
+AlignConsecutiveMacros:
+  Enabled: false
+  AcrossEmptyLines: false
+  AcrossComments: false
+  AlignCompound: false
+  AlignFunctionPointers: false
+  PadOperators: false
+
+# we format macro definition body
+SkipMacroDefinitionBody: false
+
+# we align escaped new line to left
+AlignEscapedNewlines: Left
+
+# we not allow short blocks in switch-case
+AllowShortCaseExpressionOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+
+# we dont align consecutive short case statements
+AlignConsecutiveShortCaseStatements:
+  Enabled: false
+  AcrossEmptyLines: false
+  AcrossComments: false
+  AlignCaseArrows: false
+  AlignCaseColons: false
+
+# we dont align operands
+AlignOperands: DontAlign
+
+# we align comments
+AlignTrailingComments:
+  Kind: Always
+  OverEmptyLines: 0
+
+# we allow short blocks on a single line for empty blocks only
+AllowShortBlocksOnASingleLine: Empty
+
+# we not allow short blocks in compound requirements
+AllowShortCompoundRequirementOnASingleLine: false
+
+# we allow short blocks in enum
+AllowShortEnumsOnASingleLine: true
+
+# we allow short functions on a single line for all functions
+AllowShortFunctionsOnASingleLine: All
+
+# we not allow short if statements on a single line
+AllowShortIfStatementsOnASingleLine: Never
+
+# we allow short lambdas on a single line
+AllowShortLambdasOnASingleLine: All
+
+# we use signature indentation for lambda bodies
+LambdaBodyIndentation: Signature
+
+# we not allow short loops on a single line
+AllowShortLoopsOnASingleLine: false
+
+# we not add break after the return type
+AlwaysBreakAfterDefinitionReturnType: None
+AlwaysBreakAfterReturnType: None
+BreakAfterReturnType: None
+
+# we add break before the multiline strings
+AlwaysBreakBeforeMultilineStrings: true
+
+# we use break after attributes
+BreakAfterAttributes: Always
+
+# we use break in constructor initializers
+BreakConstructorInitializers: BeforeComma
+ConstructorInitializerAllOnOneLineOrOnePerLine: false
+ConstructorInitializerIndentWidth: 4
+
+# we never pack constructor initializers
+PackConstructorInitializers: Never
+
+# we use break before the inheritance list
+BreakInheritanceList: BeforeComma
+
+# we use custom style for braces
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterCaseLabel: true
+  AfterClass: true
+  AfterControlStatement: Always
+  AfterEnum: true
+  AfterExternBlock: false
+  AfterFunction: true
+  AfterNamespace: true
+  AfterObjCDeclaration: true
+  AfterStruct: true
+  AfterUnion: true
+  BeforeCatch: true
+  BeforeElse: true
+  BeforeLambdaBody: false
+  BeforeWhile: false
+  IndentBraces: false
+  SplitEmptyFunction: false
+  SplitEmptyNamespace: false
+  SplitEmptyRecord: false
+
+# we use break before the template declaration
+BreakTemplateDeclarations: Yes
+
+# we use break before concept declarations
+BreakBeforeConceptDeclarations: Always
+
+# we use break after Java field annotations
+BreakAfterJavaFieldAnnotations: true
+
+# we use break before Java static imports
+SortJavaStaticImport: Before
+
+# JavaScriptQuotes: Leave
+# JavaScriptWrapImports: true
+
+# we use break before the binary operators
+BreakBeforeBinaryOperators: NonAssignment
+
+# we use break before the ternary operators
+BreakBeforeTernaryOperators: true
+
+# we use cpp11 braced list style
+Cpp11BracedListStyle: true
+
+# AttributeMacros:
+#   - __capability
+
+# we add space before an after the colon in bit fields
+BitFieldColonSpacing: After
+
+# we use break for string literals
+BreakAdjacentStringLiterals: true
+BreakStringLiterals: true
+
+ForEachMacros:
+  - forever
+  - foreach
+  - for_each
+  - Q_FOREACH
+  - BOOST_FOREACH
+
+IncludeIsMainSourceRegex: ""
+
+# we use identations as follows
+IndentCaseBlocks: false
+IndentCaseLabels: false
+IndentExternBlock: AfterExternBlock
+IndentGotoLabels: true
+IndentRequiresClause: true
+IndentWrappedFunctionNames: true
+
+# we not require braces for one line blocks
+InsertBraces: false
+
+# we always add new line at the end of file
+InsertNewlineAtEOF: true
+
+# we always insert trailing commas
+InsertTrailingCommas: Wrapped
+
+# we do not insert separators in integer literals
+IntegerLiteralSeparator:
+  Binary: 0
+  BinaryMinDigits: 0
+  Decimal: 0
+  DecimalMinDigits: 0
+  Hex: 0
+  HexMinDigits: 0
+
+# we do not keep empty lines at the start of file, end of file and at the start of blocks
+KeepEmptyLines:
+  AtStartOfFile: false
+  AtEndOfFile: false
+  AtStartOfBlock: false
+MaxEmptyLinesToKeep: 1
+KeepEmptyLinesAtEOF: false
+
+# we use LF as line ending
+LineEnding: LF
+
+# we use custom penalties for breaks
+PenaltyBreakAssignment: 1000
+PenaltyBreakBeforeFirstCallParameter: 1000
+PenaltyBreakComment: 1000
+PenaltyBreakFirstLessLess: 500
+PenaltyBreakOpenParenthesis: 0
+PenaltyBreakScopeResolution: 10000
+PenaltyBreakString: 1000
+PenaltyBreakTemplateDeclaration: 0
+PenaltyExcessCharacter: 1000
+PenaltyIndentedWhitespace: 0
+PenaltyReturnTypeOnItsOwnLine: 1000
+
+# we want a space between the type and the star for pointer types.
+# DerivePointerAlignment: false
+PointerAlignment: Middle
+SpaceAroundPointerQualifiers: Both
+# obsollete
+# PointerBindsToType: true
+
+# we want an alignment for references as like for pointers.
+ReferenceAlignment: Pointer
+
+PPIndentWidth: 0
+
+# we use a custom qualifier alignment
+QualifierAlignment: Custom
+QualifierOrder:
+  - friend
+  - inline
+  - static
+  - constexpr
+  - type
+  - const
+  - volatile
+  - restrict
+
+# ...
+ReflowComments: true
+
+# we remove braces for a simple ...
+RemoveBracesLLVM: true
+
+# TODO: has bug with namespaces
+# NOTE: uncomment after using c++17 namespace style
+RemoveParentheses: MultipleParentheses
+RemoveSemicolon: true
+
+RequiresClausePosition: OwnLine
+RequiresExpressionIndentation: Keyword
+
+# we sort using declarations
+SortUsingDeclarations: Lexicographic
+
+# we use spaces as follows
+SpaceAfterCStyleCast: false
+SpaceAfterLogicalNot: false
+SpaceAfterTemplateKeyword: true
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeCaseColon: false
+SpaceBeforeCpp11BracedList: false
+SpaceBeforeCtorInitializerColon: true
+SpaceBeforeInheritanceColon: true
+SpaceBeforeJsonColon: false
+SpaceBeforeParens: ControlStatements
+SpaceBeforeParensOptions:
+  AfterControlStatements: true
+  AfterForeachMacros: false
+  AfterFunctionDefinitionName: true
+  AfterFunctionDeclarationName: true
+  AfterIfMacros: false
+  AfterOverloadedOperator: true
+  AfterPlacementOperator: true
+  AfterRequiresInClause: true
+  AfterRequiresInExpression: true
+  BeforeNonEmptyParentheses: true
+SpaceBeforeRangeBasedForLoopColon: true
+SpaceBeforeSquareBrackets: false
+SpaceInEmptyBlock: false
+SpacesBeforeTrailingComments: 1
+SpacesInAngles: Never
+SpacesInContainerLiterals: true
+SpacesInLineCommentPrefix:
+  Minimum: 1
+  Maximum: -1
+SpacesInParens: Never
+SpacesInParensOptions:
+  ExceptDoubleParentheses: false
+  InCStyleCasts: false
+  InConditionalStatements: true
+  InEmptyParentheses: false
+  Other: false
+SpacesInSquareBrackets: false
+
+BreakArrays: true
+BreakBeforeInlineASMColon: OnlyMultiline
+BreakFunctionDefinitionParameters: false
+DisableFormat: false
+CommentPragmas: "^ IWYU pragma:"
+ExperimentalAutoDetectBinPacking: false
+IfMacros:
+  - KJ_IF_MAYBE
+ObjCBinPackProtocolList: Auto
+ObjCBlockIndentWidth: 4
+ObjCBreakBeforeNestedBlockParam: true
+ObjCSpaceAfterProperty: false
+ObjCSpaceBeforeProtocolList: true

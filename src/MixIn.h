@@ -13,22 +13,25 @@ namespace ScL::Feature::Detail
     template <typename Self_, typename Value_>
     class CastingMixIn
     {};
-}
+} // namespace ScL::Feature::Detail
 
 namespace ScL::Feature
 {
     template <typename Self_, typename SelfHolder_, typename Value_>
-    class ValueReflectionMixIn {};
+    class ValueReflectionMixIn
+    {};
 
     template <typename Self_, typename SelfHolder_, typename Value_>
-    class ToolReflectionMixIn {};
-}
+    class ToolReflectionMixIn
+    {};
+} // namespace ScL::Feature
 
 namespace ScL::Feature
 {
     template <typename Self_>
-    class ToolAdditionMixIn {};
-}
+    class ToolAdditionMixIn
+    {};
+} // namespace ScL::Feature
 
 namespace ScL::Feature
 {
@@ -41,6 +44,6 @@ namespace ScL::Feature
         static_assert(!::std::is_reference_v<Self_>);
         static_assert(!::std::is_reference_v<SelfHolder_>);
     };
-}
+} // namespace ScL::Feature
 
 #endif
