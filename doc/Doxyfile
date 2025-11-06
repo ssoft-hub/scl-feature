@@ -1,0 +1,40 @@
+# Doxyfile for ScL Feature module
+# This configuration file processes the separated Doxygen documentation
+
+# Project settings
+PROJECT_NAME           = "ScL Feature"
+PROJECT_BRIEF          = "Feature module for ScL library"
+OUTPUT_DIRECTORY       = ./doxygen_output
+
+# Input settings
+INPUT                  = ../src \
+                         ../include \
+                         ./api
+                         
+FILE_PATTERNS          = *.h \
+                         *.hpp \
+                         *.dox
+                         
+RECURSIVE              = YES
+
+# Language settings
+OUTPUT_LANGUAGE        = Russian
+
+# Documentation extraction settings
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = YES
+
+# Warnings
+QUIET                  = NO
+WARNINGS               = YES
+WARN_IF_UNDOCUMENTED   = YES
+
+# Output formats
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+
+# Other settings
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = YES
+EXPAND_ONLY_PREDEF     = NO
