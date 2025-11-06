@@ -1,0 +1,70 @@
+/**
+ * @file Trait.dox
+ * @brief Документация для типов и признаков из src/Trait.h
+ */
+
+/**
+ * @struct ScL::Feature::Detail::IsWrapper
+ * @brief По умолчанию, типы не являются Wrapper.
+ */
+
+/**
+ * @typedef ScL::Feature::IsWrapper
+ * @brief Признак того, что тип является Wrapper.
+ */
+
+/**
+ * @struct ScL::Feature::Detail::IsThisCompatibleWithOther
+ * @brief Типы являются совместимыми, если они одинаковые
+ * или тип _Test является производным от типа _Other.
+ *
+ * Типы Wrapper являются совместимыми, если в них используется идентичный
+ * инструмент _Tool, и вложенные типы также являются совместимыми.
+ */
+
+/**
+ * @typedef ScL::Feature::IsThisCompatibleWithOther
+ * @brief Признак совместимости типов.
+ */
+
+/**
+ * @struct ScL::Feature::Detail::IsThisCompatibleWithPartOfOther
+ * @brief Типы, не являющиеся Wrapper, не имеют вложенных частей
+ *
+ * Тип является частью Wrapper, если он совместим
+ * с любой его вложенной частью.
+ *
+ * Один тип Wrapper является частью другого Wrapper,
+ * если он совместим с любой вложенной частью другого.
+ */
+
+/**
+ * @typedef ScL::Feature::IsThisCompatibleWithPartOfOther
+ * @brief Признак совместимости типа с вложенным типом другого.
+ */
+
+/**
+ * @struct ScL::Feature::Detail::IsPartOfThisCompatibleWithOther
+ * @brief Типы, не являющиеся Wrapper, не могут быть вложенными
+ *
+ * Один тип Wrapper является частью другого, если он совместим с любой
+ * вложенной частью другого.
+ */
+
+/**
+ * @typedef ScL::Feature::IsPartOfThisCompatibleWithOther
+ * @brief Признак совместимости вложенного типа с другим.
+ */
+
+/**
+ * @struct ScL::Feature::IsSimilar
+ * @brief Признак подобия типов. Типы считаются подобными, если у них одинаковые
+ * признаки const/volatile и rvalue/lvalue.
+ */
+
+/**
+ * @struct ScL::Feature::IsThisSpecifierCompatibleWithOther
+ * @brief Признак совместимости типов по спецификатору. Типы считаются совместимыми,
+ * если можно _Other поставить слева, а _Test справа при преобразовании
+ * спецификаторов const/volatile.
+ */

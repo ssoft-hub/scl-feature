@@ -1,0 +1,9 @@
+/**
+ * @file Wrapper.dox
+ * @brief Документация для типа Wrapper из src/Wrapper.h
+ */
+
+/**
+ * @typedef ScL::Feature::Wrapper
+ * @brief This is definition of Wrapper type. No tool duplicates are guarantee.
+ */

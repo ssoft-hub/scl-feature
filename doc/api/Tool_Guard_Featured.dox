@@ -1,0 +1,9 @@
+/**
+ * @file Tool_Guard.dox
+ * @brief Документация для Tool::Guard классов
+ */
+
+/**
+ * @fn ScL::Feature::Guard::Featured::Holder::value
+ * @brief Access to internal value of Holder for any king of referencies.
+ */

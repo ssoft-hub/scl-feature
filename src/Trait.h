@@ -17,7 +17,6 @@ namespace ScL::Feature::Detail
 
 namespace ScL::Feature::Detail
 {
-    //! По умолчанию, типы не являются Wrapper.
     template <typename>
     struct IsWrapper : ::std::false_type
     {};
@@ -29,7 +28,6 @@ namespace ScL::Feature::Detail
 
 namespace ScL::Feature
 {
-    //! Признак того, что тип является Wrapper.
     template <typename _Test>
     using IsWrapper = ::ScL::Feature::Detail::IsWrapper< ::std::remove_cv_t<_Test> >;
 
@@ -49,8 +47,6 @@ namespace ScL::Feature
 
 namespace ScL::Feature::Detail
 {
-    //! Типы являются совместимыми, если они одинаковые
-    /// или тип _Test является производным от типа _Other.
     template <typename _Test, typename _Other>
     struct IsThisCompatibleWithOther
         : ::std::integral_constant<bool,
@@ -59,8 +55,6 @@ namespace ScL::Feature::Detail
                       ::std::remove_cv_t<_Test> >::value>
     {};
 
-    //! Типы Wrapper являются совместимыми, если в них используется идентичный
-    /// инструмент _Tool, и вложенные типы также являются совместимыми.
     template <typename _Test, typename _Other, typename _Tool>
     struct IsThisCompatibleWithOther< ::ScL::Feature::Detail::Wrapper<_Test, _Tool>,
         ::ScL::Feature::Detail::Wrapper<_Other, _Tool> >
@@ -71,7 +65,6 @@ namespace ScL::Feature::Detail
 
 namespace ScL::Feature
 {
-    //! Признак совместимости типов.
     template <typename _Test, typename _Other>
     using IsThisCompatibleWithOther = ::ScL::Feature::Detail::IsThisCompatibleWithOther<
         ::std::remove_cv_t<_Test>,
@@ -97,13 +90,10 @@ namespace ScL::Feature
 
 namespace ScL::Feature::Detail
 {
-    //! Типы, не являющиеся Wrapper, не имеют вложенных частей
     template <typename _Test, typename _Other>
     struct IsThisCompatibleWithPartOfOther : ::std::false_type
     {};
 
-    //! Тип является частью Wrapper, если он совместим
-    ///  с любой его вложенной частью
     template <typename _Test, typename _Other, typename _OtherTool>
     struct IsThisCompatibleWithPartOfOther<_Test,
         ::ScL::Feature::Detail::Wrapper<_Other, _OtherTool> >
@@ -112,8 +102,6 @@ namespace ScL::Feature::Detail
                   ::std::remove_cv_t<_Other> >::value>
     {};
 
-    //! Один тип Wrapper является частью другого Wrapper,
-    /// если он совместим с любой вложенной частью другого.
     template <typename _Test, typename _TestTool, typename _Other, typename _OtherTool>
     struct IsThisCompatibleWithPartOfOther< ::ScL::Feature::Detail::Wrapper<_Test, _TestTool>,
         ::ScL::Feature::Detail::Wrapper<_Other, _OtherTool> >
@@ -129,7 +117,6 @@ namespace ScL::Feature::Detail
 
 namespace ScL::Feature
 {
-    //! Признак совместимости типа с вложенным типом другого.
     template <typename _Test, typename _Other>
     using IsThisCompatibleWithPartOfOther = ::ScL::Feature::Detail::IsThisCompatibleWithPartOfOther<
         ::std::remove_cv_t<_Test>,
@@ -157,7 +144,6 @@ namespace ScL::Feature
 
 namespace ScL::Feature::Detail
 {
-    //! Типы, не являющиеся Wrapper, не могут быть вложенными
     template <typename _Test, typename _Other>
     struct IsPartOfThisCompatibleWithOther : ::std::false_type
     {};
@@ -170,8 +156,6 @@ namespace ScL::Feature::Detail
                   ::std::remove_cv_t<_Other> >::value>
     {};
 
-    //!< Один тип Wrapper является частью другого, если он совместим с любой
-    /// вложенной частью другого.
     template <typename _Test, typename _TestTool, typename _Other, typename _OtherTool>
     struct IsPartOfThisCompatibleWithOther< ::ScL::Feature::Detail::Wrapper<_Test, _TestTool>,
         ::ScL::Feature::Detail::Wrapper<_Other, _OtherTool> >
@@ -186,7 +170,6 @@ namespace ScL::Feature::Detail
 
 namespace ScL::Feature
 {
-    //! Признак совместимости вложенного типа с другим.
     template <typename _Test, typename _Other>
     using IsPartOfThisCompatibleWithOther = ::ScL::Feature::Detail::IsPartOfThisCompatibleWithOther<
         ::std::remove_cv_t<_Test>,
@@ -214,8 +197,6 @@ namespace ScL::Feature
 
 namespace ScL::Feature
 {
-    //! Признак подобия типов. Типы считаются подобными, если у них одинаковые
-    /// признаки const/volatile и rvalue/lvalue.
     template <typename _Test, typename _Other>
     struct IsSimilar
         : ::std::integral_constant<bool,
@@ -245,9 +226,6 @@ namespace ScL::Feature
 
 namespace ScL::Feature
 {
-    //! Признак совместимости типов по спецификатору. Типы считаются совместимыми,
-    /// если можно _Other поставить слева, а _Test справа при преобразовании
-    /// спецификаторов const/volatile.
     template <typename _Test, typename _Other>
     struct IsThisSpecifierCompatibleWithOther
         : ::std::integral_constant<bool,

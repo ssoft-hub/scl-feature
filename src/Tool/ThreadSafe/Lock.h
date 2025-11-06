@@ -183,7 +183,6 @@ namespace ScL::Feature::ThreadSafe
                 WritableGuard guard(*this);
             }
 
-            //! Guard internal value of Holder for any king of referencies.
             template <typename _HolderRefer>
             static constexpr void guard(_HolderRefer && holder)
             {
@@ -193,7 +192,6 @@ namespace ScL::Feature::ThreadSafe
                         HolderRefer> >::lock(::std::forward<HolderRefer>(holder).m_lock);
             }
 
-            //! Unguard internal value of Holder for any king of referencies.
             template <typename _HolderRefer>
             static constexpr void unguard(_HolderRefer && holder)
             {
@@ -203,7 +201,6 @@ namespace ScL::Feature::ThreadSafe
                         HolderRefer> >::unlock(::std::forward<HolderRefer>(holder).m_lock);
             }
 
-            //! Access to internal value of Holder for any king of referencies.
             template <typename _HolderRefer>
             static constexpr decltype(auto) value(_HolderRefer && holder)
             {

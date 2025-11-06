@@ -137,7 +137,6 @@ namespace ScL::Feature::Heap
                 return ::std::forward<_LeftWrapperRefer>(left);
             }
 
-            //! Access to internal value of Holder for any king of referencies.
             template <typename _HolderRefer>
             static constexpr decltype(auto) value(_HolderRefer && holder)
             {

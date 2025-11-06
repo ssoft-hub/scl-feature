@@ -81,7 +81,6 @@ namespace ScL::Feature::Detail
     };
 } // namespace ScL::Feature::Detail
 
-//! This is definition of Wrapper type. No tool duplicates are guarantee.
 namespace ScL::Feature
 {
     template <typename _Value, typename... _Tools>

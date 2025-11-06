@@ -1,0 +1,9 @@
+/**
+ * @file Tool.dox
+ * @brief Документация для Tool классов
+ */
+
+/**
+ * @fn ScL::Feature::Heap::Raw::Holder::value
+ * @brief Access to internal value of Holder for any king of referencies.
+ */

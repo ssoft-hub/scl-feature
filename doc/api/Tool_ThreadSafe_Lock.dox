@@ -1,0 +1,19 @@
+/**
+ * @file Tool_ThreadSafe.dox
+ * @brief Документация для Tool::ThreadSafe классов
+ */
+
+/**
+ * @fn ScL::Feature::ThreadSafe::Lock::Holder::guard
+ * @brief Guard internal value of Holder for any king of referencies.
+ */
+
+/**
+ * @fn ScL::Feature::ThreadSafe::Lock::Holder::unguard
+ * @brief Unguard internal value of Holder for any king of referencies.
+ */
+
+/**
+ * @fn ScL::Feature::ThreadSafe::Lock::Holder::value
+ * @brief Access to internal value of Holder for any king of referencies.
+ */
