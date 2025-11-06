@@ -5,5 +5,5 @@
 
 /**
  * @fn ScL::Feature::Heap::Raw::Holder::value
- * @brief Access to internal value of Holder for any king of referencies.
+ * @brief Access to internal value of Holder for any kind of referencies.
  */

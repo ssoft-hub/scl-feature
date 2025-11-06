@@ -5,15 +5,15 @@
 
 /**
  * @fn ScL::Feature::ThreadSafe::Lock::Holder::guard
- * @brief Guard internal value of Holder for any king of referencies.
+ * @brief Guard internal value of Holder for any kind of referencies.
  */
 
 /**
  * @fn ScL::Feature::ThreadSafe::Lock::Holder::unguard
- * @brief Unguard internal value of Holder for any king of referencies.
+ * @brief Unguard internal value of Holder for any kind of referencies.
  */
 
 /**
  * @fn ScL::Feature::ThreadSafe::Lock::Holder::value
- * @brief Access to internal value of Holder for any king of referencies.
+ * @brief Access to internal value of Holder for any kind of referencies.
  */
