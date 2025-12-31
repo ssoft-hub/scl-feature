@@ -1,5 +1,6 @@
-#include <ScL/Feature.h>
-#include <cstring>
+#include <scl/feature.h>
+
+#include <string>
 #include <string_view>
 
 class MyData

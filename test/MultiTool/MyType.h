@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ScL/Feature.h>
+#include <scl/feature.h>
 
 #include <string>
 

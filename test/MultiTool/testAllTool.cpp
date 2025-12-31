@@ -1,8 +1,7 @@
 #include "MyType.h"
 
-#include <ScL/Utility/Qualifier.h>
-
 #include <iostream>
+#include <utility>
 
 using namespace ::ScL::Feature;
 using namespace ::std;
@@ -28,7 +27,7 @@ void testTool()
     // (например, системные блокировки и т.п.)
 
     // Гарант свойств для применения константного значения value
-    auto cvalue_ptr = &::ScL::asConst(value);
+    auto cvalue_ptr = &::std::as_const(value);
 
     // value
     cout << "Test tool:" << endl

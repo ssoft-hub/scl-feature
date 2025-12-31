@@ -1,5 +1,6 @@
-#include "ScL/Feature.h"
-#include "ScL/Utility.h"
+#include <scl/feature.h>
+#include <scl/utility.h>
+
 #include <iostream>
 #include <map>
 #include <string>

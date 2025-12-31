@@ -2,11 +2,12 @@
 // #pragma warning( disable : 4552 4553 )
 // #endif
 
-#include <ScL/Feature.h>
-#include <ScL/Utility.h>
 #include <iostream>
 #include <type_traits>
 #include <vector>
+
+#include <scl/feature.h>
+#include <scl/utility.h>
 
 #if defined(__GNUC__)
 #include <cxxabi.h>

@@ -1,5 +1,4 @@
-#include <ScL/Feature/Wrapper.h>
-#include <ScL/Utility/Qualifier.h>
+#include <scl/feature/wrapper.h>
 
 #include "BaseType.h"
 #include "DerivedType.h"
@@ -21,7 +20,8 @@ using HeapString = Wrapper< ::std::string, Tool>;
 
 void printBase(BaseType const & base_value)
 {
-    ::std::cout << "Base: " << base_value.m_int << " " << base_value.m_string << ::std::endl;
+    ::std::cout << "Base: " << base_value.m_int << " " << base_value.m_string
+                << "\n"; //::std::endl;
 }
 
 void testBase()
@@ -32,9 +32,9 @@ void testBase()
 
     default_base_value = contruct_base_value;
 
-    printBase(*&::ScL::asConst(default_base_value));
-    printBase(*&::ScL::asConst(contruct_base_value));
-    printBase(*&::ScL::asConst(move_base_value));
+    printBase(*&::std::as_const(default_base_value));
+    printBase(*&::std::as_const(contruct_base_value));
+    printBase(*&::std::as_const(move_base_value));
 }
 
 void testBaseSetting()
@@ -43,26 +43,26 @@ void testBaseSetting()
 
     base_value->m_int = 1;
     base_value->m_string = "one";
-    printBase(*&::ScL::asConst(base_value));
+    printBase(*&::std::as_const(base_value));
 
     base_value->m_int = BaseInt(2);
     base_value->m_string = BaseString("two");
-    printBase(*&::ScL::asConst(base_value));
+    printBase(*&::std::as_const(base_value));
 
     base_value->m_int = DerivedInt(3);
     base_value->m_string = DerivedString("three");
-    printBase(*&::ScL::asConst(base_value));
+    printBase(*&::std::as_const(base_value));
 
     base_value->m_int = HeapInt(4);
     base_value->m_string = HeapString("four");
-    printBase(*&::ScL::asConst(base_value));
+    printBase(*&::std::as_const(base_value));
 }
 
 void printDerived(DerivedType const & derived_value)
 {
     printBase(derived_value);
     ::std::cout << "Derived: " << derived_value.m_int << " " << derived_value.m_string
-                << ::std::endl;
+                << "\n"; // ::std::endl;
 }
 
 void testDerived()
@@ -73,9 +73,9 @@ void testDerived()
 
     default_derived_value = contruct_derived_value; //
 
-    printDerived(*&::ScL::asConst(default_derived_value));
-    printDerived(*&::ScL::asConst(contruct_derived_value));
-    printDerived(*&::ScL::asConst(move_derived_value));
+    printDerived(*&::std::as_const(default_derived_value));
+    printDerived(*&::std::as_const(contruct_derived_value));
+    printDerived(*&::std::as_const(move_derived_value));
 }
 
 void testBaseDerivedSetting()
@@ -89,29 +89,29 @@ void testBaseDerivedSetting()
     derived_value->BaseType::m_string = "one";
     derived_value->m_int = -1;
     derived_value->m_string = "negative one";
-    printDerived(*&::ScL::asConst(derived_value));
+    printDerived(*&::std::as_const(derived_value));
 
     derived_value->BaseType::m_int = BaseInt(2);
     derived_value->BaseType::m_string = BaseString("two");
     derived_value->m_int = BaseInt(-2);
     derived_value->m_string = BaseString("negative two");
-    printDerived(*&::ScL::asConst(derived_value));
+    printDerived(*&::std::as_const(derived_value));
 
     derived_value->BaseType::m_int = DerivedInt(3);
     derived_value->BaseType::m_string = DerivedString("three");
-    derived_value->m_int = ::ScL::asConst(DerivedInt(-3));
+    derived_value->m_int = DerivedInt(-3);
     derived_value->m_string = DerivedString("negative three");
-    printDerived(*&::ScL::asConst(derived_value));
+    printDerived(*&::std::as_const(derived_value));
 
     derived_value->BaseType::m_int = HeapInt(4);
     derived_value->BaseType::m_string = HeapString("four");
     derived_value->m_int = HeapInt(-4);
     derived_value->m_string = HeapString("negative four");
-    printDerived(*&::ScL::asConst(derived_value));
+    printDerived(*&::std::as_const(derived_value));
 
     Wrapper<BaseTestType> base_value;
     base_value = derived_value; // OK
-    printBase(*&::ScL::asConst(base_value));
+    printBase(*&::std::as_const(base_value));
 
     // Wrapper< DerivedType > other_derived_value = base_value; //ERROR
 }

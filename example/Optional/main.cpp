@@ -1,8 +1,8 @@
 #include <iostream>
 #include <string>
 
-#include <ScL/Feature/Tool.h>
-#include <ScL/Feature/Wrapper.h>
+#include <scl/feature/tool.h>
+#include <scl/feature/wrapper.h>
 
 using namespace ::ScL::Feature;
 using OptionalString = Wrapper<std::string, Inplace::Optional>;

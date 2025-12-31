@@ -1,0 +1,26 @@
+PROJECT_NAME           = SCL.Feature
+PROJECT_NUMBER         = 0.1.0
+PROJECT_BRIEF          = "C++20 feature wrappers (thread safety, reflection)"
+
+INPUT                  = ./src
+RECURSIVE              = YES
+FILE_PATTERNS          = *.h *.hpp *.hh *.hxx
+
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = YES
+
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = YES
+EXPAND_ONLY_PREDEF     = NO
+
+OUTPUT_DIRECTORY       = ./doc/doxygen
+GENERATE_HTML          = NO
+GENERATE_LATEX         = NO
+GENERATE_XML           = YES
+XML_OUTPUT             = xml
+XML_PROGRAMLISTING     = YES
+
+QUIET                  = YES
+WARNINGS               = YES
+WARN_IF_UNDOCUMENTED   = NO

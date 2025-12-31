@@ -1,6 +1,7 @@
-#include <ScL/Feature/Tool.h>
-#include <ScL/Feature/Wrapper.h>
 #include <iostream>
+
+#include <scl/feature/tool.h>
+#include <scl/feature/wrapper.h>
 
 using namespace ::ScL::Feature;
 

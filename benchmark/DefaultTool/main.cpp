@@ -1,4 +1,4 @@
-#include <ScL/Feature.h>
+#include <scl/feature.h>
 #include <chrono>
 #include <iostream>
 #include <vector>

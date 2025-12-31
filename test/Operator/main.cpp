@@ -1,31 +1,23 @@
-#include <ScL/Feature.h>
+#include <scl/feature.h>
 
 class Test
 {
     int m_int;
 
 public:
-    const int & operator[](int) const
-    {
-        return m_int;
-    }
+    int const & operator[](int) const { return m_int; }
 };
 
 using namespace ::ScL::Feature;
-using namespace ::ScL::Meta;
-
-static_assert(isDetected<SquareBracketsUnstrictOperation, Test, int>(), "");
-static_assert(isDetected<SquareBracketsMemberStrictOperation, Test const, int>(), "");
+static_assert(::scl::is_detected_v<::scl::subscript_operation, Test, int>, "");
+static_assert(::scl::is_detected_v<::scl::subscript_member_exact_operation, Test const, int>, "");
 
 #include <iomanip>
 #include <ostream>
 #include <sstream>
 #include <vector>
 
-::std::ostream & my(::std::ostream & stream)
-{
-    return stream;
-}
+::std::ostream & my(::std::ostream & stream) { return stream; }
 
 void wrapper()
 {
@@ -38,7 +30,8 @@ void wrapper()
     ::std::cout << ::std::setbase(16);
 
     static_assert(
-        ::ScL::Meta::isDetected< ::ScL::Meta::LeftShiftMemberStrictOperation, decltype(::std::cout), int>(), "");
+        ::scl::is_detected_v<::scl::left_shift_member_exact_operation, decltype(::std::cout), int>,
+        "");
 
     ::std::cout << i;
     ::std::cout << n << n << test[1] << ::std::flush << ::std::endl;
@@ -56,7 +49,7 @@ void wrapper()
     sstream << Endl(::std::endl);
     sstream << ::std::endl;
 
-    static_assert(::ScL::Meta::isDetected< ::ScL::Meta::LeftShiftUnstrictOperation, SStream, Endl>(), "");
+    static_assert(::scl::is_detected_v<::scl::left_shift_operation, SStream, Endl>, "");
 }
 
 void test()

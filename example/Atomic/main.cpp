@@ -4,12 +4,11 @@
 #include <thread>
 #include <vector>
 
-#include <ScL/Feature/Cast.h>
-#include <ScL/Feature/Guard.h>
-#include <ScL/Feature/Reflection/Std.h>
-#include <ScL/Feature/Tool.h>
-#include <ScL/Feature/Wrapper.h>
-#include <ScL/Utility/Qualifier.h>
+#include <scl/feature/cast.h>
+#include <scl/feature/guard.h>
+#include <scl/feature/reflection/std.h>
+#include <scl/feature/tool.h>
+#include <scl/feature/wrapper.h>
 
 using namespace ::ScL::Feature;
 

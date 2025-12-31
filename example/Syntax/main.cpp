@@ -1,5 +1,5 @@
-#include <ScL/Feature/Tool.h>
-#include <ScL/Feature/Wrapper.h>
+#include <scl/feature/tool.h>
+#include <scl/feature/wrapper.h>
 #include <map>
 
 using namespace ScL::Feature;

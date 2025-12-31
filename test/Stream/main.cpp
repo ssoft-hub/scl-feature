@@ -1,4 +1,4 @@
-#include <ScL/Feature.h>
+#include <scl/feature.h>
 #include <iostream>
 #include <type_traits>
 

@@ -1,6 +1,6 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
-#include <ScL/Feature.h>
+#include <scl/feature.h>
 
 #include <doctest.h>
 
