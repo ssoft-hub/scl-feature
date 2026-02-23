@@ -1,0 +1,22 @@
+stages: [mirror]
+
+# ---------------------
+# Mirror to GitHub
+# ---------------------
+mirror:github:
+  stage: mirror
+  image:
+    name: alpine/git
+    entrypoint: [""]
+  rules:
+    - if: $CI_COMMIT_BRANCH
+    - if: $CI_COMMIT_TAG
+  variables:
+    GIT_STRATEGY: clone
+    GIT_DEPTH: 0
+    # Set in GitLab CI/CD group variables (ssoft-scl):
+    #   GITHUB_TOKEN       - GitHub PAT with Contents: Write (masked)
+    # Set in GitLab CI/CD project variables:
+    #   GITHUB_MIRROR_URL  - https://github.com/ssoft-hub/scl-feature.git
+  script:
+    - sh script/ci/mirror_github.sh
