@@ -7,11 +7,11 @@
 #include <scl/feature/trait.h>
 #include <scl/utility/type_traits.h>
 
-namespace ScL::Feature::Detail
+namespace scl::feature::detail
 {
     template <typename _LeftWrapper, typename _RightRefer>
     struct WrapperResolverHelper;
-} // namespace ScL::Feature::Detail
+} // namespace scl::feature::detail
 
 /*!
  * Вычислитель необходимого способа предоставления доступа к экземпляру значения
@@ -20,19 +20,19 @@ namespace ScL::Feature::Detail
  * Если типы _LeftWrapper и _RightRefer между собой являются совместимыми,
  * или _RightRefer совместим с любой внутренней частью _LeftWrapper,
  *
- * то операция выполняется между внутренними представлениями Wrapper.
+ * то операция выполняется между внутренними представлениями wrapper.
  * Если данный тип совместим с внутренней частью другого, то другой
  * "разрешается" до типа совместимого с этим. Во всех других случаях
  * другой "разрешается" до базового внутреннего значения.
  */
-namespace ScL::Feature::Detail
+namespace scl::feature::detail
 {
     template <typename _LeftWrapper, typename _RightRefer>
-    using WrapperResolver = typename ::ScL::Feature::Detail::WrapperResolverHelper<_LeftWrapper,
+    using WrapperResolver = typename ::scl::feature::detail::WrapperResolverHelper<_LeftWrapper,
         _RightRefer>::Type;
-} // namespace ScL::Feature::Detail
+} // namespace scl::feature::detail
 
-namespace ScL::Feature::Detail
+namespace scl::feature::detail
 {
     template <typename _LeftWrapper, typename _RightRefer>
     class RightCompatibleWithLeftWrapperResolver;
@@ -45,7 +45,7 @@ namespace ScL::Feature::Detail
 
     template <typename _LeftWrapper, typename _RightRefer>
     class ValueWrapperResolver;
-} // namespace ScL::Feature::Detail
+} // namespace scl::feature::detail
 
 /*
  * NOTE: Можно было бы реализовать случай преобразования одного вида Holder
@@ -53,7 +53,7 @@ namespace ScL::Feature::Detail
  * Holder и позволит получить доступ к его внутреннему содержимому,
  * что в свою очередь может изменить ожидаемое поведение.
  */
-namespace ScL::Feature::Detail
+namespace scl::feature::detail
 {
     template <typename _LeftWrapper, typename _RightRefer>
     struct WrapperResolverHelper
@@ -63,21 +63,21 @@ namespace ScL::Feature::Detail
         using RightWrapper = ::std::remove_reference_t<_RightRefer>;
 
         using Type = ::std::conditional_t<
-            ::ScL::Feature::IsThisCompatibleWithOther<RightWrapper, LeftWrapper>::value,
-            ::ScL::Feature::Detail::RightCompatibleWithLeftWrapperResolver<LeftWrapper, RightRefer>,
+            ::scl::feature::IsThisCompatibleWithOther<RightWrapper, LeftWrapper>::value,
+            ::scl::feature::detail::RightCompatibleWithLeftWrapperResolver<LeftWrapper, RightRefer>,
             ::std::conditional_t<
-                ::ScL::Feature::IsThisCompatibleWithPartOfOther<RightWrapper, LeftWrapper>::value,
-                ::ScL::Feature::Detail::RightCompatibleWithPartOfLeftWrapperResolver<LeftWrapper,
+                ::scl::feature::IsThisCompatibleWithPartOfOther<RightWrapper, LeftWrapper>::value,
+                ::scl::feature::detail::RightCompatibleWithPartOfLeftWrapperResolver<LeftWrapper,
                     RightRefer>,
-                ::std::conditional_t< ::ScL::Feature::IsPartOfThisCompatibleWithOther<RightWrapper,
+                ::std::conditional_t< ::scl::feature::IsPartOfThisCompatibleWithOther<RightWrapper,
                                           LeftWrapper>::value,
-                    ::ScL::Feature::Detail::PartOfRightCompatibleWithLeftWrapperResolver<LeftWrapper,
+                    ::scl::feature::detail::PartOfRightCompatibleWithLeftWrapperResolver<LeftWrapper,
                         RightRefer>,
-                    ::ScL::Feature::Detail::ValueWrapperResolver<LeftWrapper, RightRefer> > > >;
+                    ::scl::feature::detail::ValueWrapperResolver<LeftWrapper, RightRefer> > > >;
     };
-} // namespace ScL::Feature::Detail
+} // namespace scl::feature::detail
 
-namespace ScL::Feature::Detail
+namespace scl::feature::detail
 {
     /*!
      * Используется, если _Other совместим с _LeftWrapper.
@@ -90,7 +90,7 @@ namespace ScL::Feature::Detail
         using RightRefer = _RightRefer;
         using RightWrapper = ::std::remove_reference_t<RightRefer>;
         using RightHolder = typename RightWrapper::Holder;
-        using RightHolderRefer = ::ScL::SimilarRefer<RightHolder, RightRefer>;
+        using RightHolderRefer = ::scl::SimilarRefer<RightHolder, RightRefer>;
         using AccessRefer = RightHolderRefer;
 
     private:
@@ -103,13 +103,13 @@ namespace ScL::Feature::Detail
 
         AccessRefer resolve() const
         {
-            return ::ScL::Feature::Detail::wrapperHolder<RightRefer>(
+            return ::scl::feature::detail::wrapperHolder<RightRefer>(
                 ::std::forward<RightRefer>(m_right_refer));
         }
     };
-} // namespace ScL::Feature::Detail
+} // namespace scl::feature::detail
 
-namespace ScL::Feature::Detail
+namespace scl::feature::detail
 {
     /*!
      * Используется, если _Right совместим c вложенной частью _LeftWrapper.
@@ -132,9 +132,9 @@ namespace ScL::Feature::Detail
 
         AccessRefer resolve() const { return ::std::forward<AccessRefer>(m_right_refer); }
     };
-} // namespace ScL::Feature::Detail
+} // namespace scl::feature::detail
 
-namespace ScL::Feature::Detail
+namespace scl::feature::detail
 {
     /*!
      * Используется, если _LeftWrapper совместим с вложенной частью _Right.
@@ -145,20 +145,20 @@ namespace ScL::Feature::Detail
     public:
         using LeftWrapper = _LeftWrapper;
         using RightRefer = _RightRefer;
-        using RightWrapperGuard = ::ScL::Feature::WrapperGuard<RightRefer>;
+        using RightWrapperGuard = ::scl::feature::WrapperGuard<RightRefer>;
         using RightWrapper = ::std::remove_reference_t<RightRefer>;
         using RightValue = typename RightWrapper::Value;
-        using RightValueRefer = ::ScL::SimilarRefer<RightValue, RightRefer>;
-        using NextResolver = ::ScL::Feature::Detail::WrapperResolver<LeftWrapper, RightValueRefer>;
+        using RightValueRefer = ::scl::SimilarRefer<RightValue, RightRefer>;
+        using NextResolver = ::scl::feature::detail::WrapperResolver<LeftWrapper, RightValueRefer>;
         using AccessRefer = typename NextResolver::AccessRefer;
 
-        static_assert(::ScL::Feature::isWrapper<LeftWrapper>(),
-            "The template parameter _LeftWrapper must to be a Wrapper type!");
+        static_assert(::scl::feature::isWrapper<LeftWrapper>(),
+            "The template parameter _LeftWrapper must to be a wrapper type!");
         static_assert(::std::is_reference<RightRefer>::value,
             "The template parameter _RightRefer must to be a reference type.");
-        static_assert(::ScL::Feature::isWrapper<RightWrapper>(),
-            "The template parameter _RightRefer must to be a Wrapper type reference!");
-        // static_assert( ::ScL::Feature::isSimilar< RightRefer, RightValueRefer >(), "The
+        static_assert(::scl::feature::isWrapper<RightWrapper>(),
+            "The template parameter _RightRefer must to be a wrapper type reference!");
+        // static_assert( ::scl::feature::isSimilar< RightRefer, RightValueRefer >(), "The
         // RightRefer and RightValueRefer must to be similar types!" );
 
     private:
@@ -176,9 +176,9 @@ namespace ScL::Feature::Detail
             return ::std::forward<AccessRefer>(m_next_resolver.resolve());
         }
     };
-} // namespace ScL::Feature::Detail
+} // namespace scl::feature::detail
 
-namespace ScL::Feature::Detail
+namespace scl::feature::detail
 {
     /*!
      * Используется, если _LeftWrapper не совместим с _Right.
@@ -189,10 +189,10 @@ namespace ScL::Feature::Detail
     public:
         using LeftWrapper = _LeftWrapper;
         using RightRefer = _RightRefer;
-        using RightValueGuard = ::ScL::Feature::ValueGuard<RightRefer>;
+        using RightValueGuard = ::scl::feature::ValueGuard<RightRefer>;
         using AccessRefer = typename RightValueGuard::ValueRefer;
 
-        static_assert(::ScL::Feature::isWrapper<LeftWrapper>(),
+        static_assert(::scl::feature::isWrapper<LeftWrapper>(),
             "The template parameter _LeftWrapper must to be a wrapper!");
         static_assert(::std::is_reference<RightRefer>::value,
             "The template parameter _RightRefer must to be a reference type.");
@@ -212,6 +212,6 @@ namespace ScL::Feature::Detail
             return ::std::forward<AccessRefer>(m_value_guard.valueAccess());
         }
     };
-} // namespace ScL::Feature::Detail
+} // namespace scl::feature::detail
 
 #endif

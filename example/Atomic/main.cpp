@@ -10,19 +10,19 @@
 #include <scl/feature/tool.h>
 #include <scl/feature/wrapper.h>
 
-using namespace ::ScL::Feature;
+using namespace ::scl::feature;
 
 using Key = ::std::string;
 using Value = ::std::pair<::std::string, int>;
 using Map = ::std::map<::std::string, ::std::pair<::std::string, int>>;
 
-using AtomicMutexMap = Wrapper<Map, ThreadSafe::Atomic>;
-using RecursiveMutexMap = Wrapper<Map, ThreadSafe::RecursiveMutex>;
-using SharedMutexMap = Wrapper<Map, ThreadSafe::SharedMutex>;
-using CowRecursiveMutexMap = Wrapper<Map, Implicit::Raw, ThreadSafe::RecursiveMutex>;
+using AtomicMutexMap = wrapper<Map, ThreadSafe::Atomic>;
+using RecursiveMutexMap = wrapper<Map, ThreadSafe::RecursiveMutex>;
+using SharedMutexMap = wrapper<Map, ThreadSafe::SharedMutex>;
+using CowRecursiveMutexMap = wrapper<Map, Implicit::Raw, ThreadSafe::RecursiveMutex>;
 
-using DefaultMap = Wrapper<Map, Inplace::Default>;
-using ImplicitMap = Wrapper<Map, Implicit::Raw>;
+using DefaultMap = wrapper<Map, Inplace::Default>;
+using ImplicitMap = wrapper<Map, Implicit::Raw>;
 
 template <typename _MapType>
 void func(_MapType & test_map)

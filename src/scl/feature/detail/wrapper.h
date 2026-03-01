@@ -12,30 +12,30 @@
 
 #include <scl/feature/mixin.h>
 
-namespace ScL::Feature::Detail
+namespace scl::feature::detail
 {
     /*!
      * Класс для формирования экземпляра значения _Value, наделенными дополнительными
      * свойствами. Дополнительные свойства реализуются посредством функциональности _Tool.
      */
     template <typename _Value, typename _Tool>
-    class Wrapper final
-        : public ::ScL::Feature::MixIn<Wrapper<_Value, _Tool>,
+    class wrapper final
+        : public ::scl::feature::MixIn<wrapper<_Value, _Tool>,
               typename _Tool::template Holder<_Value>>
     {
         static_assert(!::std::is_reference<_Tool>::value,
             "The template parameter _Tool must to be not a reference type.");
 
         template <typename, typename, typename>
-        friend class ::ScL::Feature::ValueReflectionMixIn;
+        friend class ::scl::feature::ValueReflectionMixIn;
         template <typename, typename, typename>
-        friend class ::ScL::Feature::ToolReflectionMixIn;
+        friend class ::scl::feature::ToolReflectionMixIn;
         template <typename>
-        friend class ::ScL::Feature::ToolAdditionMixIn;
+        friend class ::scl::feature::ToolAdditionMixIn;
         template <typename>
-        friend struct ::ScL::Feature::Detail::WrapperAccess;
+        friend struct ::scl::feature::detail::WrapperAccess;
 
-        using ThisType = ::ScL::Feature::Detail::Wrapper<_Value, _Tool>;
+        using ThisType = ::scl::feature::detail::wrapper<_Value, _Tool>;
 
     public:
         using Value = _Value;
@@ -50,7 +50,7 @@ namespace ScL::Feature::Detail
         /// Конструктор инициализации значения по заданным параметрам
         template <typename... _Arguments,
             typename = ::std::enable_if_t<::std::is_constructible<Holder, _Arguments &&...>::value>>
-        constexpr Wrapper(_Arguments &&... arguments)
+        constexpr wrapper(_Arguments &&... arguments)
             noexcept(::std::is_nothrow_constructible<Holder, _Arguments &&...>::value)
             : m_holder{::std::forward<_Arguments>(arguments)...}
         {}
@@ -60,7 +60,7 @@ namespace ScL::Feature::Detail
             typename = ::std::enable_if_t<::std::is_constructible<Holder,
                 ::std::initializer_list<_Type>,
                 _Arguments &&...>::value>>
-        constexpr Wrapper(::std::initializer_list<_Type> list, _Arguments &&... arguments)
+        constexpr wrapper(::std::initializer_list<_Type> list, _Arguments &&... arguments)
             noexcept(::std::is_nothrow_constructible<Holder,
                 ::std::initializer_list<_Type>,
                 _Arguments &&...>::value)
@@ -69,10 +69,10 @@ namespace ScL::Feature::Detail
 
         /* All kind of constructors for ThisType */
         SCL_CONSTRUCTOR_FOR_THIS_WRAPPER
-        /* All kind of constructors for Wrapper< _OtherValue, _OtherTool > */
+        /* All kind of constructors for wrapper< _OtherValue, _OtherTool > */
         SCL_CONSTRUCTOR_FOR_OTHER_WRAPPER
 
-        /* All kind of assignment operators for any type (including Wrapper< _OtherValue, _Other >)
+        /* All kind of assignment operators for any type (including wrapper< _OtherValue, _Other >)
          */
         SCL_BINARY_OPERATOR_FOR_ANY(=, Assignment)
 
@@ -148,12 +148,12 @@ namespace ScL::Feature::Detail
             using Function = Value & (*)(Value &);
             using LeftRefer = ThisType &;
             using RightRefer = Function &&;
-            return ::ScL::Feature::Detail::Operator::Binary::LeftShiftHelper<LeftRefer,
+            return ::scl::feature::detail::Operator::Binary::LeftShiftHelper<LeftRefer,
                 RightRefer>::invoke(::std::forward<LeftRefer>(*this),
                 ::std::forward<RightRefer>(right));
         }
     };
-} // namespace ScL::Feature::Detail
+} // namespace scl::feature::detail
 
 /* RIGHT-SIDE WRAPPER OPERATORS */
 
@@ -197,9 +197,9 @@ SCL_GLOBAL_BINARY_OPERATOR(>>, RightShift)
 namespace std
 {
     template <typename _Type, typename _Tool>
-    struct hash<::ScL::Feature::Detail::Wrapper<_Type, _Tool>>
+    struct hash<::scl::feature::detail::wrapper<_Type, _Tool>>
     {
-        using Key = ::ScL::Feature::Detail::Wrapper<_Type, _Tool>;
+        using Key = ::scl::feature::detail::wrapper<_Type, _Tool>;
         ::std::size_t operator()(Key const & key) const noexcept
         {
             using Type = ::std::remove_reference_t<decltype(*&::std::declval<Key>())>;
@@ -208,87 +208,87 @@ namespace std
     };
 } // namespace std
 
-namespace ScL::Feature::Detail
+namespace scl::feature::detail
 {
     template <typename Self_, typename SelfHolder_, typename Value_, typename Tool_, typename Tool1_>
-    class ReflectionMixIn<Self_, SelfHolder_, Wrapper<Wrapper<Value_, Tool_>, Tool1_>>
-        : public ReflectionMixIn<Self_, SelfHolder_, Wrapper<Value_, Tool_>>
-        , public ::ScL::Feature::ValueReflectionMixIn<Self_, SelfHolder_, Wrapper<Value_, Tool_>>
-        , public ::ScL::Feature::ToolReflectionMixIn<Self_, SelfHolder_, Tool_>
+    class ReflectionMixIn<Self_, SelfHolder_, wrapper<wrapper<Value_, Tool_>, Tool1_>>
+        : public ReflectionMixIn<Self_, SelfHolder_, wrapper<Value_, Tool_>>
+        , public ::scl::feature::ValueReflectionMixIn<Self_, SelfHolder_, wrapper<Value_, Tool_>>
+        , public ::scl::feature::ToolReflectionMixIn<Self_, SelfHolder_, Tool_>
     {
         static_assert(!::std::is_reference_v<Self_>);
         static_assert(!::std::is_reference_v<SelfHolder_>);
     };
 
     template <typename Self_, typename SelfHolder_, typename Value_, typename Tool_, typename Tool1_>
-    class ReflectionMixIn<Self_, SelfHolder_, Wrapper<Wrapper<Value_, Tool_> const, Tool1_>>
-        : public ReflectionMixIn<Self_, SelfHolder_, Wrapper<Wrapper<Value_, Tool_>, Tool1_>>
+    class ReflectionMixIn<Self_, SelfHolder_, wrapper<wrapper<Value_, Tool_> const, Tool1_>>
+        : public ReflectionMixIn<Self_, SelfHolder_, wrapper<wrapper<Value_, Tool_>, Tool1_>>
     {};
 
     template <typename Self_, typename SelfHolder_, typename Value_, typename Tool_, typename Tool1_>
-    class ReflectionMixIn<Self_, SelfHolder_, Wrapper<Wrapper<Value_, Tool_> volatile, Tool1_>>
-        : public ReflectionMixIn<Self_, SelfHolder_, Wrapper<Wrapper<Value_, Tool_>, Tool1_>>
-    {};
-
-    template <typename Self_, typename SelfHolder_, typename Value_, typename Tool_, typename Tool1_>
-    class ReflectionMixIn<Self_,
-        SelfHolder_,
-        Wrapper<Wrapper<Value_, Tool_> const volatile, Tool1_>>
-        : public ReflectionMixIn<Self_, SelfHolder_, Wrapper<Wrapper<Value_, Tool_>, Tool1_>>
-    {};
-
-    template <typename Self_, typename SelfHolder_, typename Value_, typename Tool_, typename Tool1_>
-    class ReflectionMixIn<Self_, SelfHolder_, Wrapper<Wrapper<Value_, Tool_> &, Tool1_>>
-        : public ReflectionMixIn<Self_, SelfHolder_, Wrapper<Wrapper<Value_, Tool_>, Tool1_>>
-    {};
-
-    template <typename Self_, typename SelfHolder_, typename Value_, typename Tool_, typename Tool1_>
-    class ReflectionMixIn<Self_, SelfHolder_, Wrapper<Wrapper<Value_, Tool_> const &, Tool1_>>
-        : public ReflectionMixIn<Self_, SelfHolder_, Wrapper<Wrapper<Value_, Tool_>, Tool1_>>
-    {};
-
-    template <typename Self_, typename SelfHolder_, typename Value_, typename Tool_, typename Tool1_>
-    class ReflectionMixIn<Self_, SelfHolder_, Wrapper<Wrapper<Value_, Tool_> volatile &, Tool1_>>
-        : public ReflectionMixIn<Self_, SelfHolder_, Wrapper<Wrapper<Value_, Tool_>, Tool1_>>
+    class ReflectionMixIn<Self_, SelfHolder_, wrapper<wrapper<Value_, Tool_> volatile, Tool1_>>
+        : public ReflectionMixIn<Self_, SelfHolder_, wrapper<wrapper<Value_, Tool_>, Tool1_>>
     {};
 
     template <typename Self_, typename SelfHolder_, typename Value_, typename Tool_, typename Tool1_>
     class ReflectionMixIn<Self_,
         SelfHolder_,
-        Wrapper<Wrapper<Value_, Tool_> const volatile &, Tool1_>>
-        : public ReflectionMixIn<Self_, SelfHolder_, Wrapper<Wrapper<Value_, Tool_>, Tool1_>>
+        wrapper<wrapper<Value_, Tool_> const volatile, Tool1_>>
+        : public ReflectionMixIn<Self_, SelfHolder_, wrapper<wrapper<Value_, Tool_>, Tool1_>>
     {};
 
     template <typename Self_, typename SelfHolder_, typename Value_, typename Tool_, typename Tool1_>
-    class ReflectionMixIn<Self_, SelfHolder_, Wrapper<Wrapper<Value_, Tool_> &&, Tool1_>>
-        : public ReflectionMixIn<Self_, SelfHolder_, Wrapper<Wrapper<Value_, Tool_>, Tool1_>>
+    class ReflectionMixIn<Self_, SelfHolder_, wrapper<wrapper<Value_, Tool_> &, Tool1_>>
+        : public ReflectionMixIn<Self_, SelfHolder_, wrapper<wrapper<Value_, Tool_>, Tool1_>>
     {};
 
     template <typename Self_, typename SelfHolder_, typename Value_, typename Tool_, typename Tool1_>
-    class ReflectionMixIn<Self_, SelfHolder_, Wrapper<Wrapper<Value_, Tool_> const &&, Tool1_>>
-        : public ReflectionMixIn<Self_, SelfHolder_, Wrapper<Wrapper<Value_, Tool_>, Tool1_>>
+    class ReflectionMixIn<Self_, SelfHolder_, wrapper<wrapper<Value_, Tool_> const &, Tool1_>>
+        : public ReflectionMixIn<Self_, SelfHolder_, wrapper<wrapper<Value_, Tool_>, Tool1_>>
     {};
 
     template <typename Self_, typename SelfHolder_, typename Value_, typename Tool_, typename Tool1_>
-    class ReflectionMixIn<Self_, SelfHolder_, Wrapper<Wrapper<Value_, Tool_> volatile &&, Tool1_>>
-        : public ReflectionMixIn<Self_, SelfHolder_, Wrapper<Wrapper<Value_, Tool_>, Tool1_>>
+    class ReflectionMixIn<Self_, SelfHolder_, wrapper<wrapper<Value_, Tool_> volatile &, Tool1_>>
+        : public ReflectionMixIn<Self_, SelfHolder_, wrapper<wrapper<Value_, Tool_>, Tool1_>>
     {};
 
     template <typename Self_, typename SelfHolder_, typename Value_, typename Tool_, typename Tool1_>
     class ReflectionMixIn<Self_,
         SelfHolder_,
-        Wrapper<Wrapper<Value_, Tool_> const volatile &&, Tool1_>>
-        : public ReflectionMixIn<Self_, SelfHolder_, Wrapper<Wrapper<Value_, Tool_>, Tool1_>>
+        wrapper<wrapper<Value_, Tool_> const volatile &, Tool1_>>
+        : public ReflectionMixIn<Self_, SelfHolder_, wrapper<wrapper<Value_, Tool_>, Tool1_>>
+    {};
+
+    template <typename Self_, typename SelfHolder_, typename Value_, typename Tool_, typename Tool1_>
+    class ReflectionMixIn<Self_, SelfHolder_, wrapper<wrapper<Value_, Tool_> &&, Tool1_>>
+        : public ReflectionMixIn<Self_, SelfHolder_, wrapper<wrapper<Value_, Tool_>, Tool1_>>
+    {};
+
+    template <typename Self_, typename SelfHolder_, typename Value_, typename Tool_, typename Tool1_>
+    class ReflectionMixIn<Self_, SelfHolder_, wrapper<wrapper<Value_, Tool_> const &&, Tool1_>>
+        : public ReflectionMixIn<Self_, SelfHolder_, wrapper<wrapper<Value_, Tool_>, Tool1_>>
+    {};
+
+    template <typename Self_, typename SelfHolder_, typename Value_, typename Tool_, typename Tool1_>
+    class ReflectionMixIn<Self_, SelfHolder_, wrapper<wrapper<Value_, Tool_> volatile &&, Tool1_>>
+        : public ReflectionMixIn<Self_, SelfHolder_, wrapper<wrapper<Value_, Tool_>, Tool1_>>
+    {};
+
+    template <typename Self_, typename SelfHolder_, typename Value_, typename Tool_, typename Tool1_>
+    class ReflectionMixIn<Self_,
+        SelfHolder_,
+        wrapper<wrapper<Value_, Tool_> const volatile &&, Tool1_>>
+        : public ReflectionMixIn<Self_, SelfHolder_, wrapper<wrapper<Value_, Tool_>, Tool1_>>
     {};
 
     template <typename Self_, typename SelfHolder_, typename Value_, typename Tool_>
-    class ReflectionMixIn<Self_, SelfHolder_, Wrapper<Value_, Tool_>>
+    class ReflectionMixIn<Self_, SelfHolder_, wrapper<Value_, Tool_>>
         : public ReflectionMixIn<Self_, SelfHolder_, Value_>
-        , public ::ScL::Feature::ValueReflectionMixIn<Self_,
+        , public ::scl::feature::ValueReflectionMixIn<Self_,
               SelfHolder_,
               ::std::remove_cv_t<::std::remove_reference_t<Value_>>>
     {};
-} // namespace ScL::Feature::Detail
+} // namespace scl::feature::detail
 
 #include <scl/feature/access/value_lock.h>
 
@@ -305,7 +305,7 @@ namespace ScL::Feature::Detail
                           typename Tool_::template Holder<Value_>,                              \
                           typename Tool_::template Holder<Value_> refer>())                     \
         {                                                                                       \
-            using Locker = ::ScL::Feature::ValueLock<Self_ refer>;                              \
+            using Locker = ::scl::feature::ValueLock<Self_ refer>;                              \
             Locker locker{static_cast<Self_ refer>(*this)};                                     \
             locker.template lockFor<Value refer>();                                             \
             return locker.template valueAccessFor<Value refer>();                               \
@@ -322,7 +322,7 @@ namespace ScL::Feature::Detail
     /*SCL_CAST_OPERATOR_PROTOTYPE( volatile & )*/        \
     /*SCL_CAST_OPERATOR_PROTOTYPE( const volatile & )*/
 
-namespace ScL::Feature::Detail
+namespace scl::feature::detail
 {
 
 #define SCL_FEATURE_CASTING_MIXIN(MixIn, refer)                                                   \
@@ -343,7 +343,7 @@ namespace ScL::Feature::Detail
         {                                                                                         \
             if constexpr (::std::is_same_v<Value_ refer, Value refer>)                            \
             {                                                                                     \
-                using Locker = ::ScL::Feature::ValueLock<Self_ refer>;                            \
+                using Locker = ::scl::feature::ValueLock<Self_ refer>;                            \
                 Locker locker{static_cast<Self_ refer>(*this)};                                   \
                 locker.template lockFor<Value refer>();                                           \
                 return locker.template valueAccessFor<Value refer>();                             \
@@ -352,9 +352,9 @@ namespace ScL::Feature::Detail
     };                                                                                            \
                                                                                                   \
     template <typename Self_, typename Value_, typename Tool_>                                    \
-    class MixIn<Self_, ::ScL::Feature::Detail::Wrapper<Value_, Tool_>>                            \
+    class MixIn<Self_, ::scl::feature::detail::wrapper<Value_, Tool_>>                            \
         : public ::std::conditional_t<                                                            \
-              !::ScL::Feature::Detail::HolderInterface::doesUnguardStaticMethodExist<             \
+              !::scl::feature::detail::HolderInterface::doesUnguardStaticMethodExist<             \
                   typename Tool_::template Holder<Value_>,                                        \
                   typename Tool_::template Holder<Value_> refer>()                                \
                   && ::std::is_same_v<Value_ refer,                                               \
@@ -366,7 +366,7 @@ namespace ScL::Feature::Detail
                                                                                                   \
     public:                                                                                       \
         operator ::std::conditional_t<                                                            \
-            !::ScL::Feature::Detail::HolderInterface::doesUnguardStaticMethodExist<               \
+            !::scl::feature::detail::HolderInterface::doesUnguardStaticMethodExist<               \
                 typename Tool_::template Holder<Value_>,                                          \
                 typename Tool_::template Holder<Value_> refer>()                                  \
                 && ::std::is_same_v<Value_ refer, Value refer>,                                   \
@@ -374,12 +374,12 @@ namespace ScL::Feature::Detail
             void>() refer                                                                         \
         /*TODO: requires*/                                                                        \
         {                                                                                         \
-            if constexpr (!::ScL::Feature::Detail::HolderInterface::doesUnguardStaticMethodExist< \
+            if constexpr (!::scl::feature::detail::HolderInterface::doesUnguardStaticMethodExist< \
                               typename Tool_::template Holder<Value_>,                            \
                               typename Tool_::template Holder<Value_> refer>()                    \
                 && ::std::is_same_v<Value_ refer, Value refer>)                                   \
             {                                                                                     \
-                using Locker = ::ScL::Feature::ValueLock<Self_ refer>;                            \
+                using Locker = ::scl::feature::ValueLock<Self_ refer>;                            \
                 Locker locker{static_cast<Self_ refer>(*this)};                                   \
                 locker.template lockFor<Value refer>();                                           \
                 return locker.template valueAccessFor<Value refer>();                             \
@@ -397,9 +397,9 @@ namespace ScL::Feature::Detail
     SCL_FEATURE_CASTING_MIXIN(CastingRValueConstVolatile, const volatile &&)
 
     template <typename Self_, typename Value_, typename Tool_>
-    class CastingMixIn<Self_, Wrapper<Value_, Tool_>>
+    class CastingMixIn<Self_, wrapper<Value_, Tool_>>
         : public ::std::conditional_t<
-              !::ScL::Feature::Detail::HolderInterface::doesUnguardStaticMethodExist<
+              !::scl::feature::detail::HolderInterface::doesUnguardStaticMethodExist<
                   typename Tool_::template Holder<Value_>,
                   typename Tool_::template Holder<Value_> &>()
                   && ::std::is_same_v<Value_ &,
@@ -407,7 +407,7 @@ namespace ScL::Feature::Detail
               CastingLValue<Self_, Value_>,
               CastingLValueEmpty<Self_, Value_>>
         , public ::std::conditional_t<
-              !::ScL::Feature::Detail::HolderInterface::doesUnguardStaticMethodExist<
+              !::scl::feature::detail::HolderInterface::doesUnguardStaticMethodExist<
                   typename Tool_::template Holder<Value_>,
                   typename Tool_::template Holder<Value_> const &>()
                   && ::std::is_same_v<Value_ const &,
@@ -415,7 +415,7 @@ namespace ScL::Feature::Detail
               CastingLValueConst<Self_, Value_>,
               CastingLValueConstEmpty<Self_, Value_>>
         // , public
-        // ::std::conditional_t<!::ScL::Feature::Detail::HolderInterface::doesUnguardStaticMethodExist<
+        // ::std::conditional_t<!::scl::feature::detail::HolderInterface::doesUnguardStaticMethodExist<
         // typename Tool_::template Holder<Value_>, typename Tool_::template Holder<Value_> volatile
         // &>()
         //         && ::std::is_same_v< Value_ volatile &,
@@ -423,7 +423,7 @@ namespace ScL::Feature::Detail
         //     CastingLValueVolatile<Self_, Value_>,
         //     CastingLValueVolatileEmpty<Self_, Value_>>
         // , public
-        // ::std::conditional_t<!::ScL::Feature::Detail::HolderInterface::doesUnguardStaticMethodExist<
+        // ::std::conditional_t<!::scl::feature::detail::HolderInterface::doesUnguardStaticMethodExist<
         // typename Tool_::template Holder<Value_>, typename Tool_::template Holder<Value_> const
         // volatile &>()
         //         && ::std::is_same_v< Value_ const volatile &,
@@ -431,7 +431,7 @@ namespace ScL::Feature::Detail
         //     CastingLValueConstVolatile<Self_, Value_>,
         //     CastingLValueConstVolatileEmpty<Self_, Value_>>
         , public ::std::conditional_t<
-              !::ScL::Feature::Detail::HolderInterface::doesUnguardStaticMethodExist<
+              !::scl::feature::detail::HolderInterface::doesUnguardStaticMethodExist<
                   typename Tool_::template Holder<Value_>,
                   typename Tool_::template Holder<Value_> &&>()
                   && ::std::is_same_v<Value_ &&,
@@ -439,7 +439,7 @@ namespace ScL::Feature::Detail
               CastingRValue<Self_, Value_>,
               CastingRValueEmpty<Self_, Value_>>
         , public ::std::conditional_t<
-              !::ScL::Feature::Detail::HolderInterface::doesUnguardStaticMethodExist<
+              !::scl::feature::detail::HolderInterface::doesUnguardStaticMethodExist<
                   typename Tool_::template Holder<Value_>,
                   typename Tool_::template Holder<Value_> const &&>()
                   && ::std::is_same_v<Value_ const &&,
@@ -447,7 +447,7 @@ namespace ScL::Feature::Detail
               CastingRValueConst<Self_, Value_>,
               CastingRValueConstEmpty<Self_, Value_>>
     // , public
-    // ::std::conditional_t<!::ScL::Feature::Detail::HolderInterface::doesUnguardStaticMethodExist<
+    // ::std::conditional_t<!::scl::feature::detail::HolderInterface::doesUnguardStaticMethodExist<
     // typename Tool_::template Holder<Value_>, typename Tool_::template Holder<Value_> volatile
     // &&>()
     //         && ::std::is_same_v< Value_ volatile &&,
@@ -455,7 +455,7 @@ namespace ScL::Feature::Detail
     //     CastingRValueVolatile<Self_, Value_>,
     //     CastingRValueVolatileEmpty<Self_, Value_>>
     // , public
-    // ::std::conditional_t<!::ScL::Feature::Detail::HolderInterface::doesUnguardStaticMethodExist<
+    // ::std::conditional_t<!::scl::feature::detail::HolderInterface::doesUnguardStaticMethodExist<
     // typename Tool_::template Holder<Value_>, typename Tool_::template Holder<Value_> const
     // volatile
     // &&>()
@@ -464,6 +464,6 @@ namespace ScL::Feature::Detail
     //     CastingRValueConstVolatile<Self_, Value_>,
     //     CastingRValueConstVolatileEmpty<Self_, Value_>>
     {};
-} // namespace ScL::Feature::Detail
+} // namespace scl::feature::detail
 
 #endif

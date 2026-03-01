@@ -7,7 +7,7 @@
 #include <scl/feature/trait.h>
 #include <scl/utility/type_traits.h>
 
-namespace ScL::Feature::Detail::Guard
+namespace scl::feature::detail::Guard
 {
     template < typename _RangeRefer >
     struct RangeTool
@@ -20,7 +20,7 @@ namespace ScL::Feature::Detail::Guard
         struct Holder
         {
             using ThisType = Holder;
-            using RangeGuard = ::ScL::Feature::ValueGuard< RangeRefer >;
+            using RangeGuard = ::scl::feature::ValueGuard< RangeRefer >;
             using Iterator = _Iterator;
 
             RangeGuard m_range_guard;
@@ -46,11 +46,11 @@ namespace ScL::Feature::Detail::Guard
             static constexpr decltype(auto) value ( _HolderRefer && holder )
             {
                 using HolderRefer = _HolderRefer &&;
-                using IteratorRefer = ::ScL::SimilarRefer< Iterator, HolderRefer >;
+                using IteratorRefer = ::scl::SimilarRefer< Iterator, HolderRefer >;
                 return ::std::forward< IteratorRefer >( holder.m_iterator );
             }
         };
     };
-} // namespace ScL::Feature::Detail::Guard
+} // namespace scl::feature::detail::Guard
 
 #endif

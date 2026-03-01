@@ -5,13 +5,13 @@
 #include <scl/feature/access/holder_guard.h>
 #include <scl/utility/type_traits.h>
 
-namespace ScL::Feature::ThreadSafe
+namespace scl::feature::ThreadSafe
 {
     template <typename _Lock, typename _HolderRefer>
     struct Locking;
-} // namespace ScL::Feature::ThreadSafe
+} // namespace scl::feature::ThreadSafe
 
-namespace ScL::Feature::ThreadSafe
+namespace scl::feature::ThreadSafe
 {
     /*!
      * Инструмент для формирования значения "по месту" с добавлением
@@ -39,7 +39,7 @@ namespace ScL::Feature::ThreadSafe
             Holder(ThisType && other)
                 : m_lock{}
             {
-                using OtherMovableGuard = ::ScL::Feature::HolderGuard<ThisType &&>;
+                using OtherMovableGuard = ::scl::feature::HolderGuard<ThisType &&>;
                 OtherMovableGuard guard(other);
                 m_value = ::std::forward<Value>(other.m_value);
             }
@@ -47,7 +47,7 @@ namespace ScL::Feature::ThreadSafe
             Holder(ThisType const && other)
                 : m_lock{}
             {
-                using OtherReadableGuard = ::ScL::Feature::HolderGuard<ThisType const &&>;
+                using OtherReadableGuard = ::scl::feature::HolderGuard<ThisType const &&>;
                 OtherReadableGuard guard(other);
                 m_value = ::std::forward<Value const>(other.m_value);
             }
@@ -55,7 +55,7 @@ namespace ScL::Feature::ThreadSafe
             Holder(ThisType volatile && other)
                 : m_lock{}
             {
-                using OtherMovableGuard = ::ScL::Feature::HolderGuard<ThisType volatile &&>;
+                using OtherMovableGuard = ::scl::feature::HolderGuard<ThisType volatile &&>;
                 OtherMovableGuard guard(other);
                 m_value = ::std::forward<Value volatile>(other.m_value);
             }
@@ -63,7 +63,7 @@ namespace ScL::Feature::ThreadSafe
             Holder(ThisType const volatile && other)
                 : m_lock{}
             {
-                using OtherReadableGuard = ::ScL::Feature::HolderGuard<ThisType const volatile &&>;
+                using OtherReadableGuard = ::scl::feature::HolderGuard<ThisType const volatile &&>;
                 OtherReadableGuard guard(other);
                 m_value = ::std::forward<Value const volatile>(other.m_value);
             }
@@ -71,7 +71,7 @@ namespace ScL::Feature::ThreadSafe
             Holder(ThisType & other)
                 : m_lock{}
             {
-                using OtherMovableGuard = ::ScL::Feature::HolderGuard<ThisType &>;
+                using OtherMovableGuard = ::scl::feature::HolderGuard<ThisType &>;
                 OtherMovableGuard guard(other);
                 m_value = other.m_value;
             }
@@ -79,7 +79,7 @@ namespace ScL::Feature::ThreadSafe
             Holder(ThisType const & other)
                 : m_lock{}
             {
-                using OtherReadableGuard = ::ScL::Feature::HolderGuard<ThisType const &>;
+                using OtherReadableGuard = ::scl::feature::HolderGuard<ThisType const &>;
                 OtherReadableGuard guard(other);
                 m_value = other.m_value;
             }
@@ -87,7 +87,7 @@ namespace ScL::Feature::ThreadSafe
             Holder(ThisType volatile & other)
                 : m_lock{}
             {
-                using OtherMovableGuard = ::ScL::Feature::HolderGuard<ThisType volatile &>;
+                using OtherMovableGuard = ::scl::feature::HolderGuard<ThisType volatile &>;
                 OtherMovableGuard guard(other);
                 m_value = other.m_value;
             }
@@ -95,7 +95,7 @@ namespace ScL::Feature::ThreadSafe
             Holder(ThisType const volatile & other)
                 : m_lock{}
             {
-                using OtherReadableGuard = ::ScL::Feature::HolderGuard<ThisType const volatile &>;
+                using OtherReadableGuard = ::scl::feature::HolderGuard<ThisType const volatile &>;
                 OtherReadableGuard guard(other);
                 m_value = other.m_value;
             }
@@ -104,7 +104,7 @@ namespace ScL::Feature::ThreadSafe
             Holder(Holder<_OtherValue> && other)
                 : m_lock{}
             {
-                using OtherMovableGuard = ::ScL::Feature::HolderGuard<Holder<_OtherValue> &&>;
+                using OtherMovableGuard = ::scl::feature::HolderGuard<Holder<_OtherValue> &&>;
                 OtherMovableGuard guard(other);
                 m_value = ::std::forward<Value>(other.m_value);
             }
@@ -113,7 +113,7 @@ namespace ScL::Feature::ThreadSafe
             Holder(Holder<_OtherValue> const && other)
                 : m_lock{}
             {
-                using OtherReadableGuard = ::ScL::Feature::HolderGuard<
+                using OtherReadableGuard = ::scl::feature::HolderGuard<
                     Holder<_OtherValue> const &&>;
                 OtherReadableGuard guard(other);
                 m_value = ::std::forward<Value const>(other.m_value);
@@ -123,7 +123,7 @@ namespace ScL::Feature::ThreadSafe
             Holder(Holder<_OtherValue> volatile && other)
                 : m_lock{}
             {
-                using OtherMovableGuard = ::ScL::Feature::HolderGuard<
+                using OtherMovableGuard = ::scl::feature::HolderGuard<
                     Holder<_OtherValue> volatile &&>;
                 OtherMovableGuard guard(other);
                 m_value = ::std::forward<Value>(other.m_value);
@@ -133,7 +133,7 @@ namespace ScL::Feature::ThreadSafe
             Holder(Holder<_OtherValue> const volatile && other)
                 : m_lock{}
             {
-                using OtherReadableGuard = ::ScL::Feature::HolderGuard<
+                using OtherReadableGuard = ::scl::feature::HolderGuard<
                     Holder<_OtherValue> const volatile &&>;
                 OtherReadableGuard guard(other);
                 m_value = ::std::forward<Value const volatile>(other.m_value);
@@ -143,7 +143,7 @@ namespace ScL::Feature::ThreadSafe
             Holder(Holder<_OtherValue> & other)
                 : m_lock{}
             {
-                using OtherMovableGuard = ::ScL::Feature::HolderGuard<Holder<_OtherValue> &>;
+                using OtherMovableGuard = ::scl::feature::HolderGuard<Holder<_OtherValue> &>;
                 OtherMovableGuard guard(other);
                 m_value = other.m_value;
             }
@@ -152,7 +152,7 @@ namespace ScL::Feature::ThreadSafe
             Holder(Holder<_OtherValue> const & other)
                 : m_lock{}
             {
-                using OtherReadableGuard = ::ScL::Feature::HolderGuard<Holder<_OtherValue> const &>;
+                using OtherReadableGuard = ::scl::feature::HolderGuard<Holder<_OtherValue> const &>;
                 OtherReadableGuard guard(other);
                 m_value = other.m_value;
             }
@@ -161,7 +161,7 @@ namespace ScL::Feature::ThreadSafe
             Holder(Holder<_OtherValue> volatile & other)
                 : m_lock{}
             {
-                using OtherMovableGuard = ::ScL::Feature::HolderGuard<
+                using OtherMovableGuard = ::scl::feature::HolderGuard<
                     Holder<_OtherValue> volatile &>;
                 OtherMovableGuard guard(other);
                 m_value = other.m_value;
@@ -171,7 +171,7 @@ namespace ScL::Feature::ThreadSafe
             Holder(Holder<_OtherValue> const volatile & other)
                 : m_lock{}
             {
-                using OtherReadableGuard = ::ScL::Feature::HolderGuard<
+                using OtherReadableGuard = ::scl::feature::HolderGuard<
                     Holder<_OtherValue> const volatile &>;
                 OtherReadableGuard guard(other);
                 m_value = other.m_value;
@@ -179,7 +179,7 @@ namespace ScL::Feature::ThreadSafe
 
             ~Holder()
             {
-                using WritableGuard = ::ScL::Feature::HolderGuard<ThisType &>;
+                using WritableGuard = ::scl::feature::HolderGuard<ThisType &>;
                 WritableGuard guard(*this);
             }
 
@@ -188,7 +188,7 @@ namespace ScL::Feature::ThreadSafe
             static constexpr void guard(_HolderRefer && holder)
             {
                 using HolderRefer = _HolderRefer &&;
-                ::ScL::Feature::ThreadSafe::Locking<LockType,
+                ::scl::feature::ThreadSafe::Locking<LockType,
                     ::std::remove_reference_t<
                         HolderRefer> >::lock(::std::forward<HolderRefer>(holder).m_lock);
             }
@@ -198,7 +198,7 @@ namespace ScL::Feature::ThreadSafe
             static constexpr void unguard(_HolderRefer && holder)
             {
                 using HolderRefer = _HolderRefer &&;
-                ::ScL::Feature::ThreadSafe::Locking<LockType,
+                ::scl::feature::ThreadSafe::Locking<LockType,
                     ::std::remove_reference_t<
                         HolderRefer> >::unlock(::std::forward<HolderRefer>(holder).m_lock);
             }
@@ -208,11 +208,11 @@ namespace ScL::Feature::ThreadSafe
             static constexpr decltype(auto) value(_HolderRefer && holder)
             {
                 using HolderRefer = _HolderRefer &&;
-                using ValueRefer = ::ScL::SimilarRefer<_Value, HolderRefer>;
+                using ValueRefer = ::scl::SimilarRefer<_Value, HolderRefer>;
                 return ::std::forward<ValueRefer>(holder.m_value);
             }
         };
     };
-} // namespace ScL::Feature::ThreadSafe
+} // namespace scl::feature::ThreadSafe
 
 #endif

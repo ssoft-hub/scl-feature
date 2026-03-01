@@ -5,7 +5,7 @@
 #include <scl/utility/type_traits.h>
 #include <utility>
 
-namespace ScL::Feature::Inplace
+namespace scl::feature::Inplace
 {
     /*!
      * Инструмент для формирования экземпляра значения "по месту".  Определение "по месту"
@@ -125,11 +125,11 @@ namespace ScL::Feature::Inplace
             static constexpr decltype(auto) value(_HolderRefer && holder) noexcept
             {
                 using HolderRefer = _HolderRefer &&;
-                using ValueRefer = ::ScL::SimilarRefer<Value, HolderRefer>;
+                using ValueRefer = ::scl::SimilarRefer<Value, HolderRefer>;
                 return ::std::forward<ValueRefer>(holder.m_value);
             }
         };
     };
-} // namespace ScL::Feature::Inplace
+} // namespace scl::feature::Inplace
 
 #endif

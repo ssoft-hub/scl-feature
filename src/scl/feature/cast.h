@@ -14,7 +14,7 @@
 #define ConceptWrapper typename
 #define ConceptNonWrapper typename
 
-namespace ScL::Feature::Detail
+namespace scl::feature::detail
 {
 
     template <ConceptCaster Caster_, ConceptReference Ref_>
@@ -25,11 +25,11 @@ namespace ScL::Feature::Detail
 
 #define SCL_FEATURE_CAST_MIXIN(ref)                                                                \
     template <typename Caster_, typename Type_, typename Tool_>                                    \
-    struct CastMixIn<Caster_, Wrapper<Type_, Tool_> ref> : public CastMixIn<Caster_, Type_ ref>    \
+    struct CastMixIn<Caster_, wrapper<Type_, Tool_> ref> : public CastMixIn<Caster_, Type_ ref>    \
     {                                                                                              \
-        operator Wrapper<Type_, Tool_> ref() &&                                                    \
+        operator wrapper<Type_, Tool_> ref() &&                                                    \
         {                                                                                          \
-            return static_cast<Caster_ &&>(*this).template reference<Wrapper<Type_, Tool_> ref>(); \
+            return static_cast<Caster_ &&>(*this).template reference<wrapper<Type_, Tool_> ref>(); \
         }                                                                                          \
     };
 
@@ -41,18 +41,18 @@ namespace ScL::Feature::Detail
     SCL_FEATURE_CAST_MIXIN(const &&)
     SCL_FEATURE_CAST_MIXIN(volatile &&)
     SCL_FEATURE_CAST_MIXIN(const volatile &&)
-} // namespace ScL::Feature::Detail
+} // namespace scl::feature::detail
 
-namespace ScL::Feature::Detail
+namespace scl::feature::detail
 {
 
     template <ConceptReference Ref_>
-    struct Caster : public ::ScL::Feature::Detail::CastMixIn<Caster<Ref_>, Ref_>
+    struct Caster : public ::scl::feature::detail::CastMixIn<Caster<Ref_>, Ref_>
     {
         static_assert(::std::is_reference_v<Ref_>, "Ref_ must be a reference type.");
 
         using Refer = Ref_;
-        using Locker = ::ScL::Feature::ValueLock<Refer>;
+        using Locker = ::scl::feature::ValueLock<Refer>;
 
         Locker m_locker;
 
@@ -67,13 +67,13 @@ namespace ScL::Feature::Detail
             return m_locker.template valueAccessFor<Type_>();
         }
     };
-} // namespace ScL::Feature::Detail
+} // namespace scl::feature::detail
 
-namespace ScL::Feature
+namespace scl::feature
 {
     template <ConceptNonWrapper Type_>
     inline auto cast(Type_ && value)
-        -> ::std::enable_if_t<!::ScL::Feature::isWrapper<::std::remove_reference_t<Type_>>(),
+        -> ::std::enable_if_t<!::scl::feature::isWrapper<::std::remove_reference_t<Type_>>(),
             Type_ &&>
     {
         return ::std::forward<Type_ &&>(value);
@@ -81,11 +81,11 @@ namespace ScL::Feature
 
     template <ConceptWrapper Wrapper_>
     inline auto cast(Wrapper_ && wrapper)
-        -> ::std::enable_if_t<::ScL::Feature::isWrapper<::std::remove_reference_t<Wrapper_>>(),
-            ::ScL::Feature::Detail::Caster<Wrapper_ &&>>
+        -> ::std::enable_if_t<::scl::feature::isWrapper<::std::remove_reference_t<Wrapper_>>(),
+            ::scl::feature::detail::Caster<Wrapper_ &&>>
     {
-        return ::ScL::Feature::Detail::Caster<Wrapper_ &&>(::std::forward<Wrapper_ &&>(wrapper));
+        return ::scl::feature::detail::Caster<Wrapper_ &&>(::std::forward<Wrapper_ &&>(wrapper));
     }
-} // namespace ScL::Feature
+} // namespace scl::feature
 
 #endif

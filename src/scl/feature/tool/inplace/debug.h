@@ -20,8 +20,8 @@
         static decltype(auto) operator ## Invokable ( _WrapperRefer && wrapper )                  \
         {                                                                                         \
             using WrapperRefer = _WrapperRefer &&;                                                \
-            using ValueRefer = ::ScL::SimilarRefer< Value, WrapperRefer >;                        \
-            return symbol ::std::forward< ValueRefer && >( ::ScL::Feature::Detail::wrapperHolder( \
+            using ValueRefer = ::scl::SimilarRefer< Value, WrapperRefer >;                        \
+            return symbol ::std::forward< ValueRefer && >( ::scl::feature::detail::wrapperHolder( \
        ::std::forward< WrapperRefer >( wrapper ) ).m_value );                                     \
         }                                                                                         \
     */
@@ -29,12 +29,12 @@
 #define SCL_DEBUG_POSTFIX_UNARY_OPERATOR_WITH_ARGUMENT(symbol, Invokable)                    \
     /*                                                                                       \
         template < typename _WrapperRefer, typename _Argument >                              \
-        static decltype(auto) operator ## Invokable ( _WrapperRefer && Wrapper, _Argument && \
+        static decltype(auto) operator ## Invokable ( _WrapperRefer && wrapper, _Argument && \
        argument )                                                                            \
         {                                                                                    \
             using WrapperRefer = _WrapperRefer &&;                                           \
-            using ValueRefer = ::ScL::SimilarRefer< Value, WrapperRefer >;                   \
-            TODO: ::std::forward< ValueRefer && >( Wrapper.m_value ).operator symbol (       \
+            using ValueRefer = ::scl::SimilarRefer< Value, WrapperRefer >;                   \
+            TODO: ::std::forward< ValueRefer && >( wrapper.m_value ).operator symbol (       \
        ::std::forward< _Argument && >( argument ) );                                         \
         }                                                                                    \
     */
@@ -42,12 +42,12 @@
 #define SCL_DEBUG_POSTFIX_UNARY_OPERATOR_WITH_ARGUMENTS(symbol, Invokable)                        \
     /*                                                                                            \
         template < typename _WrapperRefer, typename ... _Arguments >                              \
-        static decltype(auto) operator ## Invokable ( _WrapperRefer && Wrapper, _Arguments && ... \
+        static decltype(auto) operator ## Invokable ( _WrapperRefer && wrapper, _Arguments && ... \
        arguments )                                                                                \
         {                                                                                         \
             using WrapperRefer = _WrapperRefer &&;                                                \
-            using ValueRefer = ::ScL::SimilarRefer< Value, WrapperRefer >;                        \
-            TODO: ::std::forward< ValueRefer && >( Wrapper.m_value ).operator symbol (            \
+            using ValueRefer = ::scl::SimilarRefer< Value, WrapperRefer >;                        \
+            TODO: ::std::forward< ValueRefer && >( wrapper.m_value ).operator symbol (            \
        ::std::forward< _Arguments &&                                                              \
        >( arguments ) ... );                                                                      \
         }                                                                                         \
@@ -56,11 +56,11 @@
 #define SCL_DEBUG_POSTFIX_UNARY_OPERATOR_WITH_INT(symbol, Invokable)             \
     /*                                                                           \
         template < typename _WrapperRefer >                                      \
-        static decltype(auto) operator ## Invokable ( _WrapperRefer && Wrapper ) \
+        static decltype(auto) operator ## Invokable ( _WrapperRefer && wrapper ) \
         {                                                                        \
             using WrapperRefer = _WrapperRefer &&;                               \
-            using ValueRefer = ::ScL::SimilarRefer< Value, WrapperRefer >;       \
-            TODO: ::std::forward< ValueRefer && >( Wrapper.m_value ) symbol;     \
+            using ValueRefer = ::scl::SimilarRefer< Value, WrapperRefer >;       \
+            TODO: ::std::forward< ValueRefer && >( wrapper.m_value ) symbol;     \
         }                                                                        \
     */
 
@@ -79,13 +79,13 @@
     } \
 */
 
-namespace ScL::Feature::Inplace
+namespace scl::feature::Inplace
 {
     /*!
      * Инструмент для формирования значения "по месту". Определение "по месту" означает,
      * что для значения не используется специальное размещение в куче и оно является
      * неотъемлемой частью пространства имен, в котором это значение определено.
-     * Отличается от ::ScL::Feature::Inplace::Default наличием отладочного вывода в ::std::cout.
+     * Отличается от ::scl::feature::Inplace::Default наличием отладочного вывода в ::std::cout.
      */
     struct Debug
     {
@@ -233,7 +233,7 @@ namespace ScL::Feature::Inplace
                 outText(SCL_DEBUG_FUNC_INFO);
 
                 using HolderRefer = _HolderRefer &&;
-                using ValueRefer = ::ScL::SimilarRefer<Value, HolderRefer>;
+                using ValueRefer = ::scl::SimilarRefer<Value, HolderRefer>;
                 return ::std::forward<ValueRefer>(holder.m_value);
             }
 
@@ -293,6 +293,6 @@ namespace ScL::Feature::Inplace
             SCL_DEBUG_BINARY_OPERATOR_FOR_ANY(>>, RightShift)
         };
     };
-} // namespace ScL::Feature::Inplace
+} // namespace scl::feature::Inplace
 
 #endif

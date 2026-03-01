@@ -6,7 +6,7 @@
 
 #include <set>
 
-namespace ScL::Feature
+namespace scl::feature
 {
     template <typename Self_,
         typename SelfHolder_,
@@ -15,6 +15,6 @@ namespace ScL::Feature
         typename Allocator_>
     class ValueReflectionMixIn<Self_, SelfHolder_, ::std::set<Key_, Compare_, Allocator_>>
     {};
-} // namespace ScL::Feature
+} // namespace scl::feature
 
 #endif

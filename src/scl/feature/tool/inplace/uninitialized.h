@@ -6,7 +6,7 @@
 
 #include <utility>
 
-namespace ScL::Feature::Inplace
+namespace scl::feature::Inplace
 {
     /*!
      * Инструмент для формирования значения "по месту", которое в случае POD типов
@@ -31,11 +31,11 @@ namespace ScL::Feature::Inplace
             static constexpr decltype(auto) value(_HolderRefer && holder)
             {
                 using HolderRefer = _HolderRefer &&;
-                using ValueRefer = ::ScL::SimilarRefer<Value, HolderRefer>;
+                using ValueRefer = ::scl::SimilarRefer<Value, HolderRefer>;
                 return ::std::forward<ValueRefer>(holder.m_value);
             }
         };
     };
-} // namespace ScL::Feature::Inplace
+} // namespace scl::feature::Inplace
 
 #endif

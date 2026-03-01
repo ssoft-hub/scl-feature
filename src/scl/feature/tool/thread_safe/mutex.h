@@ -6,7 +6,7 @@
 
 #include <mutex>
 
-namespace ScL::Feature::ThreadSafe
+namespace scl::feature::ThreadSafe
 {
     template <typename _Holder>
     struct Locking< ::std::mutex, _Holder>
@@ -25,11 +25,11 @@ namespace ScL::Feature::ThreadSafe
             ::std::forward<LockRefer>(lock).unlock();
         }
     };
-} // namespace ScL::Feature::ThreadSafe
+} // namespace scl::feature::ThreadSafe
 
-namespace ScL::Feature::ThreadSafe
+namespace scl::feature::ThreadSafe
 {
-    using Mutex = ::ScL::Feature::ThreadSafe::Lock< ::std::mutex>;
-} // namespace ScL::Feature::ThreadSafe
+    using Mutex = ::scl::feature::ThreadSafe::Lock< ::std::mutex>;
+} // namespace scl::feature::ThreadSafe
 
 #endif

@@ -6,7 +6,7 @@
 
 #include <atomic>
 
-namespace ScL::Feature::ThreadSafe
+namespace scl::feature::ThreadSafe
 {
     template <typename _Holder>
     struct Locking< ::std::atomic<bool>, _Holder>
@@ -28,11 +28,11 @@ namespace ScL::Feature::ThreadSafe
             ::std::forward<LockRefer>(lock).store(false, ::std::memory_order_release);
         }
     };
-} // namespace ScL::Feature::ThreadSafe
+} // namespace scl::feature::ThreadSafe
 
-namespace ScL::Feature::ThreadSafe
+namespace scl::feature::ThreadSafe
 {
-    using Atomic = ::ScL::Feature::ThreadSafe::Lock< ::std::atomic<bool> >;
-} // namespace ScL::Feature::ThreadSafe
+    using Atomic = ::scl::feature::ThreadSafe::Lock< ::std::atomic<bool> >;
+} // namespace scl::feature::ThreadSafe
 
 #endif

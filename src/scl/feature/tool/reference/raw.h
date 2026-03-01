@@ -6,7 +6,7 @@
 
 #include <utility>
 
-namespace ScL::Feature::Reference
+namespace scl::feature::Reference
 {
     /*!
      * Инструмент для формирования не владеющей ссылки на экземпляр значения.
@@ -111,11 +111,11 @@ namespace ScL::Feature::Reference
             static constexpr decltype(auto) value(_HolderRefer && holder) noexcept
             {
                 using HolderRefer = _HolderRefer &&;
-                using ValueRefer = ::ScL::SimilarRefer<Value, HolderRefer>;
+                using ValueRefer = ::scl::SimilarRefer<Value, HolderRefer>;
                 return ::std::forward<ValueRefer>(*holder.m_value_ptr);
             }
         };
     };
-} // namespace ScL::Feature::Reference
+} // namespace scl::feature::Reference
 
 #endif

@@ -8,7 +8,7 @@
 #include <scl/feature/reflection.h>
 #include <scl/feature/reflection/std/pair.h>
 
-namespace ScL::Feature
+namespace scl::feature
 {
     template <typename Self_,
         typename SelfHolder_,
@@ -50,6 +50,6 @@ namespace ScL::Feature
         SCL_REFLECT_METHOD(key_comp)
         SCL_REFLECT_METHOD(value_comp)
     };
-} // namespace ScL::Feature
+} // namespace scl::feature
 
 #endif

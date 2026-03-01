@@ -7,7 +7,7 @@
     constexpr decltype(auto) method(Arguments_ &&... arguments) this_refer                         \
     {                                                                                              \
         using WrapperRefer = Self_ this_refer;                                                     \
-        using ValueRefer = ::ScL::SimilarRefer<typename Self_::Value, WrapperRefer>;               \
+        using ValueRefer = ::scl::SimilarRefer<typename Self_::Value, WrapperRefer>;               \
         auto invokable = [](ValueRefer && value, Arguments_ &&... arguments)                       \
             -> decltype(::std::declval<ValueRefer>().method(::std::declval<Arguments_ &&>()...)) { \
             return ::std::forward<ValueRefer>(value).method(                                       \
@@ -16,9 +16,9 @@
         using Invokable = decltype(invokable);                                                     \
         using Returned = ::std::invoke_result_t<Invokable, ValueRefer, Arguments_ &&...>;          \
                                                                                                    \
-        return ::ScL::Feature::Detail::Operator::ResultSwitch<                                     \
-            ::ScL::Feature::Detail::Operator::LeftWrapperCase,                                     \
-            ::ScL::Feature::Detail::Operator::ResultSwitchCase<Returned,                           \
+        return ::scl::feature::detail::Operator::ResultSwitch<                                     \
+            ::scl::feature::detail::Operator::LeftWrapperCase,                                     \
+            ::scl::feature::detail::Operator::ResultSwitchCase<Returned,                           \
                 ValueRefer> >::invoke(::std::forward<Invokable>(invokable),                        \
             static_cast<WrapperRefer>(*this),                                                      \
             ::std::forward<Arguments_>(arguments)...);                                             \

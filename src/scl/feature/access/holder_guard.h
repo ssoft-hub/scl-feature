@@ -7,7 +7,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace ScL::Feature
+namespace scl::feature
 {
     template <typename _HolderRefer>
     class HolderGuard
@@ -38,16 +38,16 @@ namespace ScL::Feature
         HolderGuard(HolderRefer holder)
             : m_holder(::std::forward<HolderRefer>(holder))
         {
-            ::ScL::Feature::Detail::HolderInterface::guard<HolderRefer>(
+            ::scl::feature::detail::HolderInterface::guard<HolderRefer>(
                 ::std::forward<HolderRefer>(m_holder));
         }
 
         ~HolderGuard()
         {
-            ::ScL::Feature::Detail::HolderInterface::unguard<HolderRefer>(
+            ::scl::feature::detail::HolderInterface::unguard<HolderRefer>(
                 ::std::forward<HolderRefer>(m_holder));
         }
     };
-} // namespace ScL::Feature
+} // namespace scl::feature
 
 #endif

@@ -5,7 +5,7 @@
 #include <scl/feature/access/value_guard.h>
 #include <scl/utility/type_traits.h>
 
-namespace ScL::Feature::Guard
+namespace scl::feature::Guard
 {
     template <typename _Wrapper>
     struct Featured
@@ -17,7 +17,7 @@ namespace ScL::Feature::Guard
         {
             using ThisType = Holder<_Value>;
             using Value = _Value;
-            using ValueGuard = ::ScL::Feature::ValueGuard<WrapperRefer>;
+            using ValueGuard = ::scl::feature::ValueGuard<WrapperRefer>;
 
             ValueGuard m_value_guard;
 
@@ -32,11 +32,11 @@ namespace ScL::Feature::Guard
             static constexpr decltype(auto) value(_HolderRefer && holder)
             {
                 using HolderRefer = _HolderRefer &&;
-                using ValueRefer = ::ScL::SimilarRefer<Value, HolderRefer>;
+                using ValueRefer = ::scl::SimilarRefer<Value, HolderRefer>;
                 return ::std::forward<ValueRefer>(holder.m_value_guard.valueAccess());
             }
         };
     };
-} // namespace ScL::Feature::Guard
+} // namespace scl::feature::Guard
 
 #endif

@@ -1,5 +1,9 @@
 # Модуль feature
 
+[![GitLab Pipeline](https://gitlab.com/ssoft-scl/scl-feature/badges/main/pipeline.svg)](https://gitlab.com/ssoft-scl/scl-feature/-/pipelines)
+[![GitLab Pages](https://img.shields.io/badge/pages-gitlab-orange)](https://ssoft-scl.gitlab.io/scl-feature/)
+[![GitHub Pages](https://img.shields.io/badge/pages-github-blue)](https://ssoft-hub.github.io/scl-feature/)
+
 ScL feature является частью инструментария [ScL](https://gitlab.com/ssoft-scl) и предоставляет собой набор средств для добавления дополнительных особенностей пользовательским типам данных посредством применения к ним внешней реализации.
 
 Инструменты модуля позволяют добавить для экземпляра объекта любого типа задать дополнительные особенности, такие как

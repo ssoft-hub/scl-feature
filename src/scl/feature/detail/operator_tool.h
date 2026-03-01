@@ -9,7 +9,7 @@
 
 #include <cassert>
 
-namespace ScL::Feature::Detail::Guard
+namespace scl::feature::detail::Guard
 {
     template <typename _Invokable, typename _WrapperRefer, typename... _Arguments>
     struct LeftTool
@@ -23,8 +23,8 @@ namespace ScL::Feature::Detail::Guard
         struct Holder
         {
             using ThisType = Holder;
-            using WrapperGuard = ::ScL::Feature::WrapperGuard<WrapperRefer>;
-            using ValueRefer = ::ScL::SimilarRefer<typename ::std::decay_t<WrapperRefer>::Value,
+            using WrapperGuard = ::scl::feature::WrapperGuard<WrapperRefer>;
+            using ValueRefer = ::scl::SimilarRefer<typename ::std::decay_t<WrapperRefer>::Value,
                 WrapperRefer>;
             using Value = _Type;
 
@@ -48,17 +48,17 @@ namespace ScL::Feature::Detail::Guard
             template <typename _HolderRefer,
                 typename =
                     ::std::enable_if_t< ::std::is_same<ThisType, ::std::decay_t<_HolderRefer> >{}> >
-            static constexpr ::ScL::SimilarRefer<Value, _HolderRefer &&> value(
+            static constexpr ::scl::SimilarRefer<Value, _HolderRefer &&> value(
                 _HolderRefer && holder)
             {
-                return ::std::forward< ::ScL::SimilarRefer<Value, _HolderRefer &&> >(
+                return ::std::forward< ::scl::SimilarRefer<Value, _HolderRefer &&> >(
                     holder.m_result);
             }
         };
     };
-} // namespace ScL::Feature::Detail::Guard
+} // namespace scl::feature::detail::Guard
 
-namespace ScL::Feature::Detail::Guard
+namespace scl::feature::detail::Guard
 {
     template <typename _Invokable, typename _LeftRefer, typename _WrapperRefer>
     struct RightTool
@@ -76,8 +76,8 @@ namespace ScL::Feature::Detail::Guard
         struct Holder
         {
             using ThisType = Holder;
-            using WrapperGuard = ::ScL::Feature::WrapperGuard<WrapperRefer>;
-            using ValueRefer = ::ScL::SimilarRefer<typename ::std::decay_t<WrapperRefer>::Value,
+            using WrapperGuard = ::scl::feature::WrapperGuard<WrapperRefer>;
+            using ValueRefer = ::scl::SimilarRefer<typename ::std::decay_t<WrapperRefer>::Value,
                 WrapperRefer>;
             using Value = _Type;
 
@@ -100,17 +100,17 @@ namespace ScL::Feature::Detail::Guard
             template <typename _HolderRefer,
                 typename =
                     ::std::enable_if_t< ::std::is_same<ThisType, ::std::decay_t<_HolderRefer> >{}> >
-            static constexpr ::ScL::SimilarRefer<Value, _HolderRefer &&> value(
+            static constexpr ::scl::SimilarRefer<Value, _HolderRefer &&> value(
                 _HolderRefer && holder)
             {
-                return ::std::forward< ::ScL::SimilarRefer<Value, _HolderRefer &&> >(
+                return ::std::forward< ::scl::SimilarRefer<Value, _HolderRefer &&> >(
                     holder.m_result);
             }
         };
     };
-} // namespace ScL::Feature::Detail::Guard
+} // namespace scl::feature::detail::Guard
 
-namespace ScL::Feature::Detail::Guard
+namespace scl::feature::detail::Guard
 {
     template <typename _Invokable, typename _LeftWrapperRefer, typename _RightWrapperRefer>
     struct BothTool
@@ -127,12 +127,12 @@ namespace ScL::Feature::Detail::Guard
         struct Holder
         {
             using ThisType = Holder;
-            using LeftWrapperGuard = ::ScL::Feature::WrapperGuard<LeftWrapperRefer>;
-            using RightWrapperGuard = ::ScL::Feature::WrapperGuard<RightWrapperRefer>;
-            using LeftValueRefer = ::ScL::SimilarRefer<
+            using LeftWrapperGuard = ::scl::feature::WrapperGuard<LeftWrapperRefer>;
+            using RightWrapperGuard = ::scl::feature::WrapperGuard<RightWrapperRefer>;
+            using LeftValueRefer = ::scl::SimilarRefer<
                 typename ::std::decay_t<LeftWrapperRefer>::Value,
                 LeftWrapperRefer>;
-            using RightValueRefer = ::ScL::SimilarRefer<
+            using RightValueRefer = ::scl::SimilarRefer<
                 typename ::std::decay_t<RightWrapperRefer>::Value,
                 RightWrapperRefer>;
             using Value = _Type;
@@ -160,14 +160,14 @@ namespace ScL::Feature::Detail::Guard
             template <typename _HolderRefer,
                 typename =
                     ::std::enable_if_t< ::std::is_same<ThisType, ::std::decay_t<_HolderRefer> >{}> >
-            static constexpr ::ScL::SimilarRefer<Value, _HolderRefer &&> value(
+            static constexpr ::scl::SimilarRefer<Value, _HolderRefer &&> value(
                 _HolderRefer && holder)
             {
-                return ::std::forward< ::ScL::SimilarRefer<Value, _HolderRefer &&> >(
+                return ::std::forward< ::scl::SimilarRefer<Value, _HolderRefer &&> >(
                     holder.m_result);
             }
         };
     };
-} // namespace ScL::Feature::Detail::Guard
+} // namespace scl::feature::detail::Guard
 
 #endif

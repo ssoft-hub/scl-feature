@@ -6,7 +6,7 @@
 
 #include <string>
 
-namespace ScL::Feature
+namespace scl::feature
 {
     template <typename Self_, typename SelfHolder_>
     class ValueReflectionMixIn<Self_, SelfHolder_, ::std::string>
@@ -18,6 +18,6 @@ namespace ScL::Feature
             return 0;
         }
     };
-} // namespace ScL::Feature
+} // namespace scl::feature
 
 #endif

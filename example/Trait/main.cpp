@@ -3,7 +3,7 @@
 #include <scl/feature/tool.h>
 #include <scl/feature/wrapper.h>
 
-using namespace ::ScL::Feature;
+using namespace ::scl::feature;
 
 struct BaseType
 {};
@@ -30,14 +30,14 @@ void bar()
 // Test of multi tool definition
 void foo()
 {
-    // Wrapper< Wrapper< Wrapper< BaseType, Implicit::Shared >, Heap::Unique >,
+    // wrapper< wrapper< wrapper< BaseType, Implicit::Shared >, Heap::Unique >,
     // ThreadSafe::RecursiveMutex > >
-    using FirstType = Wrapper<Wrapper<Wrapper<BaseType, Implicit::Shared>, Heap::Unique>,
+    using FirstType = wrapper<wrapper<wrapper<BaseType, Implicit::Shared>, Heap::Unique>,
         ThreadSafe::RecursiveMutex>;
 
-    // Wrapper< Wrapper< Wrapper< BaseType, Implicit::Shared >, Heap::Unique >,
+    // wrapper< wrapper< wrapper< BaseType, Implicit::Shared >, Heap::Unique >,
     // ThreadSafe::RecursiveMutex > >
-    using SecondType = Wrapper<BaseType,
+    using SecondType = wrapper<BaseType,
         Implicit::Shared,
         Heap::Unique,
         ThreadSafe::RecursiveMutex>;
@@ -50,20 +50,20 @@ void foo()
 // Test of tool duplicate removing
 void foofoo()
 {
-    // Wrapper< Wrapper< Wrapper< BaseType, Implicit::Shared >, Heap::Unique >,
+    // wrapper< wrapper< wrapper< BaseType, Implicit::Shared >, Heap::Unique >,
     // ThreadSafe::RecursiveMutex > >
-    using FirstType = Wrapper<
-        Wrapper<
-            Wrapper<Wrapper<Wrapper<Wrapper<Wrapper<BaseType, Implicit::Shared>, Implicit::Shared>,
+    using FirstType = wrapper<
+        wrapper<
+            wrapper<wrapper<wrapper<wrapper<wrapper<BaseType, Implicit::Shared>, Implicit::Shared>,
                                 Heap::Unique>,
                         Heap::Unique>,
                 Heap::Unique>,
             Heap::Unique>,
         ThreadSafe::RecursiveMutex>;
 
-    // Wrapper< Wrapper< Wrapper< BaseType, Implicit::Shared >, Heap::Unique >,
+    // wrapper< wrapper< wrapper< BaseType, Implicit::Shared >, Heap::Unique >,
     // ThreadSafe::RecursiveMutex > >
-    using SecondType = Wrapper<BaseType,
+    using SecondType = wrapper<BaseType,
         Implicit::Shared,
         Implicit::Shared,
         Implicit::Shared,
@@ -72,10 +72,10 @@ void foofoo()
         ThreadSafe::RecursiveMutex,
         ThreadSafe::RecursiveMutex>;
 
-    // Wrapper< Wrapper< Wrapper< BaseType, Implicit::Shared >, Heap::Unique >,
+    // wrapper< wrapper< wrapper< BaseType, Implicit::Shared >, Heap::Unique >,
     // ThreadSafe::RecursiveMutex > >
-    using ThirdType = Wrapper<
-        Wrapper<Wrapper<Wrapper<BaseType, Implicit::Shared>, Implicit::Shared, Heap::Unique>,
+    using ThirdType = wrapper<
+        wrapper<wrapper<wrapper<BaseType, Implicit::Shared>, Implicit::Shared, Heap::Unique>,
             Heap::Unique,
             Heap::Unique,
             Heap::Unique>,
@@ -94,39 +94,39 @@ int main(int /*argc*/, char ** /*argv*/)
     foo();
     foofoo();
 
-    static_assert(isThisCompatibleWithOther<Wrapper<int>, Wrapper<int> >(), "");
-    ::std::cout << "isThisCompatibleWithOther< Wrapper< int >, "
-                   "Wrapper< int > >()"
+    static_assert(isThisCompatibleWithOther<wrapper<int>, wrapper<int> >(), "");
+    ::std::cout << "isThisCompatibleWithOther< wrapper< int >, "
+                   "wrapper< int > >()"
                 << ::std::endl
-                << true << " = " << isThisCompatibleWithOther<Wrapper<int>, Wrapper<int> >()
+                << true << " = " << isThisCompatibleWithOther<wrapper<int>, wrapper<int> >()
                 << ::std::endl;
 
-    static_assert(!isThisCompatibleWithOther<Wrapper<int>, Wrapper<double> >(), "");
-    ::std::cout << "isThisCompatibleWithOther< Wrapper< int >, "
-                   "Wrapper< double > >()"
+    static_assert(!isThisCompatibleWithOther<wrapper<int>, wrapper<double> >(), "");
+    ::std::cout << "isThisCompatibleWithOther< wrapper< int >, "
+                   "wrapper< double > >()"
                 << ::std::endl
-                << false << " = " << isThisCompatibleWithOther<Wrapper<int>, Wrapper<double> >()
+                << false << " = " << isThisCompatibleWithOther<wrapper<int>, wrapper<double> >()
                 << ::std::endl;
 
-    static_assert(!isThisCompatibleWithOther<Wrapper<BaseType>, Wrapper<DerivedType> >(), "");
-    ::std::cout << "isThisCompatibleWithOther< Wrapper< BaseType >, "
-                   "Wrapper< DerivedType > >()"
+    static_assert(!isThisCompatibleWithOther<wrapper<BaseType>, wrapper<DerivedType> >(), "");
+    ::std::cout << "isThisCompatibleWithOther< wrapper< BaseType >, "
+                   "wrapper< DerivedType > >()"
                 << ::std::endl
                 << false << " = "
-                << isThisCompatibleWithOther<Wrapper<BaseType>, Wrapper<DerivedType> >()
+                << isThisCompatibleWithOther<wrapper<BaseType>, wrapper<DerivedType> >()
                 << ::std::endl;
 
-    static_assert(isThisCompatibleWithOther<Wrapper<DerivedType>, Wrapper<BaseType> >(), "");
-    ::std::cout << "isThisCompatibleWithOther< Wrapper< DerivedType >, "
-                   "Wrapper< BaseType > >()"
+    static_assert(isThisCompatibleWithOther<wrapper<DerivedType>, wrapper<BaseType> >(), "");
+    ::std::cout << "isThisCompatibleWithOther< wrapper< DerivedType >, "
+                   "wrapper< BaseType > >()"
                 << ::std::endl
                 << true << " = "
-                << isThisCompatibleWithOther<Wrapper<DerivedType>, Wrapper<BaseType> >()
+                << isThisCompatibleWithOther<wrapper<DerivedType>, wrapper<BaseType> >()
                 << ::std::endl;
 
-    using FirstType = Wrapper<BaseType, Implicit::Shared, Heap::Unique, ThreadSafe::RecursiveMutex>;
+    using FirstType = wrapper<BaseType, Implicit::Shared, Heap::Unique, ThreadSafe::RecursiveMutex>;
 
-    using SecondType = Wrapper<DerivedType,
+    using SecondType = wrapper<DerivedType,
         Implicit::Shared,
         Heap::Unique,
         ThreadSafe::RecursiveMutex>;
@@ -141,8 +141,8 @@ int main(int /*argc*/, char ** /*argv*/)
                 << true << " = " << isThisCompatibleWithOther<SecondType, FirstType>()
                 << ::std::endl;
 
-    using FirstPartType = Wrapper<BaseType, Implicit::Shared>;
-    using SecondPartType = Wrapper<DerivedType, Implicit::Shared>;
+    using FirstPartType = wrapper<BaseType, Implicit::Shared>;
+    using SecondPartType = wrapper<DerivedType, Implicit::Shared>;
 
     static_assert(IsThisCompatibleWithPartOfOther<FirstPartType, FirstType>(), "");
     ::std::cout << "IsThisCompatibleWithPartOfOther< FirstPartType, FirstType >()" << ::std::endl

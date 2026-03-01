@@ -9,7 +9,7 @@
 #include <scl/feature/trait.h>
 #include <scl/utility/type_traits.h>
 
-namespace ScL::Feature::Implicit
+namespace scl::feature::Implicit
 {
     /*!
      * Инструмент для формирования неявно обобщенного значения на основе
@@ -27,7 +27,7 @@ namespace ScL::Feature::Implicit
             using Value = _Value;
 
             using Pointer = ::std::shared_ptr<Value>;
-            using WritableGuard = ::ScL::Feature::HolderGuard<ThisType &>;
+            using WritableGuard = ::scl::feature::HolderGuard<ThisType &>;
 
             Pointer m_pointer;
 
@@ -83,7 +83,7 @@ namespace ScL::Feature::Implicit
                 typename _RightWrapperRefer,
                 typename = ::std::enable_if_t<
                     !::std::is_const< ::std::remove_reference_t<_LeftWrapperRefer> >::value
-                    && ::ScL::Feature::IsThisCompatibleWithOther<
+                    && ::scl::feature::IsThisCompatibleWithOther<
                         ::std::decay_t<_RightWrapperRefer>,
                         ::std::decay_t<_LeftWrapperRefer> >::value
                     && (::std::is_volatile< ::std::remove_reference_t<_LeftWrapperRefer> >::value
@@ -94,11 +94,11 @@ namespace ScL::Feature::Implicit
             {
                 using RightWrapperRefer = _RightWrapperRefer &&;
                 using RightHolder = typename ::std::decay_t<RightWrapperRefer>::Holder;
-                using RightPointerRefer = ::ScL::SimilarRefer<typename RightHolder::Pointer,
+                using RightPointerRefer = ::scl::SimilarRefer<typename RightHolder::Pointer,
                     RightWrapperRefer>;
-                ::ScL::Feature::Detail::wrapperHolder(left)
+                ::scl::feature::detail::wrapperHolder(left)
                     .m_pointer = ::std::forward<RightPointerRefer>(
-                    ::ScL::Feature::Detail::wrapperHolder(right).m_pointer);
+                    ::scl::feature::detail::wrapperHolder(right).m_pointer);
             }
 
             /*!
@@ -123,12 +123,12 @@ namespace ScL::Feature::Implicit
             static constexpr decltype(auto) value(_HolderRefer && holder)
             {
                 using HolderRefer = _HolderRefer &&;
-                using ValueRefer = ::ScL::SimilarRefer<_Value, HolderRefer>;
+                using ValueRefer = ::scl::SimilarRefer<_Value, HolderRefer>;
                 // NOTE: Functionality ::std::shared_ptr has a limitation for volatile case.
                 return ::std::forward<ValueRefer>(*holder.m_pointer.get());
             }
         };
     };
-} // namespace ScL::Feature::Implicit
+} // namespace scl::feature::Implicit
 
 #endif

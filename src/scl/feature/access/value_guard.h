@@ -6,19 +6,19 @@
 #include <scl/feature/trait.h>
 #include <scl/utility/type_traits.h>
 
-namespace ScL::Feature::Detail
+namespace scl::feature::detail
 {
     template <typename _Value, typename _Tool>
-    class Wrapper;
-} // namespace ScL::Feature::Detail
+    class wrapper;
+} // namespace scl::feature::detail
 
-namespace ScL::Feature::Detail
+namespace scl::feature::detail
 {
     template <typename>
     struct ValueGuardHelper;
-} // namespace ScL::Feature::Detail
+} // namespace scl::feature::detail
 
-namespace ScL::Feature
+namespace scl::feature
 {
     /*!
      * @brief This type activates all features for the multi wrapped value when
@@ -26,10 +26,10 @@ namespace ScL::Feature
      * This type does nothing for non wrapped values.
      */
     template <typename _Refer>
-    using ValueGuard = typename ::ScL::Feature::Detail::ValueGuardHelper<_Refer>::Type;
-} // namespace ScL::Feature
+    using ValueGuard = typename ::scl::feature::detail::ValueGuardHelper<_Refer>::Type;
+} // namespace scl::feature
 
-namespace ScL::Feature::Detail
+namespace scl::feature::detail
 {
     /*!
      * @brief This is the WrapperGuard specialization for non wrapped value.
@@ -42,15 +42,15 @@ namespace ScL::Feature::Detail
 
     public:
         using Refer = _Refer;
-        using WrapperGuard = ::ScL::Feature::WrapperGuard<_Refer>;
+        using WrapperGuard = ::scl::feature::WrapperGuard<_Refer>;
 
         using ValueAccess = typename WrapperGuard::ValueAccess;
         using PointerAccess = typename WrapperGuard::PointerAccess;
 
         static_assert(::std::is_reference<Refer>::value,
             "The template parameter _Refer must to be a reference type.");
-        static_assert(!::ScL::Feature::isWrapper< ::std::decay_t<Refer> >(),
-            "The template parameter _Refer must to be a not Wrapper type reference!");
+        static_assert(!::scl::feature::isWrapper< ::std::decay_t<Refer> >(),
+            "The template parameter _Refer must to be a not wrapper type reference!");
 
     private:
         WrapperGuard m_wrapper_guard;
@@ -72,9 +72,9 @@ namespace ScL::Feature::Detail
 
         constexpr PointerAccess pointerAccess() const { return m_wrapper_guard.pointerAccess(); }
     };
-} // namespace ScL::Feature::Detail
+} // namespace scl::feature::detail
 
-namespace ScL::Feature::Detail
+namespace scl::feature::detail
 {
     /*!
      * @brief This is the ValueGuard specialization for multi wrapped value.
@@ -87,14 +87,14 @@ namespace ScL::Feature::Detail
 
     public:
         using WrapperRefer = _Refer;
-        using Wrapper = ::std::decay_t<WrapperRefer>;
-        using Value = typename Wrapper::Value;
-        using ValueRefer = ::ScL::SimilarRefer<Value, WrapperRefer>;
-        using Holder = typename Wrapper::Holder;
-        using HolderRefer = ::ScL::SimilarRefer<Holder, WrapperRefer>;
+        using wrapper = ::std::decay_t<WrapperRefer>;
+        using Value = typename wrapper::Value;
+        using ValueRefer = ::scl::SimilarRefer<Value, WrapperRefer>;
+        using Holder = typename wrapper::Holder;
+        using HolderRefer = ::scl::SimilarRefer<Holder, WrapperRefer>;
 
-        using WrapperGuard = ::ScL::Feature::WrapperGuard<WrapperRefer>;
-        using ValueGuard = ::ScL::Feature::ValueGuard<ValueRefer>;
+        using WrapperGuard = ::scl::feature::WrapperGuard<WrapperRefer>;
+        using ValueGuard = ::scl::feature::ValueGuard<ValueRefer>;
 
         using WrapperAccess = typename WrapperGuard::WrapperAccess;
         using ValueAccess = typename ValueGuard::ValueAccess;
@@ -102,11 +102,11 @@ namespace ScL::Feature::Detail
 
         static_assert(::std::is_reference<WrapperRefer>::value,
             "The template parameter _Refer must to be a reference type.");
-        static_assert(::ScL::Feature::isWrapper<Wrapper>(),
-            "The template parameter _Refer must to be a Wrapper type reference!");
-        // static_assert( ::ScL::Feature::isSimilar< ValueRefer, WrapperRefer >(), "The Refer and
+        static_assert(::scl::feature::isWrapper<wrapper>(),
+            "The template parameter _Refer must to be a wrapper type reference!");
+        // static_assert( ::scl::feature::isSimilar< ValueRefer, WrapperRefer >(), "The Refer and
         // ValueRefer must to be similar types!" );
-        static_assert(::ScL::Feature::isSimilar<HolderRefer, WrapperRefer>(),
+        static_assert(::scl::feature::isSimilar<HolderRefer, WrapperRefer>(),
             "The Refer and HolderRefer must to be similar types!");
 
     private:
@@ -120,13 +120,13 @@ namespace ScL::Feature::Detail
     public:
         constexpr ValueGuardForWrapped(WrapperRefer refer)
             : m_wrapper_guard(::std::forward<WrapperRefer>(refer))
-            , m_value_guard(::ScL::Feature::Detail::HolderInterface::value<HolderRefer>(
+            , m_value_guard(::scl::feature::detail::HolderInterface::value<HolderRefer>(
                   m_wrapper_guard.holderAccess()))
         {}
 
         constexpr ValueGuardForWrapped(WrapperGuard && other)
             : m_wrapper_guard(::std::forward<WrapperGuard>(other))
-            , m_value_guard(::ScL::Feature::Detail::HolderInterface::value<HolderRefer>(
+            , m_value_guard(::scl::feature::detail::HolderInterface::value<HolderRefer>(
                   m_wrapper_guard.holderAccess()))
         {}
 
@@ -136,9 +136,9 @@ namespace ScL::Feature::Detail
 
         constexpr PointerAccess pointerAccess() const { return m_value_guard.pointerAccess(); }
     };
-} // namespace ScL::Feature::Detail
+} // namespace scl::feature::detail
 
-namespace ScL::Feature::Detail
+namespace scl::feature::detail
 {
     // Case tags
     struct NonWrappedCase;
@@ -147,7 +147,7 @@ namespace ScL::Feature::Detail
     // Choice of a case
     template <typename _Refer>
     using ValueGuardSwitchCase = ::std::conditional_t<
-        ::ScL::Feature::isWrapper< ::std::remove_reference_t<_Refer> >(),
+        ::scl::feature::isWrapper< ::std::remove_reference_t<_Refer> >(),
         WrappedCase,
         NonWrappedCase>;
 
@@ -157,13 +157,13 @@ namespace ScL::Feature::Detail
     template <typename _Refer>
     struct ValueGuardSwitch<NonWrappedCase, _Refer>
     {
-        using Type = ::ScL::Feature::Detail::ValueGuardForNonWrapped<_Refer>;
+        using Type = ::scl::feature::detail::ValueGuardForNonWrapped<_Refer>;
     };
 
     template <typename _Refer>
     struct ValueGuardSwitch<WrappedCase, _Refer>
     {
-        using Type = ::ScL::Feature::Detail::ValueGuardForWrapped<_Refer>;
+        using Type = ::scl::feature::detail::ValueGuardForWrapped<_Refer>;
     };
 
     template <typename _Refer>
@@ -173,6 +173,6 @@ namespace ScL::Feature::Detail
             "The template parameter _Refer must to be a reference type.");
         using Type = typename ValueGuardSwitch<ValueGuardSwitchCase<_Refer>, _Refer>::Type;
     };
-} // namespace ScL::Feature::Detail
+} // namespace scl::feature::detail
 
 #endif

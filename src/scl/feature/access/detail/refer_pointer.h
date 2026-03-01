@@ -3,7 +3,7 @@
 #include <memory>
 #include <utility>
 
-namespace ScL::Feature::Detail
+namespace scl::feature::detail
 {
     /*!
      * Указатель на ссылку экземпляра значения, который ведет себя как "сырой" указатель
@@ -40,4 +40,4 @@ namespace ScL::Feature::Detail
 
         constexpr RawPointer operator->() const { return ::std::addressof(m_refer); }
     };
-} // namespace ScL::Feature::Detail
+} // namespace scl::feature::detail

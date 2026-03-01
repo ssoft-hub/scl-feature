@@ -12,7 +12,7 @@
 #include <scl/feature/trait.h>
 #include <scl/utility/type_traits.h>
 
-namespace ScL::Feature::Implicit
+namespace scl::feature::Implicit
 {
     /*!
      * Инструмент для формирования значения в "куче" на основе raw указателя.
@@ -112,7 +112,7 @@ namespace ScL::Feature::Implicit
             using CountedValue = Counted<Value>;
             using CountedPointer = BaseCounted *;
             using Access = Value *;
-            using WritableGuard = ::ScL::Feature::HolderGuard<ThisType &>;
+            using WritableGuard = ::scl::feature::HolderGuard<ThisType &>;
 
             struct Empty
             {};
@@ -290,7 +290,7 @@ namespace ScL::Feature::Implicit
                 typename _RightWrapperRefer,
                 typename = ::std::enable_if_t<
                     !::std::is_const< ::std::remove_reference_t<_LeftWrapperRefer> >::value
-                    && ::ScL::Feature::IsThisCompatibleWithOther<
+                    && ::scl::feature::IsThisCompatibleWithOther<
                         ::std::decay_t<_RightWrapperRefer>,
                         ::std::decay_t<_LeftWrapperRefer> >::value
                     && (::std::is_volatile< ::std::remove_reference_t<_LeftWrapperRefer> >::value
@@ -299,9 +299,9 @@ namespace ScL::Feature::Implicit
             static decltype(auto) operatorAssignment(
                 _LeftWrapperRefer && left, _RightWrapperRefer && right)
             {
-                auto && left_holder = ::ScL::Feature::Detail::wrapperHolder(
+                auto && left_holder = ::scl::feature::detail::wrapperHolder(
                     ::std::forward<_LeftWrapperRefer>(left));
-                auto && right_holder = ::ScL::Feature::Detail::wrapperHolder(
+                auto && right_holder = ::scl::feature::detail::wrapperHolder(
                     ::std::forward<_RightWrapperRefer>(right));
 
                 if (left_holder.m_pointer != right_holder.m_pointer)
@@ -342,7 +342,7 @@ namespace ScL::Feature::Implicit
             static constexpr decltype(auto) value(_HolderRefer && holder)
             {
                 using HolderRefer = _HolderRefer &&;
-                using ValueRefer = ::ScL::SimilarRefer<Value, HolderRefer>;
+                using ValueRefer = ::scl::SimilarRefer<Value, HolderRefer>;
                 return ::std::forward<ValueRefer>(*holder.m_access);
             }
         };
@@ -350,7 +350,7 @@ namespace ScL::Feature::Implicit
         template <typename _WrapperRefer>
         static bool isEmpty(_WrapperRefer && wrapper) noexcept
         {
-            return !::ScL::Feature::Detail::wrapperHolder(::std::forward<_WrapperRefer>(wrapper))
+            return !::scl::feature::detail::wrapperHolder(::std::forward<_WrapperRefer>(wrapper))
                         .m_pointer;
         }
 
@@ -360,7 +360,7 @@ namespace ScL::Feature::Implicit
         {
             if (isEmpty(::std::forward<_WrapperRefer>(wrapper)))
                 return {};
-            return ::ScL::Feature::Detail::wrapperHolder(::std::forward<_WrapperRefer>(wrapper))
+            return ::scl::feature::detail::wrapperHolder(::std::forward<_WrapperRefer>(wrapper))
                 .m_pointer->typeId();
         }
 
@@ -373,7 +373,7 @@ namespace ScL::Feature::Implicit
             using TestType = typename _TestWrapper::Holder::Value;
             static auto const test_type_id = typeid(TestType).hash_code();
             return test_type_id
-                == ::ScL::Feature::Detail::wrapperHolder(::std::forward<_WrapperRefer>(wrapper))
+                == ::scl::feature::detail::wrapperHolder(::std::forward<_WrapperRefer>(wrapper))
                        .m_pointer->typeId();
         }
 
@@ -385,7 +385,7 @@ namespace ScL::Feature::Implicit
 
             using TestAccess = typename _TestWrapper::Holder::Access;
             return dynamic_cast<TestAccess>(
-                ::ScL::Feature::Detail::wrapperHolder(::std::forward<_WrapperRefer>(wrapper))
+                ::scl::feature::detail::wrapperHolder(::std::forward<_WrapperRefer>(wrapper))
                     .m_access);
         }
 
@@ -396,7 +396,7 @@ namespace ScL::Feature::Implicit
             using Empty = typename _LeftWrapper::Holder::Empty;
 
             LeftHolder left_holder{Empty{}};
-            auto && right_holder = ::ScL::Feature::Detail::wrapperHolder(
+            auto && right_holder = ::scl::feature::detail::wrapperHolder(
                 ::std::forward<_RightWrapperRefer>(right));
 
             if (left_holder.m_pointer != right_holder.m_pointer)
@@ -418,7 +418,7 @@ namespace ScL::Feature::Implicit
             using Empty = typename _LeftWrapper::Holder::Empty;
 
             LeftHolder left_holder{Empty{}};
-            auto && right_holder = ::ScL::Feature::Detail::wrapperHolder(
+            auto && right_holder = ::scl::feature::detail::wrapperHolder(
                 ::std::forward<_RightWrapperRefer>(right));
 
             if (left_holder.m_pointer != right_holder.m_pointer)
@@ -436,21 +436,21 @@ namespace ScL::Feature::Implicit
             return _LeftWrapper{left_holder};
         }
     };
-} // namespace ScL::Feature::Implicit
+} // namespace scl::feature::Implicit
 
-namespace ScL::Feature::Implicit
+namespace scl::feature::Implicit
 {
-    using Raw = ::ScL::Feature::Implicit::CountedRaw< ::std::atomic<int32_t> >;
-} // namespace ScL::Feature::Implicit
+    using Raw = ::scl::feature::Implicit::CountedRaw< ::std::atomic<int32_t> >;
+} // namespace scl::feature::Implicit
 
 #include <scl/feature/mixin.h>
 
-namespace ScL::Feature
+namespace scl::feature
 {
     template <typename _Type>
-    class ToolAdditionMixIn< ::ScL::Feature::Detail::Wrapper<_Type, ::ScL::Feature::Implicit::Raw> >
+    class ToolAdditionMixIn< ::scl::feature::detail::wrapper<_Type, ::scl::feature::Implicit::Raw> >
     {
-        using Extended = ::ScL::Feature::Detail::Wrapper<_Type, ::ScL::Feature::Implicit::Raw>;
+        using Extended = ::scl::feature::detail::wrapper<_Type, ::scl::feature::Implicit::Raw>;
 
         auto & self() const { return *static_cast<Extended const *>(this); }
 
@@ -486,5 +486,5 @@ namespace ScL::Feature
             return Extended::Tool::template dynamicCast<_Other>(self());
         }
     };
-} // namespace ScL::Feature
+} // namespace scl::feature
 #endif

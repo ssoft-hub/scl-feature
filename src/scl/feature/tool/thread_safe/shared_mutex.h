@@ -10,21 +10,21 @@
 #include "private/shared_mutex.h"
 #endif
 
-namespace ScL
+namespace scl
 {
     using SharedMutex =
 #if __cplusplus > 201700L
         ::std::shared_mutex
 #else
-    ::ScL::Feature::Detail::SharedMutex
+    ::scl::feature::detail::SharedMutex
 #endif
     ;
 }
 
-namespace ScL::Feature::ThreadSafe
+namespace scl::feature::ThreadSafe
 {
     template < typename _Holder >
-    struct Locking< ::ScL::SharedMutex, _Holder >
+    struct Locking< ::scl::SharedMutex, _Holder >
     {
         template < typename _LockRefer >
         static constexpr void lock ( _LockRefer && lock )
@@ -42,7 +42,7 @@ namespace ScL::Feature::ThreadSafe
     };
 
     template < typename _Holder >
-    struct Locking< ::ScL::SharedMutex, const _Holder >
+    struct Locking< ::scl::SharedMutex, const _Holder >
     {
         template < typename _LockRefer >
         static constexpr void lock ( _LockRefer && lock )
@@ -60,9 +60,9 @@ namespace ScL::Feature::ThreadSafe
     };
 }
 
-namespace ScL::Feature::ThreadSafe
+namespace scl::feature::ThreadSafe
 {
-    using SharedMutex = ::ScL::Feature::ThreadSafe::Lock< ::ScL::SharedMutex >;
+    using SharedMutex = ::scl::feature::ThreadSafe::Lock< ::scl::SharedMutex >;
 }
 
 #endif

@@ -12,7 +12,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace ScL::Feature::Inplace
+namespace scl::feature::Inplace
 {
     /*!
      * Инструмент для формирования значения "по месту", которое
@@ -213,14 +213,14 @@ namespace ScL::Feature::Inplace
             static constexpr decltype(auto) value(_HolderRefer && holder)
             {
                 using HolderRefer = _HolderRefer &&;
-                using ValueRefer = ::ScL::SimilarRefer<Value, HolderRefer>;
+                using ValueRefer = ::scl::SimilarRefer<Value, HolderRefer>;
                 if (!holder.m_is_exists)
                     throw BadOptionalAccess{};
                 return ::std::forward<ValueRefer>(holder.m_value);
             }
         };
     };
-} // namespace ScL::Feature::Inplace
+} // namespace scl::feature::Inplace
 
 #define SCL_OPTIONAL_VALUE_METHOD(refer)                                                      \
     constexpr MixInValue refer value() refer                                                  \
@@ -228,7 +228,7 @@ namespace ScL::Feature::Inplace
         using WrapperRefer = MixInWrapper refer;                                              \
         using ValueRefer = MixInValue refer;                                                  \
         if (!static_cast<WrapperRefer>(*this).m_holder.m_is_exists)                           \
-            throw ::ScL::Feature::Inplace::Optional::BadOptionalAccess{};                     \
+            throw ::scl::feature::Inplace::Optional::BadOptionalAccess{};                     \
         return ::std::forward<ValueRefer>(static_cast<WrapperRefer>(*this).m_holder.m_value); \
     }
 
@@ -242,22 +242,22 @@ namespace ScL::Feature::Inplace
     SCL_OPTIONAL_VALUE_METHOD(volatile &&)      \
     SCL_OPTIONAL_VALUE_METHOD(const volatile &&)
 
-namespace ScL::Feature::Detail
+namespace scl::feature::detail
 {
     template <typename, typename>
-    class Wrapper;
-} // namespace ScL::Feature::Detail
+    class wrapper;
+} // namespace scl::feature::detail
 
-namespace ScL::Feature
+namespace scl::feature
 {
     template <typename _Value>
     class ToolAdditionMixIn<
-        ::ScL::Feature::Detail::Wrapper<_Value, ::ScL::Feature::Inplace::Optional>>
+        ::scl::feature::detail::wrapper<_Value, ::scl::feature::Inplace::Optional>>
     {
         using MixInValue = _Value;
-        using Tool = ::ScL::Feature::Inplace::Optional;
-        using MixInWrapper = ::ScL::Feature::Detail::Wrapper<_Value, Tool>;
-        using MixInHolder = ::ScL::Feature::Inplace::Optional::Holder<_Value>;
+        using Tool = ::scl::feature::Inplace::Optional;
+        using MixInWrapper = ::scl::feature::detail::wrapper<_Value, Tool>;
+        using MixInHolder = ::scl::feature::Inplace::Optional::Holder<_Value>;
 
     public:
         SCL_OPTIONAL_VALUE
@@ -344,12 +344,12 @@ namespace ScL::Feature
             return static_cast<WrapperRefer>(*this).m_holder.m_is_exists;
         }
     };
-} // namespace ScL::Feature
+} // namespace scl::feature
 
 #undef SCL_OPTIONAL_VALUE
 #undef SCL_OPTIONAL_VALUE_METHOD
 
-namespace ScL::Feature
+namespace scl::feature
 {
     template <typename Self_, typename SelfHolder_>
     class ToolReflectionMixIn<Self_, SelfHolder_, Inplace::Optional>
@@ -367,6 +367,6 @@ namespace ScL::Feature
             return 0;
         }
     };
-} // namespace ScL::Feature
+} // namespace scl::feature
 
 #endif

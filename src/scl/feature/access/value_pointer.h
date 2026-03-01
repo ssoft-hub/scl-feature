@@ -6,22 +6,22 @@
 
 #include <scl/utility/type_traits/detection/operator.h>
 
-namespace ScL::Feature
+namespace scl::feature
 {
     /*!
-     * Указатель на экземпляр вложенного в Wrapper базового значения, к которому применены
-     * все особенности, реализуемые посредством используемых Wrapper.
+     * Указатель на экземпляр вложенного в wrapper базового значения, к которому применены
+     * все особенности, реализуемые посредством используемых wrapper.
      */
     template <typename _WrapperRefer>
     class ValuePointer
     {
         template <typename, typename>
-        friend class ::ScL::Feature::Detail::Wrapper;
+        friend class ::scl::feature::detail::wrapper;
         using ThisType = ValuePointer<_WrapperRefer>;
 
     public:
         using WrapperRefer = _WrapperRefer;
-        using ValueGuard = ::ScL::Feature::ValueGuard<WrapperRefer>;
+        using ValueGuard = ::scl::feature::ValueGuard<WrapperRefer>;
         using PointerAccess = typename ValueGuard::PointerAccess;
         using ValueAccess = typename ValueGuard::ValueAccess;
 
@@ -51,6 +51,6 @@ namespace ScL::Feature
                 return m_value_guard.pointerAccess();
         }
     };
-} // namespace ScL::Feature
+} // namespace scl::feature
 
 #endif

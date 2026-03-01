@@ -5,7 +5,7 @@
 #include <scl/feature/mixin.h>
 #include <unordered_set>
 
-namespace ScL::Feature
+namespace scl::feature
 {
     template <typename Self_,
         typename SelfHolder_,
@@ -17,6 +17,6 @@ namespace ScL::Feature
         SelfHolder_,
         ::std::unordered_set<Key_, Hash_, Pred_, Allocator_>>
     {};
-} // namespace ScL::Feature
+} // namespace scl::feature
 
 #endif

@@ -7,7 +7,7 @@
 
 #include <utility>
 
-namespace ScL::Feature::Detail
+namespace scl::feature::detail
 {
     template <typename _WrapperRefer>
     struct WrapperAccess
@@ -16,36 +16,36 @@ namespace ScL::Feature::Detail
             "The template parameter _WrapperRefer must to be a reference type.");
 
         using WrapperRefer = _WrapperRefer;
-        using Wrapper = ::std::decay_t<WrapperRefer>;
+        using wrapper = ::std::decay_t<WrapperRefer>;
 
-        static_assert(::ScL::Feature::isWrapper<Wrapper>(),
-            "The template parameter _WrapperRefer must to be a Wrapper reference type.");
+        static_assert(::scl::feature::isWrapper<wrapper>(),
+            "The template parameter _WrapperRefer must to be a wrapper reference type.");
 
-        using Holder = typename Wrapper::Holder;
-        using HolderRefer = ::ScL::SimilarRefer<Holder, WrapperRefer>;
+        using Holder = typename wrapper::Holder;
+        using HolderRefer = ::scl::SimilarRefer<Holder, WrapperRefer>;
 
         static constexpr HolderRefer holderRefer(WrapperRefer refer)
         {
             return ::std::forward<HolderRefer>(refer.m_holder);
         }
     };
-} // namespace ScL::Feature::Detail
+} // namespace scl::feature::detail
 
-namespace ScL::Feature::Detail
+namespace scl::feature::detail
 {
     template <typename _WrapperRefer,
         typename =
-            ::std::enable_if_t< ::ScL::Feature::isWrapper< ::std::decay_t<_WrapperRefer> >()> >
-    constexpr ::ScL::SimilarRefer<typename ::std::decay_t<_WrapperRefer>::Holder, _WrapperRefer &&>
+            ::std::enable_if_t< ::scl::feature::isWrapper< ::std::decay_t<_WrapperRefer> >()> >
+    constexpr ::scl::SimilarRefer<typename ::std::decay_t<_WrapperRefer>::Holder, _WrapperRefer &&>
         wrapperHolder(_WrapperRefer && refer)
     {
         using WrapperRefer = _WrapperRefer &&;
-        return ::ScL::Feature::Detail::WrapperAccess<WrapperRefer>::holderRefer(
+        return ::scl::feature::detail::WrapperAccess<WrapperRefer>::holderRefer(
             ::std::forward<WrapperRefer>(refer));
     }
-} // namespace ScL::Feature::Detail
+} // namespace scl::feature::detail
 
-namespace ScL::Feature::Detail
+namespace scl::feature::detail
 {
     template <typename _HolderRefer, bool has_method>
     struct GuardHelper;
@@ -96,9 +96,9 @@ namespace ScL::Feature::Detail
             Holder::unguard(::std::forward<_HolderRefer>(holder));
         }
     };
-} // namespace ScL::Feature::Detail
+} // namespace scl::feature::detail
 
-namespace ScL::Feature::Detail
+namespace scl::feature::detail
 {
     struct HolderInterface
     {
@@ -132,7 +132,7 @@ namespace ScL::Feature::Detail
         static constexpr void guard(_HolderRefer holder)
         {
             using Holder = ::std::decay_t<_HolderRefer>;
-            ::ScL::Feature::Detail::GuardHelper<_HolderRefer,
+            ::scl::feature::detail::GuardHelper<_HolderRefer,
                 doesGuardStaticMethodExist<Holder,
                     _HolderRefer>()>::guard(::std::forward<_HolderRefer>(holder));
         }
@@ -143,7 +143,7 @@ namespace ScL::Feature::Detail
         static constexpr void unguard(_HolderRefer holder)
         {
             using Holder = ::std::decay_t<_HolderRefer>;
-            ::ScL::Feature::Detail::UnguardHelper<_HolderRefer,
+            ::scl::feature::detail::UnguardHelper<_HolderRefer,
                 doesUnguardStaticMethodExist<Holder,
                     _HolderRefer>()>::unguard(::std::forward<_HolderRefer>(holder));
         }
@@ -157,6 +157,6 @@ namespace ScL::Feature::Detail
             return Holder::value(::std::forward<_HolderRefer>(holder));
         }
     };
-} // namespace ScL::Feature::Detail
+} // namespace scl::feature::detail
 
 #endif

@@ -6,18 +6,18 @@
 #pragma warning(disable: 4521 4522)
 #endif
 
-namespace ScL::Feature::Inplace
+namespace scl::feature::Inplace
 {
     struct Default;
-} // namespace ScL::Feature::Inplace
+} // namespace scl::feature::Inplace
 
-namespace ScL::Feature::Detail
+namespace scl::feature::detail
 {
     template <typename, typename>
-    class Wrapper;
-} // namespace ScL::Feature::Detail
+    class wrapper;
+} // namespace scl::feature::detail
 
-namespace ScL::Feature::Detail
+namespace scl::feature::detail
 {
     template <typename _Value, typename... _Tools>
     struct MultiToolHelper;
@@ -25,25 +25,25 @@ namespace ScL::Feature::Detail
     template <typename _Value>
     struct MultiToolHelper<_Value>
     {
-        using Type = typename MultiToolHelper<_Value, ::ScL::Feature::Inplace::Default>::Type;
+        using Type = typename MultiToolHelper<_Value, ::scl::feature::Inplace::Default>::Type;
     };
 
     template <typename _Value, typename _Tool>
     struct MultiToolHelper<_Value, _Tool>
     {
-        using Type = ::ScL::Feature::Detail::Wrapper<_Value, _Tool>;
+        using Type = ::scl::feature::detail::wrapper<_Value, _Tool>;
     };
 
     template <typename _Value, typename _Tool>
-    struct MultiToolHelper< ::ScL::Feature::Detail::Wrapper<_Value, _Tool> >
+    struct MultiToolHelper< ::scl::feature::detail::wrapper<_Value, _Tool> >
     {
-        using Type = ::ScL::Feature::Detail::Wrapper<_Value, _Tool>;
+        using Type = ::scl::feature::detail::wrapper<_Value, _Tool>;
     };
 
     template <typename _Value, typename _Tool, typename... _Tools>
     struct MultiToolHelper<_Value, _Tool, _Tools...>
     {
-        using Type = typename MultiToolHelper< ::ScL::Feature::Detail::Wrapper<_Value, _Tool>,
+        using Type = typename MultiToolHelper< ::scl::feature::detail::wrapper<_Value, _Tool>,
             _Tools...>::Type;
     };
 
@@ -52,9 +52,9 @@ namespace ScL::Feature::Detail
     {
         using Type = typename MultiToolHelper<_Value, _Tool, _Tools...>::Type;
     };
-} // namespace ScL::Feature::Detail
+} // namespace scl::feature::detail
 
-namespace ScL::Feature::Detail
+namespace scl::feature::detail
 {
     template <typename _Type>
     struct WrapperSimplifyHelper
@@ -64,32 +64,32 @@ namespace ScL::Feature::Detail
 
     template <typename _Value, typename _Tool, typename _OtherTool>
     struct WrapperSimplifyHelper<
-        ::ScL::Feature::Detail::Wrapper< ::ScL::Feature::Detail::Wrapper<_Value, _Tool>,
+        ::scl::feature::detail::wrapper< ::scl::feature::detail::wrapper<_Value, _Tool>,
             _OtherTool> >
     {
-        using Type = ::ScL::Feature::Detail::Wrapper<
-            typename WrapperSimplifyHelper< ::ScL::Feature::Detail::Wrapper<_Value, _Tool> >::Type,
+        using Type = ::scl::feature::detail::wrapper<
+            typename WrapperSimplifyHelper< ::scl::feature::detail::wrapper<_Value, _Tool> >::Type,
             _OtherTool>;
     };
 
     template <typename _Value, typename _Tool>
     struct WrapperSimplifyHelper<
-        ::ScL::Feature::Detail::Wrapper< ::ScL::Feature::Detail::Wrapper<_Value, _Tool>, _Tool> >
+        ::scl::feature::detail::wrapper< ::scl::feature::detail::wrapper<_Value, _Tool>, _Tool> >
     {
         using Type = typename WrapperSimplifyHelper<
-            ::ScL::Feature::Detail::Wrapper<_Value, _Tool> >::Type;
+            ::scl::feature::detail::wrapper<_Value, _Tool> >::Type;
     };
-} // namespace ScL::Feature::Detail
+} // namespace scl::feature::detail
 
-//! This is definition of Wrapper type. No tool duplicates are guarantee.
-namespace ScL::Feature
+//! This is definition of wrapper type. No tool duplicates are guarantee.
+namespace scl::feature
 {
     template <typename _Value, typename... _Tools>
-    using Wrapper = typename ::ScL::Feature::Detail::WrapperSimplifyHelper<
-        typename ::ScL::Feature::Detail::MultiToolHelper<_Value, _Tools...>::Type>::Type;
-} // namespace ScL::Feature
+    using wrapper = typename ::scl::feature::detail::WrapperSimplifyHelper<
+        typename ::scl::feature::detail::MultiToolHelper<_Value, _Tools...>::Type>::Type;
+} // namespace scl::feature
 
-// ::ScL::Feature::Wrapper must be defined before includes.
+// ::scl::feature::wrapper must be defined before includes.
 #include "detail/wrapper.h"
 
 #endif

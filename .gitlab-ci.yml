@@ -1,10 +1,27 @@
-stages: [mirror]
+stages: [publish]
+
+# ---------------------
+# Documentation
+# ---------------------
+pages:
+  stage: publish
+  image: alpine:latest
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+  before_script:
+    - apk add --no-cache doxygen graphviz ttf-freefont
+  script:
+    - mkdir -p public
+    - (cat project/doxygen/Doxyfile; printf '\nGENERATE_HTML=YES\nGENERATE_XML=NO\nHTML_OUTPUT=.\nOUTPUT_DIRECTORY=public\n') | doxygen -
+  artifacts:
+    paths:
+      - public
 
 # ---------------------
 # Mirror to GitHub
 # ---------------------
 mirror:github:
-  stage: mirror
+  stage: publish
   image:
     name: alpine/git
     entrypoint: [""]

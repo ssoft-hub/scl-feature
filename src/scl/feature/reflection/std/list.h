@@ -5,11 +5,11 @@
 #include <scl/feature/mixin.h>
 #include <list>
 
-namespace ScL::Feature
+namespace scl::feature
 {
     template <typename Self_, typename SelfHolder_, typename Value_, typename Allocator_>
     class ValueReflectionMixIn<Self_, SelfHolder_, ::std::list<Value_, Allocator_>>
     {};
-} // namespace ScL::Feature
+} // namespace scl::feature
 
 #endif

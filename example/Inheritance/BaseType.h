@@ -10,8 +10,8 @@ struct BaseType
     using Int = int;
     using String = ::std::string;
 
-    ::ScL::Feature::Wrapper<Int> m_int;
-    ::ScL::Feature::Wrapper<String> m_string;
+    ::scl::feature::wrapper<Int> m_int;
+    ::scl::feature::wrapper<String> m_string;
 
     BaseType(Int int_value = {}, String string_value = {})
         : m_int(int_value)

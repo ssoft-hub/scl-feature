@@ -7,7 +7,7 @@
 #include <scl/utility/type_traits.h>
 #include <utility>
 
-namespace ScL::Feature::Heap
+namespace scl::feature::Heap
 {
 
     /*!
@@ -122,7 +122,7 @@ namespace ScL::Feature::Heap
                 typename = ::std::enable_if_t<
                     !::std::is_const< ::std::remove_reference_t<_LeftWrapperRefer> >::value
                     && !::std::is_const< ::std::remove_reference_t<_RightWrapperRefer> >::value
-                    && ::ScL::Feature::IsThisCompatibleWithOther<
+                    && ::scl::feature::IsThisCompatibleWithOther<
                         ::std::decay_t<_RightWrapperRefer>,
                         ::std::decay_t<_LeftWrapperRefer> >::value
                     && (::std::is_volatile< ::std::remove_reference_t<_LeftWrapperRefer> >::value
@@ -132,8 +132,8 @@ namespace ScL::Feature::Heap
             static decltype(auto) operatorAssignment(
                 _LeftWrapperRefer && left, _RightWrapperRefer && right)
             {
-                ::std::swap(::ScL::Feature::Detail::wrapperHolder(left).m_pointer,
-                    ::ScL::Feature::Detail::wrapperHolder(right).m_pointer);
+                ::std::swap(::scl::feature::detail::wrapperHolder(left).m_pointer,
+                    ::scl::feature::detail::wrapperHolder(right).m_pointer);
                 return ::std::forward<_LeftWrapperRefer>(left);
             }
 
@@ -142,11 +142,11 @@ namespace ScL::Feature::Heap
             static constexpr decltype(auto) value(_HolderRefer && holder)
             {
                 using HolderRefer = _HolderRefer &&;
-                using ValueRefer = ::ScL::SimilarRefer<Value, HolderRefer>;
+                using ValueRefer = ::scl::SimilarRefer<Value, HolderRefer>;
                 return ::std::forward<ValueRefer>(*holder.m_pointer);
             }
         };
     };
-} // namespace ScL::Feature::Heap
+} // namespace scl::feature::Heap
 
 #endif

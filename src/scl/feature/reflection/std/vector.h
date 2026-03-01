@@ -6,7 +6,7 @@
 #include <scl/feature/reflection.h>
 #include <vector>
 
-namespace ScL::Feature
+namespace scl::feature
 {
     template <typename Self_, typename SelfHolder_, typename Value_, typename Allocator_>
     class ValueReflectionMixIn<Self_, SelfHolder_, ::std::vector<Value_, Allocator_>>
@@ -63,6 +63,6 @@ namespace ScL::Feature
         // decltype(::std::declval<Adaptor>().rbegin()); using const_reverse_iterator =
         // decltype(::std::declval<Adaptor const>().rbegin());
     };
-} // namespace ScL::Feature
+} // namespace scl::feature
 
 #endif

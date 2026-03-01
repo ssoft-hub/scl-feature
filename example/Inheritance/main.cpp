@@ -3,7 +3,7 @@
 #include "BaseType.h"
 #include "DerivedType.h"
 
-using namespace ::ScL::Feature;
+using namespace ::scl::feature;
 
 using Int = int;
 using String = ::std::string;
@@ -15,8 +15,8 @@ using DerivedInt = DerivedType::Int;
 using DerivedString = DerivedType::String;
 
 using Tool = Heap::Unique;
-using HeapInt = Wrapper<int, Tool>;
-using HeapString = Wrapper< ::std::string, Tool>;
+using HeapInt = wrapper<int, Tool>;
+using HeapString = wrapper< ::std::string, Tool>;
 
 void printBase(BaseType const & base_value)
 {
@@ -26,9 +26,9 @@ void printBase(BaseType const & base_value)
 
 void testBase()
 {
-    Wrapper<BaseType> default_base_value;
-    Wrapper<BaseType> contruct_base_value(10, "Constructed base type");
-    Wrapper<BaseType> move_base_value = Wrapper<BaseType>(20, "Moved base type");
+    wrapper<BaseType> default_base_value;
+    wrapper<BaseType> contruct_base_value(10, "Constructed base type");
+    wrapper<BaseType> move_base_value = wrapper<BaseType>(20, "Moved base type");
 
     default_base_value = contruct_base_value;
 
@@ -39,7 +39,7 @@ void testBase()
 
 void testBaseSetting()
 {
-    Wrapper<BaseType> base_value;
+    wrapper<BaseType> base_value;
 
     base_value->m_int = 1;
     base_value->m_string = "one";
@@ -67,9 +67,9 @@ void printDerived(DerivedType const & derived_value)
 
 void testDerived()
 {
-    Wrapper<DerivedType> default_derived_value;                                               //
-    Wrapper<DerivedType> contruct_derived_value(10, "Constructed derived type");              //
-    Wrapper<DerivedType> move_derived_value = Wrapper<DerivedType>(20, "Moved derived type"); //
+    wrapper<DerivedType> default_derived_value;                                               //
+    wrapper<DerivedType> contruct_derived_value(10, "Constructed derived type");              //
+    wrapper<DerivedType> move_derived_value = wrapper<DerivedType>(20, "Moved derived type"); //
 
     default_derived_value = contruct_derived_value; //
 
@@ -80,10 +80,10 @@ void testDerived()
 
 void testBaseDerivedSetting()
 {
-    using BaseTestType = Wrapper<BaseType, Implicit::Raw>;
-    using DerivedTestType = Wrapper<DerivedType, Implicit::Raw>;
+    using BaseTestType = wrapper<BaseType, Implicit::Raw>;
+    using DerivedTestType = wrapper<DerivedType, Implicit::Raw>;
 
-    Wrapper<DerivedTestType> derived_value;
+    wrapper<DerivedTestType> derived_value;
 
     derived_value->BaseType::m_int = 1;
     derived_value->BaseType::m_string = "one";
@@ -109,11 +109,11 @@ void testBaseDerivedSetting()
     derived_value->m_string = HeapString("negative four");
     printDerived(*&::std::as_const(derived_value));
 
-    Wrapper<BaseTestType> base_value;
+    wrapper<BaseTestType> base_value;
     base_value = derived_value; // OK
     printBase(*&::std::as_const(base_value));
 
-    // Wrapper< DerivedType > other_derived_value = base_value; //ERROR
+    // wrapper< DerivedType > other_derived_value = base_value; //ERROR
 }
 
 int main(int, char **)

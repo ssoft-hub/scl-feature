@@ -11,9 +11,9 @@ struct DerivedType
     : public AdditionType
     , public BaseType
 {
-    using Tool = ::ScL::Feature::Implicit::Shared;
-    using Int = ::ScL::Feature::Wrapper<int, Tool>;
-    using String = ::ScL::Feature::Wrapper< ::std::string, Tool>;
+    using Tool = ::scl::feature::Implicit::Shared;
+    using Int = ::scl::feature::wrapper<int, Tool>;
+    using String = ::scl::feature::wrapper< ::std::string, Tool>;
 
     Int m_int;
     String m_string;

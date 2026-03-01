@@ -7,12 +7,12 @@
 #include "range_tool.h"
 #include <utility>
 
-// namespace ScL::Feature::Inplace { struct Default; }
-namespace ScL::Feature::Detail
+// namespace scl::feature::Inplace { struct Default; }
+namespace scl::feature::detail
 {
     template <typename, typename>
-    class Wrapper;
-} // namespace ScL::Feature::Detail
+    class wrapper;
+} // namespace scl::feature::detail
 
 // ::std::begin, ::std::cbegin, ::std::end, ::std::cend, ::std::size, ::std::ssize, ::std::data,
 // ::std::cdata
@@ -21,13 +21,13 @@ namespace ScL::Feature::Detail
 
 #define SCL_RANGE_METHOD_PROTOTYPE(method, refer)                                             \
     template <typename _Type, typename _Tool, typename = ::std::enable_if_t<true> >           \
-    inline decltype(auto) method(::ScL::Feature::Detail::Wrapper<_Type, _Tool> refer value)   \
+    inline decltype(auto) method(::scl::feature::detail::wrapper<_Type, _Tool> refer value)   \
     {                                                                                         \
-        using RangeWrapperRefer = ::ScL::Feature::Detail::Wrapper<_Type, _Tool> refer;        \
+        using RangeWrapperRefer = ::scl::feature::detail::wrapper<_Type, _Tool> refer;        \
         using RangeRefer = decltype(*&::std::declval<RangeWrapperRefer>());                   \
         using IteratorType = decltype(::std::method(::std::declval<RangeRefer>()));           \
-        using IteratorWrapper = ::ScL::Feature::Detail::Wrapper<IteratorType,                 \
-            ::ScL::Feature::Detail::Guard::RangeTool<RangeWrapperRefer> >;                    \
+        using IteratorWrapper = ::scl::feature::detail::wrapper<IteratorType,                 \
+            ::scl::feature::detail::Guard::RangeTool<RangeWrapperRefer> >;                    \
         return IteratorWrapper(value, [](RangeRefer range) { return ::std::method(range); }); \
     }
 

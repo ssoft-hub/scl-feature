@@ -56,7 +56,7 @@ target_include_directories(scl-${MODULE}
 
 # Dependency on scl::utility:
 if (NOT TARGET scl::utility)
-    find_package(ScL CONFIG REQUIRED COMPONENTS utility)
+    find_package(scl CONFIG REQUIRED COMPONENTS utility)
 endif()
 
 target_link_libraries(scl-${MODULE} INTERFACE scl::utility)

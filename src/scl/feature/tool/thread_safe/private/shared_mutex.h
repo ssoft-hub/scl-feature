@@ -5,7 +5,7 @@
 #include <condition_variable>
 #include <mutex>
 
-namespace ScL::Feature::Detail
+namespace scl::feature::detail
 {
     /*
      * Copied implementation from Boost library
@@ -114,6 +114,6 @@ namespace ScL::Feature::Detail
             release_waiters();
         }
     };
-} // namespace ScL::Feature::Detail
+} // namespace scl::feature::detail
 
 #endif

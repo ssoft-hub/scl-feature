@@ -7,19 +7,19 @@
 #include <scl/utility/preprocessor.h>
 #include <scl/utility/type_traits.h>
 
-namespace ScL::Feature::Detail::Operator::Binary
+namespace scl::feature::detail::Operator::Binary
 {
     /* Cases for Holder method existing */
     struct HolderHasOperatorCase
     {};
     struct HolderHasNoOperatorCase
     {};
-} // namespace ScL::Feature::Detail::Operator::Binary
+} // namespace scl::feature::detail::Operator::Binary
 
-namespace ScL::Feature::Detail::Operator::Global
+namespace scl::feature::detail::Operator::Global
 {
     struct DefaultCase;
-} // namespace ScL::Feature::Detail::Operator::Global
+} // namespace scl::feature::detail::Operator::Global
 
 // clang-format off
 #define SCL_FEATURE_DOES_BINARY_OPERATOR_EXIST(Invokable, scl_name)                             \
@@ -28,7 +28,7 @@ namespace ScL::Feature::Detail::Operator::Global
                                                                                                \
     template <typename _LeftRefer, typename _RightRefer>                                       \
     using Does##Invokable##OperatorExist = Does##Invokable##OperatorExistHelper<               \
-        ::ScL::Feature::Detail::Operator::WrapperSwitchCase<_LeftRefer, _RightRefer>,          \
+        ::scl::feature::detail::Operator::WrapperSwitchCase<_LeftRefer, _RightRefer>,          \
         _LeftRefer,                                                                            \
         _RightRefer>;                                                                          \
                                                                                                \
@@ -41,7 +41,7 @@ namespace ScL::Feature::Detail::Operator::Global
     /* Non wrapper case */                                                                     \
     template <typename _LeftRefer, typename _RightRefer>                                       \
     struct Does##Invokable##OperatorExistHelper<                                               \
-        ::ScL::Feature::Detail::Operator::NoneWrapperCase,                                     \
+        ::scl::feature::detail::Operator::NoneWrapperCase,                                     \
             _LeftRefer,                                                                        \
             _RightRefer>                                                                       \
     {                                                                                          \
@@ -57,10 +57,10 @@ namespace ScL::Feature::Detail::Operator::Global
         constexpr operator bool() const noexcept { return value; }                             \
     };                                                                                         \
                                                                                                \
-    /* Member of Wrapper case */                                                               \
+    /* Member of wrapper case */                                                               \
     template <typename _LeftWrapperRefer, typename _RightRefer>                                \
     struct Does##Invokable##OperatorExistHelper<                                               \
-            ::ScL::Feature::Detail::Operator::LeftWrapperCase,                                 \
+            ::scl::feature::detail::Operator::LeftWrapperCase,                                 \
             _LeftWrapperRefer,                                                                 \
             _RightRefer>                                                                       \
     {                                                                                          \
@@ -73,7 +73,7 @@ namespace ScL::Feature::Detail::Operator::Global
         using LeftWrapper = ::std::decay_t<LeftWrapperRefer>;                                  \
         using LeftHolder = typename LeftWrapper::Holder;                                       \
         using LeftValue = typename LeftWrapper::Value;                                         \
-        using LeftValueRefer = ::ScL::SimilarRefer<LeftValue, LeftWrapperRefer>;               \
+        using LeftValueRefer = ::scl::SimilarRefer<LeftValue, LeftWrapperRefer>;               \
         using RightRefer = _RightRefer;                                                        \
                                                                                                \
         static constexpr bool                                                                  \
@@ -91,7 +91,7 @@ namespace ScL::Feature::Detail::Operator::Global
     /* Global case */                                                                          \
     template <typename _LeftRefer, typename _RightWrapperRefer>                                \
     struct Does##Invokable##OperatorExistHelper<                                               \
-            ::ScL::Feature::Detail::Operator::RightWrapperCase,                                \
+            ::scl::feature::detail::Operator::RightWrapperCase,                                \
             _LeftRefer,                                                                        \
             _RightWrapperRefer>                                                                \
     {                                                                                          \
@@ -105,7 +105,7 @@ namespace ScL::Feature::Detail::Operator::Global
         using RightWrapper = ::std::decay_t<RightWrapperRefer>;                                \
         using RightHolder = typename RightWrapper::Holder;                                     \
         using RightValue = typename RightWrapper::Value;                                       \
-        using RightValueRefer = ::ScL::SimilarRefer<RightValue, RightWrapperRefer>;            \
+        using RightValueRefer = ::scl::SimilarRefer<RightValue, RightWrapperRefer>;            \
                                                                                                \
         static constexpr bool                                                                  \
             value = ::scl::is_detected_v< ::scl::scl_name##_operation,                        \
@@ -119,10 +119,10 @@ namespace ScL::Feature::Detail::Operator::Global
         constexpr operator bool() const noexcept { return value; }                             \
     };                                                                                         \
                                                                                                \
-    /* Member of Wrapper case */                                                               \
+    /* Member of wrapper case */                                                               \
     template <typename _LeftWrapperRefer, typename _RightWrapperRefer>                         \
     struct Does##Invokable##OperatorExistHelper<                                               \
-            ::ScL::Feature::Detail::Operator::BothWrapperCase,                                 \
+            ::scl::feature::detail::Operator::BothWrapperCase,                                 \
             _LeftWrapperRefer,                                                                 \
             _RightWrapperRefer>                                                                \
     {                                                                                          \
@@ -135,14 +135,14 @@ namespace ScL::Feature::Detail::Operator::Global
         using LeftWrapper = ::std::decay_t<LeftWrapperRefer>;                                  \
         using LeftHolder = typename LeftWrapper::Holder;                                       \
         using LeftValue = typename LeftWrapper::Value;                                         \
-        using LeftValueRefer = ::ScL::SimilarRefer<LeftValue, LeftWrapperRefer>;               \
+        using LeftValueRefer = ::scl::SimilarRefer<LeftValue, LeftWrapperRefer>;               \
         using RightWrapperRefer = _RightWrapperRefer;                                          \
         using RightWrapper = ::std::decay_t<RightWrapperRefer>;                                \
         using RightValue = typename RightWrapper::Value;                                       \
-        using RightValueRefer = ::ScL::SimilarRefer<RightValue, RightWrapperRefer>;            \
+        using RightValueRefer = ::scl::SimilarRefer<RightValue, RightWrapperRefer>;            \
                                                                                                \
         static constexpr bool                                                                  \
-            is_right_compatible_with_left = ::ScL::Feature::isThisCompatibleWithOther<         \
+            is_right_compatible_with_left = ::scl::feature::isThisCompatibleWithOther<         \
                                                 RightWrapper,                                  \
                                                 LeftWrapper>()                                 \
             && (::scl::is_detected_v<operator##Invokable##_static_method_exact_operation,       \
@@ -152,15 +152,15 @@ namespace ScL::Feature::Detail::Operator::Global
                 || does##Invokable##OperatorExist<LeftValueRefer, RightValueRefer>());         \
                                                                                                \
         static constexpr bool is_path_of_right_compatible_with_left =                          \
-            ::ScL::Feature::isPartOfThisCompatibleWithOther<RightWrapper, LeftWrapper>()       \
+            ::scl::feature::isPartOfThisCompatibleWithOther<RightWrapper, LeftWrapper>()       \
             && does##Invokable##OperatorExist<LeftWrapperRefer, RightValueRefer>();            \
                                                                                                \
         static constexpr bool is_right_compatible_with_path_of_left =                          \
-            ::ScL::Feature::isThisCompatibleWithPartOfOther<RightWrapper, LeftWrapper>()       \
+            ::scl::feature::isThisCompatibleWithPartOfOther<RightWrapper, LeftWrapper>()       \
             && does##Invokable##OperatorExist<LeftValueRefer, RightWrapperRefer>();            \
                                                                                                \
         static constexpr bool                                                                  \
-            is_right_not_compatible_with_left = !::ScL::Feature::isThisCompatibleWithOther<    \
+            is_right_not_compatible_with_left = !::scl::feature::isThisCompatibleWithOther<    \
                                                     RightWrapper,                              \
                                                     LeftWrapper>()                             \
             && does##Invokable##OperatorExist<LeftValueRefer, RightValueRefer>();              \
@@ -172,7 +172,7 @@ namespace ScL::Feature::Detail::Operator::Global
     };
 
 #define SCL_BINARY_OPERATOR_IMPLEMENTAION(symbol, Invokable, scl_name)                            \
-    namespace ScL::Feature::Detail::Operator::Binary                                       \
+    namespace scl::feature::detail::Operator::Binary                                       \
     {                                                                                              \
         SCL_METHOD_DETECTION(operator##Invokable)                                                  \
         template <typename... _Arguments>                                                          \
@@ -200,18 +200,18 @@ namespace ScL::Feature::Detail::Operator::Global
         SCL_FEATURE_DOES_BINARY_OPERATOR_EXIST(Invokable, scl_name)                                \
     }                                                                                              \
                                                                                                    \
-    namespace ScL::Feature::Detail::Operator::Global                                               \
+    namespace scl::feature::detail::Operator::Global                                               \
     {                                                                                              \
         struct Invokable##Case;                                                                    \
     }                                                                                              \
                                                                                                    \
-    namespace ScL::Feature::Detail::Operator::Binary                                               \
+    namespace scl::feature::detail::Operator::Binary                                               \
     {                                                                                              \
         template <typename>                                                                        \
         struct Invokable##Operator;                                                                \
                                                                                                    \
         template <>                                                                                \
-        struct Invokable##Operator< ::ScL::Feature::Detail::Operator::Global::DefaultCase>         \
+        struct Invokable##Operator< ::scl::feature::detail::Operator::Global::DefaultCase>         \
         {                                                                                          \
             template <typename _Left, typename _Right>                                             \
             static decltype(auto) invoke(_Left && left, _Right && right)                           \
@@ -230,24 +230,24 @@ namespace ScL::Feature::Detail::Operator::Global
                 using LeftRefer = _Left &&;                                                        \
                 using RightRefer = _Right &&;                                                      \
                 using Invokable##OperatorSwitchCase = ::std::conditional_t<                        \
-                    ::ScL::Feature::isWrapper< ::std::decay_t<RightRefer> >(),                     \
-                    ::ScL::Feature::Detail::Operator::Global::Invokable##Case,                     \
-                    ::ScL::Feature::Detail::Operator::Global::DefaultCase>;                        \
-                return ::ScL::Feature::Detail::Operator::Binary::Invokable##Operator<              \
+                    ::scl::feature::isWrapper< ::std::decay_t<RightRefer> >(),                     \
+                    ::scl::feature::detail::Operator::Global::Invokable##Case,                     \
+                    ::scl::feature::detail::Operator::Global::DefaultCase>;                        \
+                return ::scl::feature::detail::Operator::Binary::Invokable##Operator<              \
                     Invokable##OperatorSwitchCase>::invoke(::std::forward<LeftRefer>(left),        \
                     ::std::forward<RightRefer>(right));                                            \
             }                                                                                      \
         };                                                                                         \
     }                                                                                              \
                                                                                                    \
-    namespace ScL::Feature::Detail::Operator::Binary                                               \
+    namespace scl::feature::detail::Operator::Binary                                               \
     {                                                                                              \
         template <typename, typename>                                                              \
         struct Invokable##Switch;                                                                  \
                                                                                                    \
         template <>                                                                                \
-        struct Invokable##Switch< ::ScL::Feature::Detail::Operator::LeftWrapperCase,               \
-            ::ScL::Feature::Detail::Operator::Binary::HolderHasOperatorCase>                       \
+        struct Invokable##Switch< ::scl::feature::detail::Operator::LeftWrapperCase,               \
+            ::scl::feature::detail::Operator::Binary::HolderHasOperatorCase>                       \
         {                                                                                          \
             template <typename _Left, typename _Right>                                             \
             static decltype(auto) invoke(_Left && left, _Right && right)                           \
@@ -261,33 +261,33 @@ namespace ScL::Feature::Detail::Operator::Global
         };                                                                                         \
                                                                                                    \
         template <>                                                                                \
-        struct Invokable##Switch< ::ScL::Feature::Detail::Operator::LeftWrapperCase,               \
-            ::ScL::Feature::Detail::Operator::Binary::HolderHasNoOperatorCase>                     \
+        struct Invokable##Switch< ::scl::feature::detail::Operator::LeftWrapperCase,               \
+            ::scl::feature::detail::Operator::Binary::HolderHasNoOperatorCase>                     \
         {                                                                                          \
             template <typename _Left, typename _Right>                                             \
             static decltype(auto) invoke(_Left && left, _Right && right)                           \
             {                                                                                      \
                 using LeftWrapperRefer = _Left &&;                                                 \
-                using LeftValueRefer = ::ScL::SimilarRefer<                                        \
+                using LeftValueRefer = ::scl::SimilarRefer<                                        \
                     typename ::std::decay_t<LeftWrapperRefer>::Value,                              \
                     LeftWrapperRefer>;                                                             \
                 using RightRefer = _Right &&;                                                      \
-                using Invokable = ::ScL::Feature::Detail::Operator::Binary::Invokable;             \
+                using Invokable = ::scl::feature::detail::Operator::Binary::Invokable;             \
                                                                                                    \
                 using Returned = ::std::invoke_result_t<Invokable, LeftValueRefer, RightRefer>;    \
-                return ::ScL::Feature::Detail::Operator::ResultSwitch<                             \
-                    ::ScL::Feature::Detail::Operator::LeftWrapperCase,                             \
-                    ::ScL::Feature::Detail::Operator::ResultSwitchCase<Returned,                   \
+                return ::scl::feature::detail::Operator::ResultSwitch<                             \
+                    ::scl::feature::detail::Operator::LeftWrapperCase,                             \
+                    ::scl::feature::detail::Operator::ResultSwitchCase<Returned,                   \
                         LeftValueRefer> >::                                                        \
-                    invoke(::ScL::Feature::Detail::Operator::Binary::Invokable(),                  \
+                    invoke(::scl::feature::detail::Operator::Binary::Invokable(),                  \
                         ::std::forward<LeftWrapperRefer>(left),                                    \
                         ::std::forward<RightRefer>(right));                                        \
             }                                                                                      \
         };                                                                                         \
                                                                                                    \
         template <>                                                                                \
-        struct Invokable##Switch< ::ScL::Feature::Detail::Operator::RightWrapperCase,              \
-            ::ScL::Feature::Detail::Operator::Binary::HolderHasOperatorCase>                       \
+        struct Invokable##Switch< ::scl::feature::detail::Operator::RightWrapperCase,              \
+            ::scl::feature::detail::Operator::Binary::HolderHasOperatorCase>                       \
         {                                                                                          \
             template <typename _Left, typename _Right>                                             \
             static decltype(auto) invoke(_Left && left, _Right && right)                           \
@@ -301,33 +301,33 @@ namespace ScL::Feature::Detail::Operator::Global
         };                                                                                         \
                                                                                                    \
         template <>                                                                                \
-        struct Invokable##Switch< ::ScL::Feature::Detail::Operator::RightWrapperCase,              \
-            ::ScL::Feature::Detail::Operator::Binary::HolderHasNoOperatorCase>                     \
+        struct Invokable##Switch< ::scl::feature::detail::Operator::RightWrapperCase,              \
+            ::scl::feature::detail::Operator::Binary::HolderHasNoOperatorCase>                     \
         {                                                                                          \
             template <typename _Left, typename _Right>                                             \
             static decltype(auto) invoke(_Left && left, _Right && right)                           \
             {                                                                                      \
                 using LeftRefer = _Left &&;                                                        \
                 using RightWrapperRefer = _Right &&;                                               \
-                using RightValueRefer = ::ScL::SimilarRefer<                                       \
+                using RightValueRefer = ::scl::SimilarRefer<                                       \
                     typename ::std::decay_t<RightWrapperRefer>::Value,                             \
                     RightWrapperRefer>;                                                            \
-                using Invokable = ::ScL::Feature::Detail::Operator::Binary::Invokable;             \
+                using Invokable = ::scl::feature::detail::Operator::Binary::Invokable;             \
                                                                                                    \
                 using Returned = ::std::invoke_result_t<Invokable, LeftRefer, RightValueRefer>;    \
-                return ::ScL::Feature::Detail::Operator::ResultSwitch<                             \
-                    ::ScL::Feature::Detail::Operator::RightWrapperCase,                            \
-                    ::ScL::Feature::Detail::Operator::ResultSwitchCase<Returned,                   \
+                return ::scl::feature::detail::Operator::ResultSwitch<                             \
+                    ::scl::feature::detail::Operator::RightWrapperCase,                            \
+                    ::scl::feature::detail::Operator::ResultSwitchCase<Returned,                   \
                         RightValueRefer> >::                                                       \
-                    invoke(::ScL::Feature::Detail::Operator::Binary::Invokable(),                  \
+                    invoke(::scl::feature::detail::Operator::Binary::Invokable(),                  \
                         ::std::forward<LeftRefer>(left),                                           \
                         ::std::forward<RightWrapperRefer>(right));                                 \
             }                                                                                      \
         };                                                                                         \
                                                                                                    \
         template <>                                                                                \
-        struct Invokable##Switch< ::ScL::Feature::Detail::Operator::BothWrapperCase,               \
-            ::ScL::Feature::Detail::Operator::Binary::HolderHasOperatorCase>                       \
+        struct Invokable##Switch< ::scl::feature::detail::Operator::BothWrapperCase,               \
+            ::scl::feature::detail::Operator::Binary::HolderHasOperatorCase>                       \
         {                                                                                          \
             template <typename _Left, typename _Right>                                             \
             static decltype(auto) invoke(_Left && left, _Right && right)                           \
@@ -341,115 +341,115 @@ namespace ScL::Feature::Detail::Operator::Global
         };                                                                                         \
                                                                                                    \
         template <>                                                                                \
-        struct Invokable##Switch< ::ScL::Feature::Detail::Operator::BothWrapperCase,               \
-            ::ScL::Feature::Detail::Operator::Binary::HolderHasNoOperatorCase>                     \
+        struct Invokable##Switch< ::scl::feature::detail::Operator::BothWrapperCase,               \
+            ::scl::feature::detail::Operator::Binary::HolderHasNoOperatorCase>                     \
         {                                                                                          \
             template <typename _Left, typename _Right>                                             \
             static decltype(auto) invoke(_Left && left, _Right && right)                           \
             {                                                                                      \
                 using LeftWrapperRefer = _Left &&;                                                 \
                 using RightWrapperRefer = _Right &&;                                               \
-                return ::ScL::Feature::Detail::Operator::Binary::Invokable##Switch<                \
-                    ::ScL::Feature::Detail::Operator::ExposingSwitchCase<LeftWrapperRefer,         \
+                return ::scl::feature::detail::Operator::Binary::Invokable##Switch<                \
+                    ::scl::feature::detail::Operator::ExposingSwitchCase<LeftWrapperRefer,         \
                         RightWrapperRefer>,                                                        \
-                    ::ScL::Feature::Detail::Operator::Binary::HolderHasNoOperatorCase>::           \
+                    ::scl::feature::detail::Operator::Binary::HolderHasNoOperatorCase>::           \
                     invoke(::std::forward<LeftWrapperRefer>(left),                                 \
                         ::std::forward<RightWrapperRefer>(right));                                 \
             }                                                                                      \
         };                                                                                         \
                                                                                                    \
         template <>                                                                                \
-        struct Invokable##Switch< ::ScL::Feature::Detail::Operator::BothExposingCase,              \
-            ::ScL::Feature::Detail::Operator::Binary::HolderHasNoOperatorCase>                     \
+        struct Invokable##Switch< ::scl::feature::detail::Operator::BothExposingCase,              \
+            ::scl::feature::detail::Operator::Binary::HolderHasNoOperatorCase>                     \
         {                                                                                          \
             template <typename _Left, typename _Right>                                             \
             static decltype(auto) invoke(_Left && left, _Right && right)                           \
             {                                                                                      \
                 using LeftWrapperRefer = _Left &&;                                                 \
-                using LeftValueRefer = ::ScL::SimilarRefer<                                        \
+                using LeftValueRefer = ::scl::SimilarRefer<                                        \
                     typename ::std::decay_t<LeftWrapperRefer>::Value,                              \
                     LeftWrapperRefer>;                                                             \
                 using RightWrapperRefer = _Right &&;                                               \
-                using RightValueRefer = ::ScL::SimilarRefer<                                       \
+                using RightValueRefer = ::scl::SimilarRefer<                                       \
                     typename ::std::decay_t<RightWrapperRefer>::Value,                             \
                     RightWrapperRefer>;                                                            \
-                using Invokable = ::ScL::Feature::Detail::Operator::Binary::Invokable;             \
+                using Invokable = ::scl::feature::detail::Operator::Binary::Invokable;             \
                                                                                                    \
                 using Returned = ::std::invoke_result_t<Invokable,                                 \
                     LeftValueRefer,                                                                \
                     RightValueRefer>;                                                              \
-                return ::ScL::Feature::Detail::Operator::ResultSwitch<                             \
-                    ::ScL::Feature::Detail::Operator::BothExposingCase,                            \
-                    ::ScL::Feature::Detail::Operator::ResultSwitchCase<Returned,                   \
+                return ::scl::feature::detail::Operator::ResultSwitch<                             \
+                    ::scl::feature::detail::Operator::BothExposingCase,                            \
+                    ::scl::feature::detail::Operator::ResultSwitchCase<Returned,                   \
                         LeftValueRefer> >::                                                        \
-                    invoke(::ScL::Feature::Detail::Operator::Binary::Invokable(),                  \
+                    invoke(::scl::feature::detail::Operator::Binary::Invokable(),                  \
                         ::std::forward<LeftWrapperRefer>(left),                                    \
                         ::std::forward<RightWrapperRefer>(right));                                 \
             }                                                                                      \
         };                                                                                         \
                                                                                                    \
         template <>                                                                                \
-        struct Invokable##Switch< ::ScL::Feature::Detail::Operator::LeftExposingCase,              \
-            ::ScL::Feature::Detail::Operator::Binary::HolderHasNoOperatorCase>                     \
+        struct Invokable##Switch< ::scl::feature::detail::Operator::LeftExposingCase,              \
+            ::scl::feature::detail::Operator::Binary::HolderHasNoOperatorCase>                     \
         {                                                                                          \
             template <typename _Left, typename _Right>                                             \
             static decltype(auto) invoke(_Left && left, _Right && right)                           \
             {                                                                                      \
                 using LeftWrapperRefer = _Left &&;                                                 \
-                using LeftValueRefer = ::ScL::SimilarRefer<                                        \
+                using LeftValueRefer = ::scl::SimilarRefer<                                        \
                     typename ::std::decay_t<LeftWrapperRefer>::Value,                              \
                     LeftWrapperRefer>;                                                             \
                 using RightWrapperRefer = _Right &&;                                               \
-                using Invokable = ::ScL::Feature::Detail::Operator::Binary::Invokable;             \
+                using Invokable = ::scl::feature::detail::Operator::Binary::Invokable;             \
                                                                                                    \
                 using Returned = ::std::invoke_result_t<Invokable,                                 \
                     LeftValueRefer,                                                                \
                     RightWrapperRefer>;                                                            \
-                return ::ScL::Feature::Detail::Operator::ResultSwitch<                             \
-                    ::ScL::Feature::Detail::Operator::LeftExposingCase,                            \
-                    ::ScL::Feature::Detail::Operator::ResultSwitchCase<Returned,                   \
+                return ::scl::feature::detail::Operator::ResultSwitch<                             \
+                    ::scl::feature::detail::Operator::LeftExposingCase,                            \
+                    ::scl::feature::detail::Operator::ResultSwitchCase<Returned,                   \
                         LeftValueRefer> >::                                                        \
-                    invoke(::ScL::Feature::Detail::Operator::Binary::Invokable(),                  \
+                    invoke(::scl::feature::detail::Operator::Binary::Invokable(),                  \
                         ::std::forward<LeftWrapperRefer>(left),                                    \
                         ::std::forward<RightWrapperRefer>(right));                                 \
             }                                                                                      \
         };                                                                                         \
                                                                                                    \
         template <>                                                                                \
-        struct Invokable##Switch< ::ScL::Feature::Detail::Operator::RightExposingCase,             \
-            ::ScL::Feature::Detail::Operator::Binary::HolderHasNoOperatorCase>                     \
+        struct Invokable##Switch< ::scl::feature::detail::Operator::RightExposingCase,             \
+            ::scl::feature::detail::Operator::Binary::HolderHasNoOperatorCase>                     \
         {                                                                                          \
             template <typename _Left, typename _Right>                                             \
             static decltype(auto) invoke(_Left && left, _Right && right)                           \
             {                                                                                      \
                 using LeftWrapperRefer = _Left &&;                                                 \
                 using RightWrapperRefer = _Right &&;                                               \
-                using RightValueRefer = ::ScL::SimilarRefer<                                       \
+                using RightValueRefer = ::scl::SimilarRefer<                                       \
                     typename ::std::decay_t<RightWrapperRefer>::Value,                             \
                     RightWrapperRefer>;                                                            \
-                using Invokable = ::ScL::Feature::Detail::Operator::Binary::Invokable;             \
+                using Invokable = ::scl::feature::detail::Operator::Binary::Invokable;             \
                                                                                                    \
                 using Returned = ::std::invoke_result_t<Invokable,                                 \
                     LeftWrapperRefer,                                                              \
                     RightValueRefer>;                                                              \
-                return ::ScL::Feature::Detail::Operator::ResultSwitch<                             \
-                    ::ScL::Feature::Detail::Operator::RightExposingCase,                           \
-                    ::ScL::Feature::Detail::Operator::ResultSwitchCase<Returned,                   \
+                return ::scl::feature::detail::Operator::ResultSwitch<                             \
+                    ::scl::feature::detail::Operator::RightExposingCase,                           \
+                    ::scl::feature::detail::Operator::ResultSwitchCase<Returned,                   \
                         LeftWrapperRefer> >::                                                      \
-                    invoke(::ScL::Feature::Detail::Operator::Binary::Invokable(),                  \
+                    invoke(::scl::feature::detail::Operator::Binary::Invokable(),                  \
                         ::std::forward<LeftWrapperRefer>(left),                                    \
                         ::std::forward<RightWrapperRefer>(right));                                 \
             }                                                                                      \
         };                                                                                         \
     }                                                                                              \
                                                                                                    \
-    namespace ScL::Feature::Detail::Operator::Binary                                               \
+    namespace scl::feature::detail::Operator::Binary                                               \
     {                                                                                              \
         template <typename>                                                                        \
         struct Invokable##WrapperSwitch;                                                           \
                                                                                                    \
         template <>                                                                                \
-        struct Invokable##WrapperSwitch< ::ScL::Feature::Detail::Operator::LeftWrapperCase>        \
+        struct Invokable##WrapperSwitch< ::scl::feature::detail::Operator::LeftWrapperCase>        \
         {                                                                                          \
             template <typename _Left, typename _Right>                                             \
             static constexpr decltype(auto) invoke(_Left && left, _Right && right)                 \
@@ -459,14 +459,14 @@ namespace ScL::Feature::Detail::Operator::Global
                 using LeftHolder = typename LeftWrapper::Holder;                                   \
                 using RightRefer = _Right &&;                                                      \
                                                                                                    \
-                constexpr bool holder_has_method_for_operator = ::ScL::Feature::Detail::Operator:: \
+                constexpr bool holder_has_method_for_operator = ::scl::feature::detail::Operator:: \
                     Binary::doesOperator##Invokable##ForLeftWrapperStaticMethodExist<LeftHolder,   \
                         LeftWrapperRefer,                                                          \
                         RightRefer>();                                                             \
                 using OperatorSwitchCase = ::std::conditional_t<holder_has_method_for_operator,    \
-                    ::ScL::Feature::Detail::Operator::Binary::HolderHasOperatorCase,               \
-                    ::ScL::Feature::Detail::Operator::Binary::HolderHasNoOperatorCase>;            \
-                return ::ScL::Feature::Detail::Operator::Binary::Invokable##Switch<                \
+                    ::scl::feature::detail::Operator::Binary::HolderHasOperatorCase,               \
+                    ::scl::feature::detail::Operator::Binary::HolderHasNoOperatorCase>;            \
+                return ::scl::feature::detail::Operator::Binary::Invokable##Switch<                \
                     LeftWrapperCase,                                                               \
                     OperatorSwitchCase>::invoke(::std::forward<LeftWrapperRefer>(left),            \
                     ::std::forward<RightRefer>(right));                                            \
@@ -474,7 +474,7 @@ namespace ScL::Feature::Detail::Operator::Global
         };                                                                                         \
                                                                                                    \
         template <>                                                                                \
-        struct Invokable##WrapperSwitch< ::ScL::Feature::Detail::Operator::RightWrapperCase>       \
+        struct Invokable##WrapperSwitch< ::scl::feature::detail::Operator::RightWrapperCase>       \
         {                                                                                          \
             template <typename _Left, typename _Right>                                             \
             static constexpr decltype(auto) invoke(_Left && left, _Right && right)                 \
@@ -484,14 +484,14 @@ namespace ScL::Feature::Detail::Operator::Global
                 using RightHolder = typename RightWrapper::Holder;                                 \
                 using LeftRefer = _Left &&;                                                        \
                                                                                                    \
-                constexpr bool holder_has_method_for_operator = ::ScL::Feature::Detail::Operator:: \
+                constexpr bool holder_has_method_for_operator = ::scl::feature::detail::Operator:: \
                     Binary::doesOperator##Invokable##ForRightWrapperStaticMethodExist<RightHolder, \
                         LeftRefer,                                                                 \
                         RightWrapperRefer>();                                                      \
                 using OperatorSwitchCase = ::std::conditional_t<holder_has_method_for_operator,    \
-                    ::ScL::Feature::Detail::Operator::Binary::HolderHasOperatorCase,               \
-                    ::ScL::Feature::Detail::Operator::Binary::HolderHasNoOperatorCase>;            \
-                return ::ScL::Feature::Detail::Operator::Binary::Invokable##Switch<                \
+                    ::scl::feature::detail::Operator::Binary::HolderHasOperatorCase,               \
+                    ::scl::feature::detail::Operator::Binary::HolderHasNoOperatorCase>;            \
+                return ::scl::feature::detail::Operator::Binary::Invokable##Switch<                \
                     RightWrapperCase,                                                              \
                     OperatorSwitchCase>::invoke(::std::forward<LeftRefer>(left),                   \
                     ::std::forward<RightWrapperRefer>(right));                                     \
@@ -499,7 +499,7 @@ namespace ScL::Feature::Detail::Operator::Global
         };                                                                                         \
                                                                                                    \
         template <>                                                                                \
-        struct Invokable##WrapperSwitch< ::ScL::Feature::Detail::Operator::BothWrapperCase>        \
+        struct Invokable##WrapperSwitch< ::scl::feature::detail::Operator::BothWrapperCase>        \
         {                                                                                          \
             template <typename _Left, typename _Right>                                             \
             static constexpr decltype(auto) invoke(_Left && left, _Right && right)                 \
@@ -512,25 +512,25 @@ namespace ScL::Feature::Detail::Operator::Global
                 /*using RightHolder = typename RightWrapper::Holder;*/                             \
                                                                                                    \
                 constexpr bool                                                                     \
-                    is_left_compatible_to_right = ::ScL::Feature::IsThisCompatibleWithOther<       \
+                    is_left_compatible_to_right = ::scl::feature::IsThisCompatibleWithOther<       \
                         RightWrapper,                                                              \
                         LeftWrapper>{};                                                            \
-                constexpr bool holder_has_method_for_operator = ::ScL::Feature::Detail::Operator:: \
+                constexpr bool holder_has_method_for_operator = ::scl::feature::detail::Operator:: \
                     Binary::doesOperator##Invokable##StaticMethodExist<LeftHolder,                 \
                         LeftWrapperRefer,                                                          \
                         RightWrapperRefer>();                                                      \
                 using OperatorSwitchCase = ::std::conditional_t<is_left_compatible_to_right        \
                         && holder_has_method_for_operator,                                         \
-                    ::ScL::Feature::Detail::Operator::Binary::HolderHasOperatorCase,               \
-                    ::ScL::Feature::Detail::Operator::Binary::HolderHasNoOperatorCase>;            \
-                return ::ScL::Feature::Detail::Operator::Binary::Invokable##Switch<                \
+                    ::scl::feature::detail::Operator::Binary::HolderHasOperatorCase,               \
+                    ::scl::feature::detail::Operator::Binary::HolderHasNoOperatorCase>;            \
+                return ::scl::feature::detail::Operator::Binary::Invokable##Switch<                \
                     BothWrapperCase,                                                               \
                     OperatorSwitchCase>::invoke(::std::forward<LeftWrapperRefer>(left),            \
                     ::std::forward<RightWrapperRefer>(right));                                     \
             }                                                                                      \
         };                                                                                         \
     }                                                                                              \
-    namespace ScL::Feature::Detail::Operator::Binary                                               \
+    namespace scl::feature::detail::Operator::Binary                                               \
     {                                                                                              \
         template <typename _LeftRefer, typename _RightRefer>                                       \
         struct Invokable##Helper                                                                   \
@@ -547,8 +547,8 @@ namespace ScL::Feature::Detail::Operator::Global
                                                                                                    \
             static constexpr decltype(auto) invoke(LeftRefer left, RightRefer right)               \
             {                                                                                      \
-                return ::ScL::Feature::Detail::Operator::Binary::Invokable##WrapperSwitch<         \
-                    ::ScL::Feature::Detail::Operator::WrapperSwitchCase<LeftRefer,                 \
+                return ::scl::feature::detail::Operator::Binary::Invokable##WrapperSwitch<         \
+                    ::scl::feature::detail::Operator::WrapperSwitchCase<LeftRefer,                 \
                         RightRefer> >::invoke(::std::forward<LeftRefer>(left),                     \
                     ::std::forward<RightRefer>(right));                                            \
             }                                                                                      \

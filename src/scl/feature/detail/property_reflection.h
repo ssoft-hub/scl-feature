@@ -8,7 +8,7 @@
 
 #include <utility>
 
-namespace ScL::Feature::Tool
+namespace scl::feature::Tool
 {
     template <typename WrapperHolder_>
     struct PropertyReflection
@@ -38,8 +38,8 @@ namespace ScL::Feature::Tool
             static constexpr void guard(_HolderRefer && holder)
             {
                 using HolderRefer = _HolderRefer &&;
-                using WrapperHolderRefer = ::ScL::SimilarRefer<WrapperHolder, HolderRefer>;
-                using HolderInterface = ::ScL::Feature::Detail::HolderInterface;
+                using WrapperHolderRefer = ::scl::SimilarRefer<WrapperHolder, HolderRefer>;
+                using HolderInterface = ::scl::feature::detail::HolderInterface;
                 HolderInterface::guard<WrapperHolderRefer>(
                     ::std::forward<WrapperHolderRefer>(*holder.m_holder));
             }
@@ -48,8 +48,8 @@ namespace ScL::Feature::Tool
             static constexpr void unguard(_HolderRefer && holder)
             {
                 using HolderRefer = _HolderRefer &&;
-                using WrapperHolderRefer = ::ScL::SimilarRefer<WrapperHolder, HolderRefer>;
-                using HolderInterface = ::ScL::Feature::Detail::HolderInterface;
+                using WrapperHolderRefer = ::scl::SimilarRefer<WrapperHolder, HolderRefer>;
+                using HolderInterface = ::scl::feature::detail::HolderInterface;
                 HolderInterface::unguard<WrapperHolderRefer>(
                     ::std::forward<WrapperHolderRefer>(*holder.m_holder));
             }
@@ -58,8 +58,8 @@ namespace ScL::Feature::Tool
             static constexpr decltype(auto) baseValue(_HolderRefer && holder)
             {
                 using HolderRefer = _HolderRefer &&;
-                using WrapperHolderRefer = ::ScL::SimilarRefer<WrapperHolder, HolderRefer>;
-                using HolderInterface = ::ScL::Feature::Detail::HolderInterface;
+                using WrapperHolderRefer = ::scl::SimilarRefer<WrapperHolder, HolderRefer>;
+                using HolderInterface = ::scl::feature::detail::HolderInterface;
                 return HolderInterface::value<WrapperHolderRefer>(
                     ::std::forward<WrapperHolderRefer>(*holder.m_holder));
             }
@@ -68,18 +68,18 @@ namespace ScL::Feature::Tool
             static constexpr decltype(auto) value(_HolderRefer && holder)
             {
                 using HolderRefer = _HolderRefer &&;
-                using WrappedValueRefer = ::ScL::SimilarRefer<WrappedValue, HolderRefer>;
-                using ValueRefer = ::ScL::SimilarRefer<Value, WrappedValueRefer>;
+                using WrappedValueRefer = ::scl::SimilarRefer<WrappedValue, HolderRefer>;
+                using ValueRefer = ::scl::SimilarRefer<Value, WrappedValueRefer>;
                 return ::std::forward<ValueRefer>(
                     baseValue(::std::forward<_HolderRefer>(holder)).*holder.m_property);
             }
         };
     };
-} // namespace ScL::Feature::Tool
+} // namespace scl::feature::Tool
 
 #define SCL_DECLTYPE_PROPERTY_P(property)                                                     \
-    ::ScL::Feature::Wrapper<decltype(::std::declval<typename SelfHolder_::Value>().property), \
-        ::ScL::Feature::Tool::PropertyReflection<SelfHolder_>>
+    ::scl::feature::wrapper<decltype(::std::declval<typename SelfHolder_::Value>().property), \
+        ::scl::feature::Tool::PropertyReflection<SelfHolder_>>
 
 #define SCL_DECLTYPE_PROPERTY(property)                                                   \
     ::std::conditional_t<                                                                 \
@@ -96,7 +96,7 @@ namespace ScL::Feature::Tool
 #define SCL_REFLECT_PROPERTY(property)                                                             \
 public:                                                                                            \
     template <typename ___>                                                                        \
-    static constexpr ::std::enable_if_t<::ScL::Feature::IsWrapper<___>::value,                     \
+    static constexpr ::std::enable_if_t<::scl::feature::IsWrapper<___>::value,                     \
         decltype(&___::___private_##property##___)>                                                \
         ___addressof___##property##___()                                                           \
     {                                                                                              \
@@ -104,7 +104,7 @@ public:                                                                         
     }                                                                                              \
                                                                                                    \
     template <typename ___>                                                                        \
-    static constexpr ::std::enable_if_t<!::ScL::Feature::IsWrapper<___>::value,                    \
+    static constexpr ::std::enable_if_t<!::scl::feature::IsWrapper<___>::value,                    \
         decltype(&___::property)>                                                                  \
         ___addressof___##property##___()                                                           \
     {                                                                                              \

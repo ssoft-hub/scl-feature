@@ -4,8 +4,8 @@
 #include <scl/feature/tool.h>
 #include <scl/feature/wrapper.h>
 
-using namespace ::ScL::Feature;
-using OptionalString = Wrapper<std::string, Inplace::Optional>;
+using namespace ::scl::feature;
+using OptionalString = wrapper<std::string, Inplace::Optional>;
 
 OptionalString create(bool b)
 {

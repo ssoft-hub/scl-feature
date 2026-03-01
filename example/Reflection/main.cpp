@@ -16,7 +16,7 @@ public:
     void setName(TextView name) { m_name = name; }
 };
 
-namespace ScL::Feature {
+namespace scl::feature {
 
 template <typename Self_, typename SelfHolder_>
 class ValueReflectionMixIn<Self_, SelfHolder_, MyData>
@@ -26,7 +26,7 @@ public:
     SCL_REFLECT_METHOD(setName)
 };
 
-} // namespace ScL::Feature
+} // namespace scl::feature
 
 template <typename Type_>
 void foo()
@@ -39,8 +39,8 @@ void foo()
 
 int main(int, char **)
 {
-    using namespace ::ScL::Feature;
+    using namespace ::scl::feature;
 
     foo<MyData>();
-    foo<Wrapper<MyData>>();
+    foo<wrapper<MyData>>();
 }

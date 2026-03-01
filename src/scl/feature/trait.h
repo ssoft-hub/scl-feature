@@ -6,57 +6,57 @@
 
 #include <type_traits>
 
-namespace ScL
+namespace scl
 {
     template <typename _Type, typename _Refer>
     // using SimilarRefer = typename ::scl::detail::SimilarReferHelper<_Type, _Refer>::Type;
     using SimilarRefer = typename ::scl::forward_like_t<_Refer, _Type>;
-} // namespace ScL
+} // namespace scl
 
-namespace ScL::Feature::Inplace
+namespace scl::feature::Inplace
 {
     struct Default;
-} // namespace ScL::Feature::Inplace
+} // namespace scl::feature::Inplace
 
-namespace ScL::Feature::Detail
+namespace scl::feature::detail
 {
     template <typename, typename>
-    class Wrapper;
-} // namespace ScL::Feature::Detail
+    class wrapper;
+} // namespace scl::feature::detail
 
-namespace ScL::Feature::Detail
+namespace scl::feature::detail
 {
-    //! По умолчанию, типы не являются Wrapper.
+    //! По умолчанию, типы не являются wrapper.
     template <typename>
     struct IsWrapper : ::std::false_type
     {};
 
     template <typename _Test, typename _Tool>
-    struct IsWrapper< ::ScL::Feature::Detail::Wrapper<_Test, _Tool> > : ::std::true_type
+    struct IsWrapper< ::scl::feature::detail::wrapper<_Test, _Tool> > : ::std::true_type
     {};
-} // namespace ScL::Feature::Detail
+} // namespace scl::feature::detail
 
-namespace ScL::Feature
+namespace scl::feature
 {
-    //! Признак того, что тип является Wrapper.
+    //! Признак того, что тип является wrapper.
     template <typename _Test>
-    using IsWrapper = ::ScL::Feature::Detail::IsWrapper< ::std::remove_cv_t<_Test> >;
+    using IsWrapper = ::scl::feature::detail::IsWrapper< ::std::remove_cv_t<_Test> >;
 
     template <typename _Test>
     inline constexpr bool isWrapper()
     {
-        return ::ScL::Feature::IsWrapper<_Test>::value;
+        return ::scl::feature::IsWrapper<_Test>::value;
     }
 
     template <typename _Test>
-    using is_wrapper = ::ScL::Feature::IsWrapper<_Test>;
+    using is_wrapper = ::scl::feature::IsWrapper<_Test>;
     template <typename _Test>
-    using is_wrapper_t = typename ::ScL::Feature::IsWrapper<_Test>::type;
+    using is_wrapper_t = typename ::scl::feature::IsWrapper<_Test>::type;
     template <typename _Test>
-    inline constexpr auto is_wrapper_v = ::ScL::Feature::IsWrapper<_Test>::value;
-} // namespace ScL::Feature
+    inline constexpr auto is_wrapper_v = ::scl::feature::IsWrapper<_Test>::value;
+} // namespace scl::feature
 
-namespace ScL::Feature::Detail
+namespace scl::feature::detail
 {
     //! Типы являются совместимыми, если они одинаковые
     /// или тип _Test является производным от типа _Other.
@@ -68,160 +68,160 @@ namespace ScL::Feature::Detail
                       ::std::remove_cv_t<_Test> >::value>
     {};
 
-    //! Типы Wrapper являются совместимыми, если в них используется идентичный
+    //! Типы wrapper являются совместимыми, если в них используется идентичный
     /// инструмент _Tool, и вложенные типы также являются совместимыми.
     template <typename _Test, typename _Other, typename _Tool>
-    struct IsThisCompatibleWithOther< ::ScL::Feature::Detail::Wrapper<_Test, _Tool>,
-        ::ScL::Feature::Detail::Wrapper<_Other, _Tool> >
-        : ::ScL::Feature::Detail::IsThisCompatibleWithOther< ::std::remove_cv_t<_Test>,
+    struct IsThisCompatibleWithOther< ::scl::feature::detail::wrapper<_Test, _Tool>,
+        ::scl::feature::detail::wrapper<_Other, _Tool> >
+        : ::scl::feature::detail::IsThisCompatibleWithOther< ::std::remove_cv_t<_Test>,
               ::std::remove_cv_t<_Other> >
     {};
-} // namespace ScL::Feature::Detail
+} // namespace scl::feature::detail
 
-namespace ScL::Feature
+namespace scl::feature
 {
     //! Признак совместимости типов.
     template <typename _Test, typename _Other>
-    using IsThisCompatibleWithOther = ::ScL::Feature::Detail::IsThisCompatibleWithOther<
+    using IsThisCompatibleWithOther = ::scl::feature::detail::IsThisCompatibleWithOther<
         ::std::remove_cv_t<_Test>,
         ::std::remove_cv_t<_Other> >;
 
     template <typename _Test, typename _Other>
     inline constexpr bool isThisCompatibleWithOther()
     {
-        return ::ScL::Feature::IsThisCompatibleWithOther<_Test, _Other>::value;
+        return ::scl::feature::IsThisCompatibleWithOther<_Test, _Other>::value;
     }
 
     template <typename _Test, typename _Other>
-    using is_this_compatible_with_other = ::ScL::Feature::IsThisCompatibleWithOther<_Test, _Other>;
+    using is_this_compatible_with_other = ::scl::feature::IsThisCompatibleWithOther<_Test, _Other>;
     template <typename _Test, typename _Other>
-    using is_this_compatible_with_other_t = typename ::ScL::Feature::IsThisCompatibleWithOther<
+    using is_this_compatible_with_other_t = typename ::scl::feature::IsThisCompatibleWithOther<
         _Test,
         _Other>::type;
     template <typename _Test, typename _Other>
     inline constexpr auto
-        is_this_compatible_with_other_v = ::ScL::Feature::IsThisCompatibleWithOther<_Test,
+        is_this_compatible_with_other_v = ::scl::feature::IsThisCompatibleWithOther<_Test,
             _Other>::value;
-} // namespace ScL::Feature
+} // namespace scl::feature
 
-namespace ScL::Feature::Detail
+namespace scl::feature::detail
 {
-    //! Типы, не являющиеся Wrapper, не имеют вложенных частей
+    //! Типы, не являющиеся wrapper, не имеют вложенных частей
     template <typename _Test, typename _Other>
     struct IsThisCompatibleWithPartOfOther : ::std::false_type
     {};
 
-    //! Тип является частью Wrapper, если он совместим
+    //! Тип является частью wrapper, если он совместим
     ///  с любой его вложенной частью
     template <typename _Test, typename _Other, typename _OtherTool>
     struct IsThisCompatibleWithPartOfOther<_Test,
-        ::ScL::Feature::Detail::Wrapper<_Other, _OtherTool> >
+        ::scl::feature::detail::wrapper<_Other, _OtherTool> >
         : ::std::integral_constant<bool,
-              ::ScL::Feature::IsThisCompatibleWithOther< ::std::remove_cv_t<_Test>,
+              ::scl::feature::IsThisCompatibleWithOther< ::std::remove_cv_t<_Test>,
                   ::std::remove_cv_t<_Other> >::value>
     {};
 
-    //! Один тип Wrapper является частью другого Wrapper,
+    //! Один тип wrapper является частью другого wrapper,
     /// если он совместим с любой вложенной частью другого.
     template <typename _Test, typename _TestTool, typename _Other, typename _OtherTool>
-    struct IsThisCompatibleWithPartOfOther< ::ScL::Feature::Detail::Wrapper<_Test, _TestTool>,
-        ::ScL::Feature::Detail::Wrapper<_Other, _OtherTool> >
+    struct IsThisCompatibleWithPartOfOther< ::scl::feature::detail::wrapper<_Test, _TestTool>,
+        ::scl::feature::detail::wrapper<_Other, _OtherTool> >
         : ::std::integral_constant<bool,
-              ::ScL::Feature::IsThisCompatibleWithOther<
-                  ::ScL::Feature::Detail::Wrapper<_Test, _TestTool>,
+              ::scl::feature::IsThisCompatibleWithOther<
+                  ::scl::feature::detail::wrapper<_Test, _TestTool>,
                   ::std::remove_cv_t<_Other> >::value
-                  || ::ScL::Feature::Detail::IsThisCompatibleWithPartOfOther<
-                      ::ScL::Feature::Detail::Wrapper<_Test, _TestTool>,
+                  || ::scl::feature::detail::IsThisCompatibleWithPartOfOther<
+                      ::scl::feature::detail::wrapper<_Test, _TestTool>,
                       ::std::remove_cv_t<_Other> >::value>
     {};
-} // namespace ScL::Feature::Detail
+} // namespace scl::feature::detail
 
-namespace ScL::Feature
+namespace scl::feature
 {
     //! Признак совместимости типа с вложенным типом другого.
     template <typename _Test, typename _Other>
-    using IsThisCompatibleWithPartOfOther = ::ScL::Feature::Detail::IsThisCompatibleWithPartOfOther<
+    using IsThisCompatibleWithPartOfOther = ::scl::feature::detail::IsThisCompatibleWithPartOfOther<
         ::std::remove_cv_t<_Test>,
         ::std::remove_cv_t<_Other> >;
 
     template <typename _Test, typename _Other>
     inline constexpr bool isThisCompatibleWithPartOfOther()
     {
-        return ::ScL::Feature::IsThisCompatibleWithPartOfOther<_Test, _Other>::value;
+        return ::scl::feature::IsThisCompatibleWithPartOfOther<_Test, _Other>::value;
     }
 
     template <typename _Test, typename _Other>
-    using is_this_compatible_with_part_of_other = ::ScL::Feature::IsThisCompatibleWithPartOfOther<
+    using is_this_compatible_with_part_of_other = ::scl::feature::IsThisCompatibleWithPartOfOther<
         _Test,
         _Other>;
     template <typename _Test, typename _Other>
     using is_this_compatible_with_part_of_other_t =
-        typename ::ScL::Feature::IsThisCompatibleWithPartOfOther<_Test, _Other>::type;
+        typename ::scl::feature::IsThisCompatibleWithPartOfOther<_Test, _Other>::type;
     template <typename _Test, typename _Other>
     inline constexpr auto
-        is_this_compatible_with_part_of_other_v = ::ScL::Feature::IsThisCompatibleWithPartOfOther<
+        is_this_compatible_with_part_of_other_v = ::scl::feature::IsThisCompatibleWithPartOfOther<
             _Test,
             _Other>::value;
-} // namespace ScL::Feature
+} // namespace scl::feature
 
-namespace ScL::Feature::Detail
+namespace scl::feature::detail
 {
-    //! Типы, не являющиеся Wrapper, не могут быть вложенными
+    //! Типы, не являющиеся wrapper, не могут быть вложенными
     template <typename _Test, typename _Other>
     struct IsPartOfThisCompatibleWithOther : ::std::false_type
     {};
 
     template <typename _Test, typename _TestTool, typename _Other>
-    struct IsPartOfThisCompatibleWithOther< ::ScL::Feature::Detail::Wrapper<_Test, _TestTool>,
+    struct IsPartOfThisCompatibleWithOther< ::scl::feature::detail::wrapper<_Test, _TestTool>,
         _Other>
         : ::std::integral_constant<bool,
-              ::ScL::Feature::IsThisCompatibleWithOther< ::std::remove_cv_t<_Test>,
+              ::scl::feature::IsThisCompatibleWithOther< ::std::remove_cv_t<_Test>,
                   ::std::remove_cv_t<_Other> >::value>
     {};
 
-    //!< Один тип Wrapper является частью другого, если он совместим с любой
+    //!< Один тип wrapper является частью другого, если он совместим с любой
     /// вложенной частью другого.
     template <typename _Test, typename _TestTool, typename _Other, typename _OtherTool>
-    struct IsPartOfThisCompatibleWithOther< ::ScL::Feature::Detail::Wrapper<_Test, _TestTool>,
-        ::ScL::Feature::Detail::Wrapper<_Other, _OtherTool> >
+    struct IsPartOfThisCompatibleWithOther< ::scl::feature::detail::wrapper<_Test, _TestTool>,
+        ::scl::feature::detail::wrapper<_Other, _OtherTool> >
         : ::std::integral_constant<bool,
-              ::ScL::Feature::IsThisCompatibleWithOther< ::std::remove_cv_t<_Test>,
-                  ::ScL::Feature::Detail::Wrapper<_Other, _OtherTool> >::value
-                  || ::ScL::Feature::Detail::IsPartOfThisCompatibleWithOther<
+              ::scl::feature::IsThisCompatibleWithOther< ::std::remove_cv_t<_Test>,
+                  ::scl::feature::detail::wrapper<_Other, _OtherTool> >::value
+                  || ::scl::feature::detail::IsPartOfThisCompatibleWithOther<
                       ::std::remove_cv_t<_Test>,
-                      ::ScL::Feature::Detail::Wrapper<_Other, _OtherTool> >::value>
+                      ::scl::feature::detail::wrapper<_Other, _OtherTool> >::value>
     {};
-} // namespace ScL::Feature::Detail
+} // namespace scl::feature::detail
 
-namespace ScL::Feature
+namespace scl::feature
 {
     //! Признак совместимости вложенного типа с другим.
     template <typename _Test, typename _Other>
-    using IsPartOfThisCompatibleWithOther = ::ScL::Feature::Detail::IsPartOfThisCompatibleWithOther<
+    using IsPartOfThisCompatibleWithOther = ::scl::feature::detail::IsPartOfThisCompatibleWithOther<
         ::std::remove_cv_t<_Test>,
         ::std::remove_cv_t<_Other> >;
 
     template <typename _Test, typename _Other>
     inline constexpr bool isPartOfThisCompatibleWithOther()
     {
-        return ::ScL::Feature::IsPartOfThisCompatibleWithOther<_Test, _Other>::value;
+        return ::scl::feature::IsPartOfThisCompatibleWithOther<_Test, _Other>::value;
     }
 
     template <typename _Test, typename _Other>
-    using is_part_of_this_compatible_with_other = ::ScL::Feature::IsPartOfThisCompatibleWithOther<
+    using is_part_of_this_compatible_with_other = ::scl::feature::IsPartOfThisCompatibleWithOther<
         _Test,
         _Other>;
     template <typename _Test, typename _Other>
     using is_part_of_this_compatible_with_other_t =
-        typename ::ScL::Feature::IsPartOfThisCompatibleWithOther<_Test, _Other>::type;
+        typename ::scl::feature::IsPartOfThisCompatibleWithOther<_Test, _Other>::type;
     template <typename _Test, typename _Other>
     inline constexpr auto
-        is_part_of_this_compatible_with_other_v = ::ScL::Feature::IsPartOfThisCompatibleWithOther<
+        is_part_of_this_compatible_with_other_v = ::scl::feature::IsPartOfThisCompatibleWithOther<
             _Test,
             _Other>::value;
-} // namespace ScL::Feature
+} // namespace scl::feature
 
-namespace ScL::Feature
+namespace scl::feature
 {
     //! Признак подобия типов. Типы считаются подобными, если у них одинаковые
     /// признаки const/volatile и rvalue/lvalue.
@@ -241,18 +241,18 @@ namespace ScL::Feature
     template <typename _Test, typename _Other>
     inline constexpr bool isSimilar()
     {
-        return ::ScL::Feature::IsSimilar<_Test, _Other>::value;
+        return ::scl::feature::IsSimilar<_Test, _Other>::value;
     }
 
     template <typename _Test, typename _Other>
-    using is_similar = ::ScL::Feature::IsSimilar<_Test, _Other>;
+    using is_similar = ::scl::feature::IsSimilar<_Test, _Other>;
     template <typename _Test, typename _Other>
-    using is_similar_t = typename ::ScL::Feature::IsSimilar<_Test, _Other>::type;
+    using is_similar_t = typename ::scl::feature::IsSimilar<_Test, _Other>::type;
     template <typename _Test, typename _Other>
-    inline constexpr auto is_similar_v = ::ScL::Feature::IsSimilar<_Test, _Other>::value;
-} // namespace ScL::Feature
+    inline constexpr auto is_similar_v = ::scl::feature::IsSimilar<_Test, _Other>::value;
+} // namespace scl::feature
 
-namespace ScL::Feature
+namespace scl::feature
 {
     //! Признак совместимости типов по спецификатору. Типы считаются совместимыми,
     /// если можно _Other поставить слева, а _Test справа при преобразовании
@@ -269,18 +269,18 @@ namespace ScL::Feature
     template <typename _Test, typename _Other>
     inline constexpr bool isThisSpecifierCompatibleWithOther()
     {
-        return ::ScL::Feature::IsThisSpecifierCompatibleWithOther<_Test, _Other>::value;
+        return ::scl::feature::IsThisSpecifierCompatibleWithOther<_Test, _Other>::value;
     }
 
     template <typename _Test, typename _Other>
     using is_this_specifier_compatible_with_other =
-        ::ScL::Feature::IsThisSpecifierCompatibleWithOther<_Test, _Other>;
+        ::scl::feature::IsThisSpecifierCompatibleWithOther<_Test, _Other>;
     template <typename _Test, typename _Other>
     using is_this_specifier_compatible_with_other_t =
-        typename ::ScL::Feature::IsThisSpecifierCompatibleWithOther<_Test, _Other>::type;
+        typename ::scl::feature::IsThisSpecifierCompatibleWithOther<_Test, _Other>::type;
     template <typename _Test, typename _Other>
     inline constexpr auto is_this_specifier_compatible_with_other_v =
-        ::ScL::Feature::IsThisSpecifierCompatibleWithOther<_Test, _Other>::value;
-} // namespace ScL::Feature
+        ::scl::feature::IsThisSpecifierCompatibleWithOther<_Test, _Other>::value;
+} // namespace scl::feature
 
 #endif

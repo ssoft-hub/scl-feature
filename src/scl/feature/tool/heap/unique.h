@@ -9,11 +9,11 @@
 #include <scl/feature/trait.h>
 #include <scl/utility/type_traits.h>
 
-namespace ScL::Feature::Heap
+namespace scl::feature::Heap
 {
     /*!
      * Инструмент для формирования значения в "куче" на основе умного указателя
-     * ::std::unique_ptr. Не поддерживает использование volatile Wrapper из-за
+     * ::std::unique_ptr. Не поддерживает использование volatile wrapper из-за
      * ограничений ::std::unique_ptr.
      */
     struct Unique
@@ -77,7 +77,7 @@ namespace ScL::Feature::Heap
                 typename _RightWrapperRefer,
                 typename = ::std::enable_if_t<
                     !::std::is_const< ::std::remove_reference_t<_LeftWrapperRefer> >::value
-                    && ::ScL::Feature::IsThisCompatibleWithOther<
+                    && ::scl::feature::IsThisCompatibleWithOther<
                         ::std::decay_t<_RightWrapperRefer>,
                         ::std::decay_t<_LeftWrapperRefer> >::value
                     && !::std::is_const< ::std::remove_reference_t<_RightWrapperRefer> >::value
@@ -88,8 +88,8 @@ namespace ScL::Feature::Heap
             static decltype(auto) operatorAssignment_(
                 _LeftWrapperRefer && left, _RightWrapperRefer && right)
             {
-                ::ScL::Feature::Detail::wrapperHolder(left).m_pointer.swap(
-                    ::ScL::Feature::Detail::wrapperHolder(right).m_pointer);
+                ::scl::feature::detail::wrapperHolder(left).m_pointer.swap(
+                    ::scl::feature::detail::wrapperHolder(right).m_pointer);
                 return ::std::forward<_LeftWrapperRefer>(left);
             }
 
@@ -103,12 +103,12 @@ namespace ScL::Feature::Heap
             static constexpr decltype(auto) value(_HolderRefer && holder)
             {
                 using HolderRefer = _HolderRefer &&;
-                using ValueRefer = ::ScL::SimilarRefer<_Value, HolderRefer>;
+                using ValueRefer = ::scl::SimilarRefer<_Value, HolderRefer>;
                 // NOTE: Functionality ::std::unique_ptr has a limitation for volatile case.
                 return ::std::forward<ValueRefer>(*holder.m_pointer.get());
             }
         };
     };
-} // namespace ScL::Feature::Heap
+} // namespace scl::feature::Heap
 
 #endif

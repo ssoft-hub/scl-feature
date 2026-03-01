@@ -3,7 +3,7 @@
 
 #include <scl/feature.h>
 
-using namespace ::ScL::Feature;
+using namespace ::scl::feature;
 using namespace ::std;
 
 // Unworkable case
@@ -11,8 +11,8 @@ using namespace ::std;
 // using Url      = string;
 
 // Strong typedef case
-using Filename = Wrapper<string, Inplace::Typedef<class Filename_tag> >;
-using Url = Wrapper<string, Inplace::Typedef<class Url_tag> >;
+using Filename = wrapper<string, Inplace::Typedef<class Filename_tag> >;
+using Url = wrapper<string, Inplace::Typedef<class Url_tag> >;
 
 auto read(Filename filename) { /*read from disk*/ return filename; }
 
