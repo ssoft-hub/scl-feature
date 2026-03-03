@@ -1,0 +1,7 @@
+---
+# Relaxed rules for tests, examples and other non-library code
+Checks: >
+  -*,
+  bugprone-*
+
+WarningsAsErrors: '*'
