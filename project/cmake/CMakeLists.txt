@@ -43,7 +43,7 @@ endif()
 add_library(scl::${MODULE} ALIAS scl-${MODULE})
 
 # Requires for C++
-target_compile_features(scl-${MODULE} ${SCL_FEATURE_SCOPE} cxx_std_20)
+target_compile_features(scl-${MODULE} ${SCL_FEATURE_SCOPE} cxx_std_23)
 
 # Ensure the imported/install name is scl::feature
 set_target_properties(scl-${MODULE} PROPERTIES EXPORT_NAME feature)
