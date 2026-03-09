@@ -24,7 +24,7 @@ if (EXISTS "${SCL_FEATURE_TEST_DIR}")
                     target_link_libraries(${tgt} PRIVATE scl::feature GTest::gtest_main)
                     target_compile_features(${tgt} PRIVATE cxx_std_20)
                     include(GoogleTest)            # Provides gtest_discover_tests
-                    gtest_discover_tests(${tgt} DISCOVERY_TIMEOUT 30)
+                    gtest_discover_tests(${tgt} DISCOVERY_TIMEOUT 30 DISCOVERY_MODE PRE_TEST)
                 endif()
             endif()
 
