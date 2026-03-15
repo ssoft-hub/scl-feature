@@ -7,6 +7,23 @@
 
 #include <scl/utility/type_traits/forward_like.h>
 
+#define SCL_EXECUTOR_CONSTRUCTOR_FOR_SELF_PROTOTYPE(cv_ref)           \
+    constexpr explicit uninitialized(self_type cv_ref other) noexcept \
+    {                                                                 \
+        for (::std::size_t i = 0; i < sizeof(value_type); ++i)        \
+            m_storage[i] = other.m_storage[i];                        \
+    }
+
+#define SCL_EXECUTOR_CONSTRUCTOR_FOR_SELF                         \
+    SCL_EXECUTOR_CONSTRUCTOR_FOR_SELF_PROTOTYPE(&)                \
+    SCL_EXECUTOR_CONSTRUCTOR_FOR_SELF_PROTOTYPE(const &)          \
+    SCL_EXECUTOR_CONSTRUCTOR_FOR_SELF_PROTOTYPE(volatile &)       \
+    SCL_EXECUTOR_CONSTRUCTOR_FOR_SELF_PROTOTYPE(const volatile &) \
+    SCL_EXECUTOR_CONSTRUCTOR_FOR_SELF_PROTOTYPE(&&)               \
+    SCL_EXECUTOR_CONSTRUCTOR_FOR_SELF_PROTOTYPE(const &&)         \
+    SCL_EXECUTOR_CONSTRUCTOR_FOR_SELF_PROTOTYPE(volatile &&)      \
+    SCL_EXECUTOR_CONSTRUCTOR_FOR_SELF_PROTOTYPE(const volatile &&)
+
 namespace scl::feature::inplace
 {
     /**
@@ -21,6 +38,7 @@ namespace scl::feature::inplace
      *    wrapper<int, feature::inplace::uninitialized> w{};
      * @endcode
      */
+    // NOLINTBEGIN(cppcoreguidelines-special-member-functions, cppcoreguidelines-missing-std-forward, cppcoreguidelines-pro-type-member-init)
     template <typename Value>
     class uninitialized
     {
@@ -28,6 +46,11 @@ namespace scl::feature::inplace
 
     public:
         using value_type = Value;
+
+    public:
+        constexpr uninitialized() noexcept = default;
+
+        SCL_EXECUTOR_CONSTRUCTOR_FOR_SELF
 
     public:
         template <typename Self, typename Func, typename... Args>
@@ -49,4 +72,8 @@ namespace scl::feature::inplace
     private:
         alignas(value_type)::std::byte m_storage[sizeof(value_type)]; // NOLINT(*-avoid-c-arrays)
     };
+    // NOLINTEND(cppcoreguidelines-special-member-functions, cppcoreguidelines-missing-std-forward, cppcoreguidelines-pro-type-member-init)
 } // namespace scl::feature::inplace
+
+#undef SCL_EXECUTOR_CONSTRUCTOR_FOR_SELF
+#undef SCL_EXECUTOR_CONSTRUCTOR_FOR_SELF_PROTOTYPE
