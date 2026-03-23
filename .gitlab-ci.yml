@@ -9,11 +9,14 @@ clang-tidy:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH =~ /^(main|dev)$/
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq git
+    - git clone --depth=1 "https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_NAMESPACE}/scl-utility.git" /tmp/scl-utility
   script:
     - |
       [ -d "$SCL_SRC_DIR" ] || { echo "No sources, skipping."; exit 0; }
       find $SCL_SRC_DIR \( -name '*.h' -o -name '*.hpp' \) | while IFS= read -r f; do
-        clang-tidy "$f" --quiet --warnings-as-errors='*' -- -std=c++20 -xc++ -I$SCL_SRC_DIR || exit 1
+        clang-tidy "$f" --quiet --warnings-as-errors='*' -- -std=c++20 -xc++ -I$SCL_SRC_DIR -I/tmp/scl-utility/src || exit 1
       done
 
 clang-format:
@@ -25,8 +28,8 @@ clang-format:
   script:
     - |
       [ -d "$SCL_SRC_DIR" ] || { echo "No sources, skipping."; exit 0; }
-      find $SCL_SRC_DIR \( -name '*.h' -o -name '*.hpp' \) | xargs --no-run-if-empty clang-format
-        --dry-run
+      find $SCL_SRC_DIR \( -name '*.h' -o -name '*.hpp' \) | xargs --no-run-if-empty clang-format \
+        --dry-run \
         --Werror
 
 cppcheck:
