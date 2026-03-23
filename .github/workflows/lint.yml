@@ -14,11 +14,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Clone scl-utility
+        run: git clone --depth=1 https://github.com/ssoft-hub/scl-utility.git /tmp/scl-utility
+
       - name: Run clang-tidy
         run: |
           [ -d src ] || { echo "No sources, skipping."; exit 0; }
           find src \( -name '*.h' -o -name '*.hpp' \) | while IFS= read -r f; do
-            clang-tidy "$f" --quiet --warnings-as-errors='*' -- -std=c++20 -xc++ -Isrc || exit 1
+            clang-tidy "$f" --quiet --warnings-as-errors='*' -- -std=c++20 -xc++ -Isrc -I/tmp/scl-utility/src || exit 1
           done
 
   clang-format:
