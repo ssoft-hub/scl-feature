@@ -1,0 +1,63 @@
+name: Lint
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: ['*']
+
+jobs:
+  clang-tidy:
+    runs-on: ubuntu-latest
+    container: silkeh/clang:21
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Clone scl-utility
+        run: git clone --depth=1 https://github.com/ssoft-hub/scl-utility.git /tmp/scl-utility
+
+      - name: Run clang-tidy
+        run: |
+          [ -d src ] || { echo "No sources, skipping."; exit 0; }
+          find src \( -name '*.h' -o -name '*.hpp' \) | while IFS= read -r f; do
+            clang-tidy "$f" --quiet --warnings-as-errors='*' -- -std=c++20 -xc++ -Isrc -I/tmp/scl-utility/src || exit 1
+          done
+
+  clang-format:
+    runs-on: ubuntu-latest
+    container: silkeh/clang:21
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check formatting
+        run: |
+          [ -d src ] || { echo "No sources, skipping."; exit 0; }
+          find src \( -name '*.h' -o -name '*.hpp' \) | xargs --no-run-if-empty clang-format \
+            --dry-run \
+            --Werror
+
+  cppcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install cppcheck
+        run: |
+          sudo apt-get update && sudo apt-get install -y cppcheck
+          cppcheck --version
+
+      - name: Run cppcheck
+        run: |
+          [ -d src ] || { echo "No sources, skipping."; exit 0; }
+          find src \( -name '*.h' -o -name '*.hpp' \) -exec cppcheck \
+            --enable=warning,style,performance,portability \
+            --std=c++20 \
+            --language=c++ \
+            --inline-suppr \
+            --error-exitcode=1 \
+            --suppress=missingIncludeSystem \
+            --suppress=unusedFunction \
+            -Isrc \
+            -UDOXYGEN \
+            {} +
