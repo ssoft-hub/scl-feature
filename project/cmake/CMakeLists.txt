@@ -8,6 +8,7 @@
 get_filename_component(SCL_FEATURE_ROOT "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE)
 
 set(MODULE feature)
+set(SCL_FEATURE_VERSION "0.0.1")
 
 # ---- Make headers visible in IDE ----
 set(SCL_FEATURE_SRC_DIR "${SCL_FEATURE_ROOT}/src")
