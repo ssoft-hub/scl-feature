@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     container: silkeh/clang:21
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Clone scl-utility
         run: git clone --depth=1 https://github.com/ssoft-hub/scl-utility.git /tmp/scl-utility
@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     container: silkeh/clang:21
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Check formatting
         run: |
@@ -40,7 +40,7 @@ jobs:
   cppcheck:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Install cppcheck
         run: |
