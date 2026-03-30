@@ -1,4 +1,4 @@
-#include <gtest/gtest.h>
+#include <gtest_utils.h>
 
 #include <scl/feature/inplace/uninitialized.h>
 #include <scl/feature/wrapper.h>
