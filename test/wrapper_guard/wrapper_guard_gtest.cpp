@@ -58,19 +58,19 @@ struct counting_executor
 
 TEST(WrapperGuardValue, NotCopyable)
 {
-    STATIC_EXPECT_FALSE(std::is_copy_constructible_v<feature::wrapper_guard<int &>>);
+    STATIC_EXPECT_FALSE(::std::is_copy_constructible_v<wrapper_guard<int &>>);
 }
 
 TEST(WrapperGuardValue, NotMovable)
 {
-    STATIC_EXPECT_FALSE(std::is_move_constructible_v<feature::wrapper_guard<int &>>);
+    STATIC_EXPECT_FALSE(::std::is_move_constructible_v<wrapper_guard<int &>>);
 }
 
 TEST(WrapperGuardValue, HoldsIntRef)
 {
     constexpr auto result = [] {
         int x = 42;
-        feature::wrapper_guard<int &> g{x};
+        wrapper_guard<int &> g{x};
         return g.value() == 42;
     }();
     STATIC_EXPECT_TRUE(result);
@@ -80,7 +80,7 @@ TEST(WrapperGuardValue, HoldsConstRef)
 {
     constexpr auto result = [] {
         int const x = 7;
-        feature::wrapper_guard<int const &> g{x};
+        wrapper_guard<int const &> g{x};
         return g.value() == 7;
     }();
     STATIC_EXPECT_TRUE(result);
@@ -90,7 +90,7 @@ TEST(WrapperGuardValue, HoldsStringViewRef)
 {
     constexpr auto result = [] {
         std::string_view s = "hello";
-        feature::wrapper_guard<std::string_view &> g{s};
+        wrapper_guard<std::string_view &> g{s};
         return g.value() == "hello";
     }();
     STATIC_EXPECT_TRUE(result);
@@ -103,20 +103,20 @@ TEST(WrapperGuardValue, HoldsStringViewRef)
 TEST(WrapperGuardWrapper, NotCopyable)
 {
     using W = wrapper<int, feature::inplace::plain>;
-    STATIC_EXPECT_FALSE(std::is_copy_constructible_v<feature::wrapper_guard<W &>>);
+    STATIC_EXPECT_FALSE(::std::is_copy_constructible_v<wrapper_guard<W &>>);
 }
 
 TEST(WrapperGuardWrapper, NotMovable)
 {
     using W = wrapper<int, feature::inplace::plain>;
-    STATIC_EXPECT_FALSE(std::is_move_constructible_v<feature::wrapper_guard<W &>>);
+    STATIC_EXPECT_FALSE(::std::is_move_constructible_v<wrapper_guard<W &>>);
 }
 
 TEST(WrapperGuardWrapper, PlainExecutorValue)
 {
     constexpr auto result = [] {
         wrapper<int, feature::inplace::plain> w{42};
-        feature::wrapper_guard<decltype(w) &> g{w};
+        wrapper_guard<decltype(w) &> g{w};
         return g.value() == 42;
     }();
     STATIC_EXPECT_TRUE(result);
@@ -126,7 +126,7 @@ TEST(WrapperGuardWrapper, PlainExecutorConstValue)
 {
     constexpr auto result = [] {
         wrapper<int, feature::inplace::plain> const w{99};
-        feature::wrapper_guard<const decltype(w) &> g{w};
+        wrapper_guard<const decltype(w) &> g{w};
         return g.value() == 99;
     }();
     STATIC_EXPECT_TRUE(result);
@@ -141,7 +141,7 @@ TEST(WrapperGuardWrapper, GuardCalledOnConstruction)
     guard_counters counters;
     wrapper<int, counting_executor> w{42, counters};
     {
-        feature::wrapper_guard<decltype(w) &> g{w};
+        wrapper_guard<decltype(w) &> g{w};
         EXPECT_EQ(counters.guard_count, 1);
         EXPECT_EQ(counters.unguard_count, 0);
     }
@@ -154,7 +154,7 @@ TEST(WrapperGuardWrapper, CountingExecutorValue)
     constexpr auto result = [] {
         guard_counters counters;
         wrapper<int, counting_executor> w{123, counters};
-        feature::wrapper_guard<decltype(w) &> g{w};
+        wrapper_guard<decltype(w) &> g{w};
         return g.value() == 123;
     }();
     STATIC_EXPECT_TRUE(result);

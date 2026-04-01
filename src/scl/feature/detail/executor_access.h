@@ -15,11 +15,11 @@ namespace scl::feature::detail
     {
         /// @brief Returns the executor of @p w, preserving cv-ref qualifiers.
         // NOLINTBEGIN(cppcoreguidelines-missing-std-forward)
-        template <typename WrapperRefer>
-            requires ::scl::feature::is_wrapper_v<::std::remove_cvref_t<WrapperRefer>>
-        static constexpr decltype(auto) get(WrapperRefer && w) noexcept
+        template <typename Wrapper>
+            requires ::scl::feature::is_wrapper_v<::std::remove_cvref_t<Wrapper>>
+        static constexpr decltype(auto) get(Wrapper && w) noexcept
         {
-            return ::scl::forward_like<WrapperRefer>(w.m_executor);
+            return ::scl::forward_like<Wrapper>(w.m_executor);
         }
         // NOLINTEND(cppcoreguidelines-missing-std-forward)
     };

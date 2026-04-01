@@ -127,10 +127,6 @@ namespace scl::feature::detail
             : m_right{::std::forward<RightRefer>(right)}
         {}
 
-        constexpr wrapper_constructor_resolver(wrapper_constructor_resolver &) = default;
-        constexpr wrapper_constructor_resolver(wrapper_constructor_resolver &&) = default;
-        constexpr wrapper_constructor_resolver(wrapper_constructor_resolver const &) = default;
-
         constexpr decltype(auto) resolve()
         {
             if constexpr (::scl::feature::is_compatible_with_v<left_type, right_type>)
@@ -163,7 +159,9 @@ namespace scl::feature::detail
                 }
                 else
                 {
-                    // no unguard — no RAII needed; call guard if present, then access value directly
+                    // no unguard — intentional: guard() without unguard() is a valid executor
+                    // contract (e.g. a one-shot initializer).  RAII is unnecessary because
+                    // there is nothing to release; call guard() if present, then read value.
                     decltype(auto) executor = executor_access::get(::std::forward<RightRefer>(m_right));
 
                     if constexpr (

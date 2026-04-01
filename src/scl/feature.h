@@ -39,6 +39,22 @@
  */
 
 /**
+ * @defgroup scl_feature_locking ScL Locking Utilities
+ * @brief RAII guards and lazy locks for wrapper and plain value types.
+ *
+ * @details
+ * Three complementary primitives cover the full range of locking needs for
+ * @c scl::wrapper chains:
+ *
+ * | Type | Acquisition | Depth |
+ * |------|-------------|-------|
+ * | @c scl::wrapper_guard | eager (constructor) | single layer |
+ *
+ * All three are transparent for non-wrapper types: construction, locking,
+ * and value access become no-ops or direct reference passes respectively.
+ */
+
+/**
  * @mainpage ScL Feature
  *
  * @section intro Overview
@@ -67,4 +83,6 @@
  *   related metaprogramming utilities.
  * - **Concepts** (@ref scl_feature_concepts) — C++20 concepts such as
  *   @c concepts::wrapper.
+ * - **Locking utilities** (@ref scl_feature_locking) — @c wrapper_guard
+ *   for RAII access to wrapper chains.
  */
