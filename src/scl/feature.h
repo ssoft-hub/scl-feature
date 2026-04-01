@@ -9,6 +9,7 @@
 #include <scl/feature/type_traits.h>
 #include <scl/feature/wrapper.h>
 #include <scl/feature/wrapper_guard.h>
+#include <scl/feature/wrapper_lock.h>
 
 /**
  * @namespace scl
@@ -49,6 +50,7 @@
  * | Type | Acquisition | Depth |
  * |------|-------------|-------|
  * | @c scl::wrapper_guard | eager (constructor) | single layer |
+ * | @c scl::wrapper_lock  | lazy (@c lock())    | single layer |
  *
  * All three are transparent for non-wrapper types: construction, locking,
  * and value access become no-ops or direct reference passes respectively.
@@ -83,6 +85,6 @@
  *   related metaprogramming utilities.
  * - **Concepts** (@ref scl_feature_concepts) — C++20 concepts such as
  *   @c concepts::wrapper.
- * - **Locking utilities** (@ref scl_feature_locking) — @c wrapper_guard
- *   for RAII access to wrapper chains.
+ * - **Locking utilities** (@ref scl_feature_locking) — @c wrapper_guard,
+ *   and @c wrapper_lock for RAII access to wrapper chains.
  */
