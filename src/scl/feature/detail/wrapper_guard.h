@@ -16,13 +16,13 @@ namespace scl::feature::detail
     };
 
     template <typename Refer, wrapper_guard_case Case>
+        requires ::std::is_reference_v<Refer>
     class wrapper_guard;
 
     template <typename Refer>
+        requires ::std::is_reference_v<Refer>
     class wrapper_guard<Refer, wrapper_guard_case::value>
     {
-        static_assert(::std::is_reference_v<Refer>);
-
     public:
         wrapper_guard(wrapper_guard &&) = delete;
         wrapper_guard(wrapper_guard const &) = delete;
@@ -41,11 +41,10 @@ namespace scl::feature::detail
     };
 
     template <typename WrapperRefer>
+        requires ::std::is_reference_v<WrapperRefer> &&
+        ::scl::feature::is_wrapper_v<::std::remove_cvref_t<WrapperRefer>>
     class wrapper_guard<WrapperRefer, wrapper_guard_case::wrapper>
     {
-        static_assert(::std::is_reference_v<WrapperRefer>);
-        static_assert(::scl::feature::is_wrapper_v<::std::remove_cvref_t<WrapperRefer>>);
-
         using wrapper_type = ::std::remove_cvref_t<WrapperRefer>;
         using executor_type = typename wrapper_type::executor_type;
         using executor_refer = scl::forward_like_t<WrapperRefer, executor_type>;

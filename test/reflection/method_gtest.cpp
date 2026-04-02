@@ -102,7 +102,7 @@ TEST(ReflectMethod, GetFromRValue)
 TEST(ReflectMethod, GetFromConstRValue)
 {
     // constexpr
-    STATIC_EXPECT_EQ(std::move(static_cast<ReflectedTarget const &>(ReflectedTarget{42})).get(), 242);
+    STATIC_EXPECT_EQ(::std::move(static_cast<ReflectedTarget const &>(ReflectedTarget{42})).get(), 242);
 }
 
 TEST(ReflectMethod, SetThroughReflection)
@@ -113,7 +113,7 @@ TEST(ReflectMethod, SetThroughReflection)
 }
 
 template <typename T, typename... Args>
-constexpr bool can_call_set_v = requires { std::declval<T>().set(std::declval<Args>()...); };
+constexpr bool can_call_set_v = requires { ::std::declval<T>().set(::std::declval<Args>()...); };
 
 TEST(ReflectMethod, SetNotAvailableOnConst)
 {
