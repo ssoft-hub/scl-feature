@@ -1,7 +1,7 @@
 #pragma once
 
-#include <scl/feature/detail/wrapper_guard.h>
 #include <scl/feature/type_traits/wrapper.h>
+#include <scl/feature/wrapper_guard.h>
 #include <scl/utility/type_traits/forward_like.h>
 
 #include <type_traits>
@@ -43,7 +43,7 @@ namespace scl::feature::detail
         requires ::scl::feature::is_wrapper_v<::std::remove_cvref_t<RightRefer>>
     class guarded_wrapper_constructor_resolver
     {
-        using guard_type = wrapper_guard<RightRefer, wrapper_guard_case::wrapper>;
+        using guard_type = ::scl::wrapper_guard<RightRefer>;
         using inner_refer_t = decltype(::std::declval<guard_type &>().value());
         using inner_resolver_t = wrapper_constructor_resolver<LeftWrapper, inner_refer_t>;
 
