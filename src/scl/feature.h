@@ -7,8 +7,11 @@
 
 #include <scl/feature/concepts.h>
 #include <scl/feature/type_traits.h>
+#include <scl/feature/value_lock.h>
 #include <scl/feature/wrapper.h>
+#include <scl/feature/wrapper_cast.h>
 #include <scl/feature/wrapper_guard.h>
+#include <scl/feature/wrapper_lock.h>
 
 /**
  * @namespace scl
@@ -49,9 +52,25 @@
  * | Type | Acquisition | Depth |
  * |------|-------------|-------|
  * | @c scl::wrapper_guard | eager (constructor) | single layer |
+ * | @c scl::wrapper_lock  | lazy (@c lock())    | single layer |
+ * | @c scl::value_lock    | lazy (@c lock_for()) | entire chain |
  *
  * All three are transparent for non-wrapper types: construction, locking,
  * and value access become no-ops or direct reference passes respectively.
+ */
+
+/**
+ * @defgroup scl_feature_wrapper_cast ScL Wrapper Cast
+ * @brief Lazy-locking cast utility for wrapper and plain value references.
+ *
+ * @details
+ * @c scl::wrapper_cast() returns a @c wrapper_caster<Refer> proxy that
+ * captures references to every executor in the wrapper chain without
+ * acquiring any guard.  Guards are activated **lazily**, only at the moment
+ * the proxy is converted to the desired target type.
+ *
+ * This allows generic code to cast uniformly through wrapper chains:
+ * non-wrapper types are passed through as-is via a no-op overload.
  */
 
 /**
@@ -83,6 +102,8 @@
  *   related metaprogramming utilities.
  * - **Concepts** (@ref scl_feature_concepts) — C++20 concepts such as
  *   @c concepts::wrapper.
- * - **Locking utilities** (@ref scl_feature_locking) — @c wrapper_guard
- *   for RAII access to wrapper chains.
+ * - **Locking utilities** (@ref scl_feature_locking) — @c wrapper_guard,
+ *   @c wrapper_lock, and @c value_lock for RAII access to wrapper chains.
+ * - **Cast** (@ref scl_feature_wrapper_cast) — @c wrapper_cast() lazy-locking
+ *   cast proxy for uniform access through wrapper and plain value references.
  */
