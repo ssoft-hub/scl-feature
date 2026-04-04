@@ -17,6 +17,7 @@ or deferred invocation without modifying the wrapped type. Licensed under [The U
   - Delegates all method calls to the held `Value` through a left-folded executor chain
   - Adjacent duplicate executors in the list are collapsed automatically
   - Defaults to `feature::inplace::plain` when no executor is specified
+  - Each executor must satisfy `concepts::executor`
 - **Executors** (`scl::feature::inplace`):
   - `inplace::plain` — stores `Value` in-place with zero overhead; serves as the default executor
   - `inplace::uninitialized` — holds `Value` in correctly sized and aligned raw storage,

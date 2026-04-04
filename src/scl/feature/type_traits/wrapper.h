@@ -1,12 +1,14 @@
 #pragma once
 
+#include <scl/feature/concepts/executor.h>
 #include <scl/utility/type_traits/forward_like.h>
 
 #include <type_traits>
 
 namespace scl::feature::detail
 {
-    template <typename, template <typename> class>
+    template <typename Value, template <typename> class Executor>
+        requires ::scl::feature::concepts::executor<Executor<Value>>
     class wrapper;
 } // namespace scl::feature::detail
 

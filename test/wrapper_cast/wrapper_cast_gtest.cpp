@@ -25,6 +25,12 @@ struct counting_executor
         , m_counters{counters}
     {}
 
+    template <typename Self, typename Func, typename... Args>
+    static constexpr decltype(auto) execute(Self && self, Func && func, Args &&... args)
+    {
+        return ::std::invoke(::std::forward<Func>(func), ::std::forward<Args>(args)...);
+    }
+
     template <typename Self>
     static constexpr decltype(auto) value(Self && self)
         requires ::std::same_as<std::remove_cvref_t<Self>, counting_executor>
@@ -159,8 +165,8 @@ TEST(WrapperCastCounting, GuardReleasedWhenCasterDestroyed)
     guard_counters ctrs;
     wrapper<int, counting_executor> w{42, ctrs};
     {
-        [[maybe_unused]]
         auto caster = wrapper_cast(w);
+        [[maybe_unused]]
         int val = ::std::move(caster);
         EXPECT_EQ(ctrs.unguard_count, 0); // caster still alive
     }
@@ -174,7 +180,7 @@ TEST(WrapperCastCounting, CastToWrapperRefNoGuard)
     using w_type = ::std::remove_reference_t<decltype(w)>;
     {
         [[maybe_unused]]
-        w_type & ref = wrapper_cast(w); // identity cast: no guard needed
+        w_type const & ref = wrapper_cast(w); // identity cast: no guard needed
         EXPECT_EQ(ctrs.guard_count, 0);
     }
     EXPECT_EQ(ctrs.unguard_count, 0);
@@ -202,7 +208,7 @@ TEST(WrapperCastNested, CastToInnerWrapperRefNoGuard)
         inner_w{42, inner_ctrs}
     };
     [[maybe_unused]]
-    inner_w & ref = wrapper_cast(w);
+    inner_w const & ref = wrapper_cast(w);
     EXPECT_EQ(inner_ctrs.guard_count, 0); // inner identity: no guard
 }
 
