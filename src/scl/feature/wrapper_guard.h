@@ -5,15 +5,10 @@
 #include <scl/feature/detail/wrapper_guard.h>
 #include <scl/feature/type_traits/wrapper.h>
 
-#include <type_traits>
-
 namespace scl
 {
     template <typename Refer>
-    using wrapper_guard = ::scl::feature::detail::wrapper_guard<Refer,
-        ::scl::feature::is_wrapper_v<::std::remove_cvref_t<Refer>>
-            ? ::scl::feature::detail::wrapper_guard_case::wrapper
-            : ::scl::feature::detail::wrapper_guard_case::value>;
+    using wrapper_guard = ::scl::feature::detail::wrapper_guard<Refer>;
 } // namespace scl
 
 #else // DOXYGEN

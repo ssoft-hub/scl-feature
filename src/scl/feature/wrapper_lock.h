@@ -5,15 +5,10 @@
 #include <scl/feature/detail/wrapper_lock.h>
 #include <scl/feature/type_traits/wrapper.h>
 
-#include <type_traits>
-
 namespace scl
 {
     template <typename Refer>
-    using wrapper_lock = ::scl::feature::detail::wrapper_lock<Refer,
-        ::scl::feature::is_wrapper_v<::std::remove_cvref_t<Refer>>
-            ? ::scl::feature::detail::wrapper_lock_case::wrapper
-            : ::scl::feature::detail::wrapper_lock_case::value>;
+    using wrapper_lock = ::scl::feature::detail::wrapper_lock<Refer>;
 } // namespace scl
 
 #else // DOXYGEN
@@ -65,7 +60,8 @@ namespace scl
         /**
          * @brief Releases the guard if it was acquired.
          *
-         * Calls @c unlock() — a no-op if @c lock() was never called.
+         * Calls @c unlock().  @c noexcept if @c executor_type::unguard() does not
+         * exist or is @c noexcept (see @c is_unguard_noexcept_v).
          */
         ~wrapper_lock();
 
@@ -73,8 +69,9 @@ namespace scl
          * @brief Acquires the guard on the executor (idempotent).
          *
          * For wrapper types calls @c executor_type::guard() on the first call;
-         * subsequent calls are no-ops.
-         * For non-wrapper types always a no-op.
+         * subsequent calls are no-ops.  For non-wrapper types always a no-op.
+         * @c noexcept if @c executor_type::guard() does not exist or is @c noexcept
+         * (see @c is_guard_noexcept_v).
          */
         void lock();
 
@@ -84,6 +81,8 @@ namespace scl
          * For wrapper types calls @c executor_type::unguard() if the guard is held,
          * then clears the locked flag.  Subsequent calls are no-ops.
          * For non-wrapper types always a no-op.
+         * @c noexcept if @c executor_type::unguard() does not exist or is @c noexcept
+         * (see @c is_unguard_noexcept_v).
          */
         void unlock();
 

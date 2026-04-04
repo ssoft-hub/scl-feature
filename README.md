@@ -22,10 +22,16 @@ or deferred invocation without modifying the wrapped type. Licensed under [The U
   - `inplace::plain` — stores `Value` in-place with zero overhead; serves as the default executor
   - `inplace::uninitialized` — holds `Value` in correctly sized and aligned raw storage,
     enabling deferred (lazy) construction
-- **Wrapper guard** — `scl::feature::wrapper_guard<Refer>`:
-  - RAII guard that calls `guard()` / `unguard()` on the executor at construction / destruction
-  - Works uniformly for wrapper references and plain value references
-  - Exposes `value()` preserving the cv- and ref-qualifiers of the incoming reference
+- **Locking utilities**:
+  - `scl::wrapper_guard<Refer>` — RAII guard that calls `guard()` / `unguard()` on the executor
+    at construction / destruction; works uniformly for wrapper and plain value references
+  - `scl::wrapper_lock<Refer>` — lazy RAII lock for a single wrapper layer; guard is activated
+    only when `lock()` is called explicitly and released by `unlock()` or destruction
+  - `scl::value_lock<Refer>` — recursive lazy lock through the entire wrapper chain; captures
+    references to every executor at construction (no guard acquired), activates guards for the
+    layers needed to reach a target type via `lock_for<Target>()`
+  - `scl::wrapper_cast(w)` — returns a `wrapper_caster<Refer>` proxy that lazily acquires guards
+    only at the moment of implicit conversion or explicit `.to<Target>()`
 - **Type traits** (`scl::feature`):
   - `is_wrapper_v<T>` — checks whether `T` is a `wrapper` specialization (strips cv-ref qualifiers)
   - `is_executor_v<T>` — checks whether `T` satisfies the executor interface (strips cv-ref qualifiers)

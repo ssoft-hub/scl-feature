@@ -5,15 +5,10 @@
 #include <scl/feature/detail/value_lock.h>
 #include <scl/feature/type_traits/wrapper.h>
 
-#include <type_traits>
-
 namespace scl
 {
     template <typename Refer>
-    using value_lock = ::scl::feature::detail::value_lock<Refer,
-        ::scl::feature::is_wrapper_v<::std::remove_cvref_t<Refer>>
-            ? ::scl::feature::detail::value_lock_case::wrapper
-            : ::scl::feature::detail::value_lock_case::value>;
+    using value_lock = ::scl::feature::detail::value_lock<Refer>;
 } // namespace scl
 
 #else // DOXYGEN
@@ -73,34 +68,36 @@ namespace scl
         /**
          * @brief Activates guards for every wrapper layer needed to reach @p Target.
          *
-         * @tparam Target  The desired value type (cv-ref qualified).
+         * @tparam Target  The desired value type (cv-ref qualified) — must satisfy
+         *                 @c concepts::convertible_from<Target, Refer>.
          *
-         * If @p Target equals the outermost wrapper reference type, no guard is
-         * acquired (identity — no unwrapping required).  Otherwise locks each layer
+         * If @p Target is directly convertible from @p Refer (identity — no
+         * unwrapping required), no guard is acquired.  Otherwise locks each layer
          * from the outside in until @p Target is reached.
          *
-         * Calling @c lock_for() a second time with the same @p Target is safe but
-         * will re-enter the idempotency check of the underlying @c wrapper_lock.
-         *
-         * For non-wrapper types @p Target must equal @c Refer; the call is a no-op.
+         * Calling @c lock_for() a second time with the same @p Target is safe
+         * (idempotency is guaranteed by the underlying @c wrapper_lock).
          */
         template <typename Target>
-        void lock_for();
+        void lock_for()
+            requires ::scl::feature::concepts::convertible_from<Target, Refer>;
 
         /**
          * @brief Returns the stored value at the level matching @p Target.
          *
-         * @tparam Target  The desired value type (cv-ref qualified).
+         * @tparam Target  The desired value type (cv-ref qualified) — must satisfy
+         *                 @c concepts::convertible_from<Target, Refer>.
          *
          * @pre  @c lock_for<Target>() must have been called beforehand for any
          *       wrapper layer that guards the requested value.
          *
-         * If @p Target equals the outermost wrapper reference type, returns the
-         * wrapper itself without going deeper.  Otherwise delegates recursively to
-         * the inner @c value_lock.
+         * If @p Target is directly convertible from @p Refer, returns the
+         * outermost reference without going deeper.  Otherwise delegates
+         * recursively to the inner @c value_lock.
          */
         template <typename Target>
-        Target value_as() const;
+        Target value_as()
+            requires ::scl::feature::concepts::convertible_from<Target, Refer>;
     };
 
     /** @} */ // end of group scl_feature_locking
