@@ -1,5 +1,7 @@
 #pragma once
 
+#include <scl/utility/type_traits/forward_like.h>
+
 #include <type_traits>
 
 namespace scl::feature::detail
@@ -153,5 +155,56 @@ namespace scl::feature
             ::std::remove_cv_t<TestValue>> ||
         is_part_compatible_with_v<::scl::feature::detail::wrapper<ExpectedValue, ExpectedExecutor>,
             ::std::remove_cv_t<TestValue>>;
+
+    // -------------------------------------------------------------------------
+
+    namespace detail
+    {
+        enum class convertible_from_case : bool
+        {
+            value = false,
+            wrapper = true,
+        };
+
+        template <typename Target,
+            typename Refer,
+            convertible_from_case Case = ::scl::feature::is_wrapper_v<::std::remove_cvref_t<Refer>>
+                ? convertible_from_case::wrapper
+                : convertible_from_case::value>
+        struct is_convertible_from_impl;
+
+        template <typename Target, typename Refer>
+        struct is_convertible_from_impl<Target, Refer, convertible_from_case::value>
+            : ::std::bool_constant<::std::is_convertible_v<Refer, Target>>
+        {};
+
+        template <typename Target, typename WrapperRefer>
+        struct is_convertible_from_impl<Target, WrapperRefer, convertible_from_case::wrapper>
+            : ::std::bool_constant<::std::is_convertible_v<WrapperRefer, Target> ||
+                  is_convertible_from_impl<Target,
+                      ::scl::forward_like_t<WrapperRefer, typename ::std::remove_cvref_t<WrapperRefer>::value_type>>::value>
+        {};
+    } // namespace detail
+
+    /**
+     * @ingroup scl_feature_type_traits
+     * @brief Checks whether @p Target is convertible from @p Refer directly or
+     *        through any level of the wrapper chain.
+     *
+     * Extends @c std::is_convertible to wrapper chains:
+     * - base case: @p Refer is directly convertible to @p Target, or
+     * - recursive case: @p Refer is a wrapper and @p Target is convertible from
+     *   the inner value reference type.
+     *
+     * This is the condition under which
+     * @c value_lock<Refer>::lock_for<Target>() and
+     * @c value_lock<Refer>::value_as<Target>() are well-formed.
+     *
+     * @tparam Target  The desired reference type (cv-ref qualified).
+     * @tparam Refer   The starting reference type (outermost wrapper or plain value).
+     */
+    template <typename Target, typename Refer>
+    inline constexpr bool is_convertible_from_v =
+        ::scl::feature::detail::is_convertible_from_impl<Target, Refer>::value;
 
 } // namespace scl::feature
