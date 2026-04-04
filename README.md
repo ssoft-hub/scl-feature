@@ -26,7 +26,8 @@ or deferred invocation without modifying the wrapped type. Licensed under [The U
   - Works uniformly for wrapper references and plain value references
   - Exposes `value()` preserving the cv- and ref-qualifiers of the incoming reference
 - **Type traits** (`scl::feature`):
-  - `is_wrapper_v<T>` — checks whether `T` is a `wrapper` specialization (strips cv-qualifiers)
+  - `is_wrapper_v<T>` — checks whether `T` is a `wrapper` specialization (strips cv-ref qualifiers)
+  - `is_executor_v<T>` — checks whether `T` satisfies the executor interface (strips cv-ref qualifiers)
   - `has_value_v<E, Self>`, `has_execute_v<E, Self>` — detects `value()` / `execute()` on executor `E`
   - `has_guard_v<E, Self>`, `has_unguard_v<E, Self>` — detects `guard()` / `unguard()` on executor `E`
   - `is_guard_noexcept_v<E, Self>`, `is_unguard_noexcept_v<E, Self>` — checks `noexcept` on
@@ -38,6 +39,7 @@ or deferred invocation without modifying the wrapped type. Licensed under [The U
   - `is_part_compatible_with_v<Expected, Test>` — `Test` (a wrapper) recursively contains
     a value compatible with `Expected`
 - **Concepts** (`scl::feature::concepts`):
+  - `concepts::executor<T>` — satisfied when `T` satisfies the executor interface, strips cv-ref qualifiers (`is_executor_v`)
   - `concepts::wrapper<T>` — satisfied when `T` is a `wrapper` specialization
   - `concepts::compatible_with<Expected, T>`
   - `concepts::compatible_with_part_of<Expected, T>`

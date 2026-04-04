@@ -107,6 +107,65 @@ namespace scl::feature
 
     // -------------------------------------------------------------------------
 
+    namespace detail
+    {
+        /// @c true if @p Type is a class and has static @c value() and @c execute()
+        /// callable for the three primary value categories: @c Type&, @c Type&&,
+        /// @c Type const&.  Non-class types (e.g. @c void, scalars) yield @c false.
+        template <typename Type>
+        inline constexpr bool has_executor_minimal_interface_v = []() constexpr -> bool {
+            if constexpr (::std::is_class_v<Type>)
+                return has_value_v<Type, Type &> && has_value_v<Type, Type &&> &&
+                    has_value_v<Type, Type const &> && has_execute_v<Type, Type &> &&
+                    has_execute_v<Type, Type &&> && has_execute_v<Type, Type const &>;
+            return false;
+        }();
+    } // namespace detail
+
+    // -------------------------------------------------------------------------
+
+    /// @ingroup scl_feature_type_traits
+    /// @brief @c true if @p Type satisfies the executor interface.
+    ///
+    /// The check requires that the following static methods are callable for
+    /// the three primary value categories (@c Type&, @c Type&&, @c Type const&):
+    ///
+    /// - @c Type::value(Self&&) — returns a reference to the held value.
+    /// - @c Type::execute(Self&&, Func&&) — invokes a callable in the
+    ///   executor's context; checked with a zero-argument @c void(*)().
+    ///
+    /// Optional methods (@c guard, @c unguard) are not part of this check.
+    /// Non-class types (e.g. @c void, scalars) always yield @c false.
+    /// cv-ref qualifiers on @p Type are stripped before the check (@c remove_cvref_t).
+    ///
+    /// @tparam Type  Type to check (cv-ref qualifiers are stripped).
+    ///
+    /// @see scl::feature::concepts::executor
+    ///
+    /// @code{.cpp}
+    ///   static_assert( is_executor_v<feature::inplace::plain<int>>);
+    ///   static_assert( is_executor_v<feature::inplace::plain<int> const>);  // cv-ref stripped
+    ///   static_assert(!is_executor_v<int>);
+    ///   static_assert(!is_executor_v<void>);
+    ///
+    ///   template <typename T>
+    ///   struct MyExecutor {
+    ///       using value_type = T;
+    ///       T m_value{};
+    ///       template <typename Self, typename Func>
+    ///       static constexpr decltype(auto) execute(Self&&, Func&& f) { return f(); }
+    ///       template <typename Self>
+    ///       static constexpr decltype(auto) value(Self&& self) { return forward_like<Self>(self.m_value); }
+    ///   };
+    ///   static_assert(is_executor_v<MyExecutor<int>>);
+    /// @endcode
+    template <typename Type>
+    inline constexpr bool is_executor_v = ::std::is_same_v<::std::remove_cvref_t<Type>, Type>
+        ? detail::has_executor_minimal_interface_v<Type>
+        : is_executor_v<::std::remove_cvref_t<Type>>;
+
+    // -------------------------------------------------------------------------
+
     /// @ingroup scl_feature_type_traits
     /// @brief @c true if @c ExecutorType::guard() for @c ExecutorRefer either
     ///        does not exist or is @c noexcept.

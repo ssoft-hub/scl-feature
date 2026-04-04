@@ -98,10 +98,10 @@
  *
  * - **Wrapper** — @c scl::wrapper<Value, Tools...>, a composable
  *   adapter with orthogonal tool-based features.
- * - **Type traits** (@ref scl_feature_type_traits) — @c is_wrapper and
- *   related metaprogramming utilities.
+ * - **Type traits** (@ref scl_feature_type_traits) — @c is_wrapper,
+ *   @c is_executor, and related metaprogramming utilities.
  * - **Concepts** (@ref scl_feature_concepts) — C++20 concepts such as
- *   @c concepts::wrapper.
+ *   @c concepts::wrapper and @c concepts::executor.
  * - **Locking utilities** (@ref scl_feature_locking) — @c wrapper_guard,
  *   @c wrapper_lock, and @c value_lock for RAII access to wrapper chains.
  * - **Cast** (@ref scl_feature_wrapper_cast) — @c wrapper_cast() lazy-locking

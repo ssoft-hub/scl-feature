@@ -332,3 +332,41 @@ TEST(IsUnguardNoexcept, ThrowingUnguard)
     STATIC_EXPECT_FALSE((is_unguard_noexcept_v<ThrowingGuardExecutor, ThrowingGuardExecutor &&>));
     STATIC_EXPECT_FALSE((is_unguard_noexcept_v<ThrowingGuardExecutor, ThrowingGuardExecutor const &>));
 }
+
+// ── is_executor_v ─────────────────────────────────────────────────────────────
+
+TEST(IsExecutor, InplaceExecutors)
+{
+    STATIC_EXPECT_TRUE(is_executor_v<inplace::plain<int>>);
+    STATIC_EXPECT_TRUE(is_executor_v<inplace::uninitialized<int>>);
+    STATIC_EXPECT_TRUE(is_executor_v<MinimalExecutor<int>>);
+}
+
+TEST(IsExecutor, CvStripped)
+{
+    STATIC_EXPECT_TRUE(is_executor_v<inplace::plain<int> const>);
+    STATIC_EXPECT_TRUE(is_executor_v<inplace::plain<int> volatile>);
+    STATIC_EXPECT_TRUE(is_executor_v<inplace::plain<int> const volatile>);
+}
+
+TEST(IsExecutor, RefStripped)
+{
+    STATIC_EXPECT_TRUE(is_executor_v<inplace::plain<int> &>);
+    STATIC_EXPECT_TRUE(is_executor_v<inplace::plain<int> &&>);
+    STATIC_EXPECT_TRUE(is_executor_v<inplace::plain<int> const &>);
+}
+
+TEST(IsExecutor, GuardUnguardAloneNotEnough)
+{
+    // guard/unguard are optional — their presence alone does not satisfy the interface.
+    STATIC_EXPECT_FALSE(is_executor_v<NoexceptGuardExecutor>);
+    STATIC_EXPECT_FALSE(is_executor_v<ThrowingGuardExecutor>);
+}
+
+TEST(IsExecutor, NotExecutor)
+{
+    STATIC_EXPECT_FALSE(is_executor_v<NoInterfaceExecutor>);
+    STATIC_EXPECT_FALSE(is_executor_v<NoExecuteExecutor>);
+    STATIC_EXPECT_FALSE(is_executor_v<int>);
+    STATIC_EXPECT_FALSE(is_executor_v<void>);
+}
