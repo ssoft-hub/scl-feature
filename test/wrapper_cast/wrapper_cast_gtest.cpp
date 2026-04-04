@@ -193,9 +193,7 @@ TEST(WrapperCastCounting, CastToWrapperRefNoGuard)
 TEST(WrapperCastNested, CastToOuterWrapperRefNoGuard)
 {
     guard_counters inner_ctrs;
-    outer_w w{
-        inner_w{42, inner_ctrs}
-    };
+    outer_w w{inner_w{42, inner_ctrs}};
     outer_w & ref = wrapper_cast(w);
     EXPECT_EQ(&ref, &w);
     EXPECT_EQ(inner_ctrs.guard_count, 0);
@@ -204,9 +202,7 @@ TEST(WrapperCastNested, CastToOuterWrapperRefNoGuard)
 TEST(WrapperCastNested, CastToInnerWrapperRefNoGuard)
 {
     guard_counters inner_ctrs;
-    outer_w w{
-        inner_w{42, inner_ctrs}
-    };
+    outer_w w{inner_w{42, inner_ctrs}};
     [[maybe_unused]]
     inner_w const & ref = wrapper_cast(w);
     EXPECT_EQ(inner_ctrs.guard_count, 0); // inner identity: no guard
@@ -215,9 +211,7 @@ TEST(WrapperCastNested, CastToInnerWrapperRefNoGuard)
 TEST(WrapperCastNested, CastToValueLocksInnerExecutor)
 {
     guard_counters inner_ctrs;
-    outer_w w{
-        inner_w{42, inner_ctrs}
-    };
+    outer_w w{inner_w{42, inner_ctrs}};
     int val = wrapper_cast(w);
     EXPECT_EQ(inner_ctrs.guard_count, 1);
     EXPECT_EQ(val, 42);
@@ -226,9 +220,7 @@ TEST(WrapperCastNested, CastToValueLocksInnerExecutor)
 TEST(WrapperCastNested, DestructorReleasesInnerGuard)
 {
     guard_counters inner_ctrs;
-    outer_w w{
-        inner_w{42, inner_ctrs}
-    };
+    outer_w w{inner_w{42, inner_ctrs}};
     {
         auto caster = wrapper_cast(w);
         [[maybe_unused]]
@@ -305,9 +297,7 @@ TEST(WrapperCasterTo, LvalueNotInvocable)
 TEST(WrapperCasterTo, NestedToOuterRefNoGuard)
 {
     guard_counters inner_ctrs;
-    outer_w w{
-        inner_w{42, inner_ctrs}
-    };
+    outer_w w{inner_w{42, inner_ctrs}};
     outer_w & ref = wrapper_cast(w).to<outer_w &>();
     EXPECT_EQ(&ref, &w);
     EXPECT_EQ(inner_ctrs.guard_count, 0);
@@ -316,9 +306,7 @@ TEST(WrapperCasterTo, NestedToOuterRefNoGuard)
 TEST(WrapperCasterTo, NestedToInnerWrapperRefNoGuard)
 {
     guard_counters inner_ctrs;
-    outer_w w{
-        inner_w{42, inner_ctrs}
-    };
+    outer_w w{inner_w{42, inner_ctrs}};
     [[maybe_unused]]
     inner_w const & ref = wrapper_cast(w).to<inner_w &>();
     EXPECT_EQ(inner_ctrs.guard_count, 0);
@@ -327,9 +315,7 @@ TEST(WrapperCasterTo, NestedToInnerWrapperRefNoGuard)
 TEST(WrapperCasterTo, NestedToValueLocksInnerExecutor)
 {
     guard_counters inner_ctrs;
-    outer_w w{
-        inner_w{42, inner_ctrs}
-    };
+    outer_w w{inner_w{42, inner_ctrs}};
     int val = wrapper_cast(w).to<int &>();
     EXPECT_EQ(inner_ctrs.guard_count, 1);
     EXPECT_EQ(val, 42);
@@ -338,9 +324,7 @@ TEST(WrapperCasterTo, NestedToValueLocksInnerExecutor)
 TEST(WrapperCasterTo, NestedDestructorReleasesInnerGuard)
 {
     guard_counters inner_ctrs;
-    outer_w w{
-        inner_w{42, inner_ctrs}
-    };
+    outer_w w{inner_w{42, inner_ctrs}};
     {
         auto caster = wrapper_cast(w);
         [[maybe_unused]]

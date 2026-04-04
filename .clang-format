@@ -49,7 +49,7 @@ BinPackParameters: false                # When wrapped, place one parameter per 
 # -----------------------------
 # Arrays of structs / visual alignment helpers
 # -----------------------------
-AlignArrayOfStructures: Right   # Align columns in braced arrays of structs to the right
+AlignArrayOfStructures: None   # Disabled: Left/Right misalign constructor initialisers
 
 # -----------------------------
 # Access specifiers (public/protected/private) in classes

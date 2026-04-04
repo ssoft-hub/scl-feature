@@ -187,9 +187,7 @@ TEST(ValueLockWrapper, DestructorWithoutLockNoUnguard)
 TEST(ValueLockNested, NoGuardAtConstruction)
 {
     guard_counters inner_ctrs;
-    outer_w w{
-        inner_w{42, inner_ctrs}
-    };
+    outer_w w{inner_w{42, inner_ctrs}};
     {
         [[maybe_unused]]
         value_lock<outer_w &> vl{w};
@@ -201,9 +199,7 @@ TEST(ValueLockNested, NoGuardAtConstruction)
 TEST(ValueLockNested, LockForOuterWrapperRefNoGuard)
 {
     guard_counters inner_ctrs;
-    outer_w w{
-        inner_w{42, inner_ctrs}
-    };
+    outer_w w{inner_w{42, inner_ctrs}};
     value_lock<outer_w &> vl{w};
     vl.lock_for<outer_w &>(); // identity at outer level — no guard acquired
     EXPECT_EQ(inner_ctrs.guard_count, 0);
@@ -212,9 +208,7 @@ TEST(ValueLockNested, LockForOuterWrapperRefNoGuard)
 TEST(ValueLockNested, LockForInnerWrapperRefNoGuard)
 {
     guard_counters inner_ctrs;
-    outer_w w{
-        inner_w{42, inner_ctrs}
-    };
+    outer_w w{inner_w{42, inner_ctrs}};
     value_lock<outer_w &> vl{w};
     vl.lock_for<inner_w &>(); // identity at inner level — outer plain, inner no lock needed
     EXPECT_EQ(inner_ctrs.guard_count, 0);
@@ -223,9 +217,7 @@ TEST(ValueLockNested, LockForInnerWrapperRefNoGuard)
 TEST(ValueLockNested, LockForValueLocksInnerExecutor)
 {
     guard_counters inner_ctrs;
-    outer_w w{
-        inner_w{42, inner_ctrs}
-    };
+    outer_w w{inner_w{42, inner_ctrs}};
     value_lock<outer_w &> vl{w};
     vl.lock_for<int &>(); // must lock the counting_executor inside inner_w
     EXPECT_EQ(inner_ctrs.guard_count, 1);
@@ -234,9 +226,7 @@ TEST(ValueLockNested, LockForValueLocksInnerExecutor)
 TEST(ValueLockNested, ValueAsOuterWrapperRef)
 {
     guard_counters inner_ctrs;
-    outer_w w{
-        inner_w{42, inner_ctrs}
-    };
+    outer_w w{inner_w{42, inner_ctrs}};
     value_lock<outer_w &> vl{w};
     EXPECT_EQ(&vl.value_as<outer_w &>(), &w);
 }
@@ -244,9 +234,7 @@ TEST(ValueLockNested, ValueAsOuterWrapperRef)
 TEST(ValueLockNested, ValueAsInnerWrapperRef)
 {
     guard_counters inner_ctrs;
-    outer_w w{
-        inner_w{42, inner_ctrs}
-    };
+    outer_w w{inner_w{42, inner_ctrs}};
     value_lock<outer_w &> vl{w};
     inner_w & inner_ref = vl.value_as<inner_w &>();
     // Verify the inner wrapper holds the right value via wrapper_lock
@@ -258,9 +246,7 @@ TEST(ValueLockNested, ValueAsInnerWrapperRef)
 TEST(ValueLockNested, ValueAsIntRef)
 {
     guard_counters inner_ctrs;
-    outer_w w{
-        inner_w{42, inner_ctrs}
-    };
+    outer_w w{inner_w{42, inner_ctrs}};
     value_lock<outer_w &> vl{w};
     vl.lock_for<int &>();
     EXPECT_EQ(vl.value_as<int &>(), 42);
@@ -269,9 +255,7 @@ TEST(ValueLockNested, ValueAsIntRef)
 TEST(ValueLockNested, DestructorReleasesInnerGuard)
 {
     guard_counters inner_ctrs;
-    outer_w w{
-        inner_w{42, inner_ctrs}
-    };
+    outer_w w{inner_w{42, inner_ctrs}};
     {
         value_lock<outer_w &> vl{w};
         vl.lock_for<int &>();
