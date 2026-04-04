@@ -31,6 +31,12 @@ TEST(IsWrapper, CvStripped)
     STATIC_EXPECT_TRUE(is_wrapper_v<wrapper<int> const>);
     STATIC_EXPECT_TRUE(is_wrapper_v<wrapper<int> volatile>);
     STATIC_EXPECT_TRUE(is_wrapper_v<wrapper<int> const volatile>);
+    STATIC_EXPECT_TRUE(is_wrapper_v<wrapper<int> const &>);
+    STATIC_EXPECT_TRUE(is_wrapper_v<wrapper<int> volatile &>);
+    STATIC_EXPECT_TRUE(is_wrapper_v<wrapper<int> const volatile &>);
+    STATIC_EXPECT_TRUE(is_wrapper_v<wrapper<int> const &&>);
+    STATIC_EXPECT_TRUE(is_wrapper_v<wrapper<int> volatile &&>);
+    STATIC_EXPECT_TRUE(is_wrapper_v<wrapper<int> const volatile &&>);
 }
 
 // ── is_compatible_with ───────────────────────────────────────────────────────

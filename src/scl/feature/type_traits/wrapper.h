@@ -16,19 +16,20 @@ namespace scl::feature
      * @ingroup scl_feature_type_traits
      * @brief Checks whether @p Type is a @c wrapper specialization.
      *
-     * cv-qualifiers on @p Type are stripped before the check.
+     * cv-ref qualifiers on @p Type are stripped before the check (@c remove_cvref_t).
      *
      * @tparam Type  Type to check.
      *
      * @code{.cpp}
      *    static_assert(!is_wrapper_v<int>);
-     *    static_assert( is_wrapper_v<wrapper<int>>);
-     *    static_assert( is_wrapper_v<wrapper<int> const>);  // cv stripped
+     *    static_assert( is_wrapper_v<wrapper<int, feature::inplace::plain>>);
+     *    static_assert( is_wrapper_v<wrapper<int, feature::inplace::plain> const>);  // cv-ref stripped
      * @endcode
      */
     template <typename Type>
-    inline constexpr bool is_wrapper_v =
-        ::std::is_same_v<::std::remove_cv_t<Type>, Type> ? false : is_wrapper_v<::std::remove_cv_t<Type>>;
+    inline constexpr bool is_wrapper_v = ::std::is_same_v<::std::remove_cvref_t<Type>, Type>
+        ? false
+        : is_wrapper_v<::std::remove_cvref_t<Type>>;
 
     template <typename Type, template <typename> class Executor>
     inline constexpr bool is_wrapper_v<::scl::feature::detail::wrapper<Type, Executor>> = true;
@@ -168,9 +169,8 @@ namespace scl::feature
 
         template <typename Target,
             typename Refer,
-            convertible_from_case Case = ::scl::feature::is_wrapper_v<::std::remove_cvref_t<Refer>>
-                ? convertible_from_case::wrapper
-                : convertible_from_case::value>
+            convertible_from_case Case =
+                ::scl::feature::is_wrapper_v<Refer> ? convertible_from_case::wrapper : convertible_from_case::value>
         struct is_convertible_from_impl;
 
         template <typename Target, typename Refer>

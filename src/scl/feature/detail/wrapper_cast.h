@@ -1,5 +1,6 @@
 #pragma once
 
+#include <scl/feature/concepts/wrapper.h>
 #include <scl/feature/detail/value_lock.h>
 #include <scl/feature/type_traits/wrapper.h>
 #include <scl/utility/type_traits/forward_like.h>
@@ -25,8 +26,7 @@ namespace scl::feature::detail
 
     template <typename Caster,
         typename Refer,
-        wrapper_cast_case Case =
-            ::scl::feature::is_wrapper_v<::std::remove_cvref_t<Refer>> ? wrapper_cast_case::wrapper : wrapper_cast_case::value>
+        wrapper_cast_case Case = ::scl::feature::is_wrapper_v<Refer> ? wrapper_cast_case::wrapper : wrapper_cast_case::value>
         requires ::std::is_reference_v<Refer>
     class cast_mixin;
 
@@ -41,9 +41,8 @@ namespace scl::feature::detail
 
     // Wrapper level: one operator for the wrapper reference itself plus
     // inherited operators for every inner level via recursive base.
-    template <typename Caster, typename WrapperRefer>
-        requires ::std::is_reference_v<WrapperRefer> &&
-        ::scl::feature::is_wrapper_v<::std::remove_cvref_t<WrapperRefer>>
+    template <typename Caster, concepts::wrapper WrapperRefer>
+        requires ::std::is_reference_v<WrapperRefer>
     class cast_mixin<Caster, WrapperRefer, wrapper_cast_case::wrapper>
         : public cast_mixin<Caster, ::scl::forward_like_t<WrapperRefer, typename ::std::remove_cvref_t<WrapperRefer>::value_type>>
     {
@@ -70,7 +69,7 @@ namespace scl::feature::detail
     class [[nodiscard]] wrapper_caster : public cast_mixin<wrapper_caster<Refer>, Refer>
     {
         using lock_type = ::scl::feature::detail::value_lock<Refer,
-            ::scl::feature::is_wrapper_v<::std::remove_cvref_t<Refer>> ? value_lock_case::wrapper : value_lock_case::value>;
+            ::scl::feature::is_wrapper_v<Refer> ? value_lock_case::wrapper : value_lock_case::value>;
 
     public:
         wrapper_caster(wrapper_caster &&) = delete;
@@ -79,7 +78,7 @@ namespace scl::feature::detail
         wrapper_caster & operator=(wrapper_caster const &) = delete;
         ~wrapper_caster() = default;
 
-        constexpr explicit wrapper_caster(Refer ref)
+        constexpr explicit wrapper_caster(Refer ref) noexcept
             : m_lock{::std::forward<Refer>(ref)}
         {}
 

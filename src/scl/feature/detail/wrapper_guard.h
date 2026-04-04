@@ -1,6 +1,8 @@
 #pragma once
 
+#include <scl/feature/concepts/wrapper.h>
 #include <scl/feature/detail/executor_access.h>
+#include <scl/feature/type_traits/executor.h>
 #include <scl/feature/type_traits/wrapper.h>
 #include <scl/utility/type_traits/forward_like.h>
 
@@ -15,7 +17,8 @@ namespace scl::feature::detail
         wrapper = true,
     };
 
-    template <typename Refer, wrapper_guard_case Case>
+    template <typename Refer,
+        wrapper_guard_case Case = ::scl::feature::is_wrapper_v<Refer> ? wrapper_guard_case::wrapper : wrapper_guard_case::value>
         requires ::std::is_reference_v<Refer>
     class wrapper_guard;
 
@@ -40,9 +43,8 @@ namespace scl::feature::detail
         Refer m_value;
     };
 
-    template <typename WrapperRefer>
-        requires ::std::is_reference_v<WrapperRefer> &&
-        ::scl::feature::is_wrapper_v<::std::remove_cvref_t<WrapperRefer>>
+    template <concepts::wrapper WrapperRefer>
+        requires ::std::is_reference_v<WrapperRefer>
     class wrapper_guard<WrapperRefer, wrapper_guard_case::wrapper>
     {
         using wrapper_type = ::std::remove_cvref_t<WrapperRefer>;
@@ -56,16 +58,17 @@ namespace scl::feature::detail
         wrapper_guard & operator=(wrapper_guard const &) = delete;
 
         constexpr explicit wrapper_guard(WrapperRefer w)
+            noexcept(::scl::feature::is_guard_noexcept_v<executor_type, executor_refer>)
             : m_executor{executor_access::get(::std::forward<WrapperRefer>(w))}
         {
-            if constexpr (requires { executor_type::template guard<executor_refer>(m_executor); })
-                executor_type::template guard<executor_refer>(m_executor);
+            if constexpr (::scl::feature::has_guard_v<executor_type, executor_refer>)
+                executor_type::guard(::std::forward<executor_refer>(m_executor));
         }
 
-        constexpr ~wrapper_guard()
+        constexpr ~wrapper_guard() noexcept(::scl::feature::is_unguard_noexcept_v<executor_type, executor_refer>)
         {
-            if constexpr (requires { executor_type::template unguard<executor_refer>(m_executor); })
-                executor_type::template unguard<executor_refer>(m_executor);
+            if constexpr (::scl::feature::has_unguard_v<executor_type, executor_refer>)
+                executor_type::unguard(::std::forward<executor_refer>(m_executor));
         }
 
         constexpr decltype(auto) value() const noexcept

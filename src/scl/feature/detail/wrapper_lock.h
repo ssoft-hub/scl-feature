@@ -1,6 +1,8 @@
 #pragma once
 
+#include <scl/feature/concepts/wrapper.h>
 #include <scl/feature/detail/executor_access.h>
+#include <scl/feature/type_traits/executor.h>
 #include <scl/feature/type_traits/wrapper.h>
 #include <scl/utility/type_traits/forward_like.h>
 
@@ -15,7 +17,8 @@ namespace scl::feature::detail
         wrapper = true,
     };
 
-    template <typename Refer, wrapper_lock_case Case>
+    template <typename Refer,
+        wrapper_lock_case Case = ::scl::feature::is_wrapper_v<Refer> ? wrapper_lock_case::wrapper : wrapper_lock_case::value>
         requires ::std::is_reference_v<Refer>
     class wrapper_lock;
 
@@ -53,9 +56,8 @@ namespace scl::feature::detail
     // Wrapper specialisation — lazy guard: lock()/unlock() call guard()/unguard().
     // -------------------------------------------------------------------------
 
-    template <typename WrapperRefer>
-        requires ::std::is_reference_v<WrapperRefer> &&
-        ::scl::feature::is_wrapper_v<::std::remove_cvref_t<WrapperRefer>>
+    template <concepts::wrapper WrapperRefer>
+        requires ::std::is_reference_v<WrapperRefer>
     class wrapper_lock<WrapperRefer, wrapper_lock_case::wrapper>
     {
         using wrapper_type = ::std::remove_cvref_t<WrapperRefer>;
@@ -74,21 +76,25 @@ namespace scl::feature::detail
             : m_ref{::std::forward<WrapperRefer>(ref)}
         {}
 
-        constexpr ~wrapper_lock() { unlock(); }
-
-        constexpr void lock()
+        constexpr ~wrapper_lock() noexcept(::scl::feature::is_unguard_noexcept_v<executor_type, executor_refer>)
         {
-            if (!::std::exchange(m_locked, true))
-                if constexpr (requires { executor_type::template guard<executor_refer>(executor()); })
-                    executor_type::template guard<executor_refer>(executor());
+            unlock();
         }
 
-        constexpr void unlock()
+        constexpr void
+        lock() noexcept(::scl::feature::is_guard_noexcept_v<executor_type, executor_refer>)
+        {
+            if (!::std::exchange(m_locked, true))
+                if constexpr (::scl::feature::has_guard_v<executor_type, executor_refer>)
+                    executor_type::guard(executor());
+        }
+
+        constexpr void
+        unlock() noexcept(::scl::feature::is_unguard_noexcept_v<executor_type, executor_refer>)
         {
             if (::std::exchange(m_locked, false))
-                if constexpr (
-                    requires { executor_type::template unguard<executor_refer>(executor()); })
-                    executor_type::template unguard<executor_refer>(executor());
+                if constexpr (::scl::feature::has_unguard_v<executor_type, executor_refer>)
+                    executor_type::unguard(executor());
         }
 
         /// Returns the wrapper reference itself (does not require the lock).

@@ -143,10 +143,9 @@ namespace scl
          * @tparam Other  Source wrapper type (cv-ref qualifiers are deduced).
          * @param  other  Source wrapper.
          */
-        template <typename Other>
+        template <concepts::wrapper Other>
         constexpr wrapper(Other && other)
-            requires(::scl::feature::is_wrapper_v<::std::remove_cvref_t<Other>> &&
-                !::std::same_as<::std::remove_cvref_t<Other>, wrapper> &&
+            requires(!::std::same_as<::std::remove_cvref_t<Other>, wrapper> &&
                 ::std::constructible_from<executor_type,
                     decltype(wrapper_constructor_resolver<wrapper, Other &&>{other}.resolve())>);
     };
