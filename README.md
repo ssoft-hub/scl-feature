@@ -27,6 +27,10 @@ or deferred invocation without modifying the wrapped type. Licensed under [The U
   - Exposes `value()` preserving the cv- and ref-qualifiers of the incoming reference
 - **Type traits** (`scl::feature`):
   - `is_wrapper_v<T>` — checks whether `T` is a `wrapper` specialization (strips cv-qualifiers)
+  - `has_value_v<E, Self>`, `has_execute_v<E, Self>` — detects `value()` / `execute()` on executor `E`
+  - `has_guard_v<E, Self>`, `has_unguard_v<E, Self>` — detects `guard()` / `unguard()` on executor `E`
+  - `is_guard_noexcept_v<E, Self>`, `is_unguard_noexcept_v<E, Self>` — checks `noexcept` on
+    `guard()` / `unguard()` (true when the method is absent or marked `noexcept`)
   - `is_compatible_with_v<Expected, Test>` — `Test` is the same as or derived from `Expected`;
     for wrapper specialisations with the same executor the check is applied recursively to value types
   - `is_compatible_with_part_of_v<Expected, Test>` — `Expected` (a wrapper) recursively contains
