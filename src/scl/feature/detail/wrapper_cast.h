@@ -36,7 +36,10 @@ namespace scl::feature::detail
     class cast_mixin<Caster, Refer, wrapper_cast_case::value>
     {
     public:
-        operator Refer() && { return static_cast<Caster &&>(*this).template get<Refer>(); }
+        operator Refer() && noexcept(noexcept(::std::declval<Caster &&>().template to<Refer>()))
+        {
+            return static_cast<Caster &&>(*this).template to<Refer>();
+        }
     };
 
     // Wrapper level: one operator for the wrapper reference itself plus
@@ -47,9 +50,9 @@ namespace scl::feature::detail
         : public cast_mixin<Caster, ::scl::forward_like_t<WrapperRefer, typename ::std::remove_cvref_t<WrapperRefer>::value_type>>
     {
     public:
-        operator WrapperRefer() &&
+        operator WrapperRefer() && noexcept(noexcept(::std::declval<Caster &&>().template to<WrapperRefer>()))
         {
-            return static_cast<Caster &&>(*this).template get<WrapperRefer>();
+            return static_cast<Caster &&>(*this).template to<WrapperRefer>();
         }
     };
 
@@ -57,7 +60,7 @@ namespace scl::feature::detail
     // wrapper_caster — lazy-locking proxy returned by wrapper_cast().
     //
     // Constructs a value_lock (all executor references stored, no guard yet).
-    // Each implicit conversion operator (provided by cast_mixin) calls get<T>()
+    // Each implicit conversion operator (provided by cast_mixin) calls to<T>()
     // which activates the necessary guards just before returning the value.
     //
     // All conversions are &&-qualified: the caster must be used as an rvalue.
@@ -82,13 +85,15 @@ namespace scl::feature::detail
             : m_lock{::std::forward<Refer>(ref)}
         {}
 
-        /// Activates guards for layers needed to reach @p T, then returns the value.
+        /// Activates guards for layers needed to reach @p Type, then returns the value.
         /// Called by cast_mixin's conversion operators.
-        template <typename T>
-        T get() &&
+        template <typename Type>
+            requires ::scl::feature::concepts::convertible_from<Type, Refer>
+        Type to() && noexcept(noexcept(::std::declval<lock_type &>().template lock_for<Type>()) &&
+            noexcept(::std::declval<lock_type &>().template value_as<Type>()))
         {
-            m_lock.template lock_for<T>();
-            return m_lock.template value_as<T>();
+            m_lock.template lock_for<Type>();
+            return m_lock.template value_as<Type>();
         }
 
     private:
