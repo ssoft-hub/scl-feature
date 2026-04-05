@@ -20,6 +20,7 @@ namespace scl::feature::detail
         using executor_type = Executor<value_type>;
 
     private:
+        [[no_unique_address]]
         executor_type m_executor;
 
         friend struct executor_access;
