@@ -46,7 +46,11 @@ namespace scl::feature::detail
         constexpr void unlock() noexcept {}
 
         /// Returns the held reference (identity).
-        constexpr Refer value() const noexcept { return ::std::forward<Refer>(m_ref); }
+        [[nodiscard]]
+        constexpr Refer value() const noexcept
+        {
+            return ::std::forward<Refer>(m_ref);
+        }
 
     private:
         Refer m_ref;
@@ -98,12 +102,14 @@ namespace scl::feature::detail
         }
 
         /// Returns the wrapper reference itself (does not require the lock).
+        [[nodiscard]]
         constexpr WrapperRefer wrapper_value() const noexcept
         {
             return ::std::forward<WrapperRefer>(m_ref);
         }
 
         /// Returns the inner value through the executor (lock should be held by the caller).
+        [[nodiscard]]
         constexpr value_refer value() const noexcept(noexcept(
             executor_type::template value<executor_refer>(::std::declval<executor_refer>())))
             requires requires {
@@ -114,6 +120,7 @@ namespace scl::feature::detail
         }
 
     private:
+        [[nodiscard]]
         constexpr executor_refer executor() const noexcept
         {
             return executor_access::get(::std::forward<WrapperRefer>(m_ref));

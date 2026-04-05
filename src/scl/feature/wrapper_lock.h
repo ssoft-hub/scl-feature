@@ -91,6 +91,7 @@ namespace scl
          *
          * Only available for wrapper types.
          */
+        [[nodiscard]]
         Refer wrapper_value() const noexcept;
 
         /**
@@ -101,6 +102,7 @@ namespace scl
          *
          * @pre  For wrapper types @c lock() must have been called beforehand.
          */
+        [[nodiscard]]
         decltype(auto) value() const noexcept;
     };
 

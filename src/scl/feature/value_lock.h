@@ -96,6 +96,7 @@ namespace scl
          * recursively to the inner @c value_lock.
          */
         template <typename Target>
+        [[nodiscard]]
         Target value_as()
             requires ::scl::feature::concepts::convertible_from<Target, Refer>;
     };

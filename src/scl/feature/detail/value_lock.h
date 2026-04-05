@@ -42,6 +42,7 @@ namespace scl::feature::detail
         {}
 
         template <typename Target>
+        [[nodiscard]]
         constexpr Target value_as() noexcept(::std::is_nothrow_convertible_v<Refer, Target>)
             requires ::std::convertible_to<Refer, Target>
         {
@@ -96,6 +97,7 @@ namespace scl::feature::detail
 
         /// Returns the value at the level matching @p Target (lock_for should be held by the caller).
         template <typename Target>
+        [[nodiscard]]
         constexpr Target value_as() noexcept(value_as_noexcept<Target>())
             requires ::scl::feature::concepts::convertible_from<Target, WrapperRefer>
         {

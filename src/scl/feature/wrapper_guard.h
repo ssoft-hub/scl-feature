@@ -72,6 +72,7 @@ namespace scl
          *
          * @pre  For wrapper types the guard is held (guaranteed by the constructor).
          */
+        [[nodiscard]]
         decltype(auto) value() const noexcept;
     };
 

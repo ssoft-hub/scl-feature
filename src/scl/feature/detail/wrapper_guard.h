@@ -37,7 +37,11 @@ namespace scl::feature::detail
             : m_value{::std::forward<Refer>(v)}
         {}
 
-        constexpr decltype(auto) value() const noexcept { return ::std::forward<Refer>(m_value); }
+        [[nodiscard]]
+        constexpr decltype(auto) value() const noexcept
+        {
+            return ::std::forward<Refer>(m_value);
+        }
 
     private:
         Refer m_value;
@@ -71,6 +75,7 @@ namespace scl::feature::detail
                 executor_type::unguard(::std::forward<executor_refer>(m_executor));
         }
 
+        [[nodiscard]]
         constexpr decltype(auto) value() const noexcept
             requires requires {
                          executor_type::template value<executor_refer>(::std::declval<executor_refer>());

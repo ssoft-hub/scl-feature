@@ -51,7 +51,7 @@ namespace scl
      * @endcode
      */
     template <typename Refer>
-    class wrapper_caster
+    class [[nodiscard]] wrapper_caster
     {
     public:
         wrapper_caster(wrapper_caster &&) = delete;
@@ -88,6 +88,7 @@ namespace scl
          * @note Acquired guards remain held until the @c wrapper_caster is destroyed,
          *       not until the end of the conversion expression.
          */
+        [[nodiscard]]
         operator Refer() &&;
 
         /**
@@ -101,6 +102,7 @@ namespace scl
          * @note Acquired guards remain held until the @c wrapper_caster is destroyed.
          */
         template <typename T>
+        [[nodiscard]]
         T to() &&
             requires ::scl::feature::concepts::convertible_from<T, Refer>;
     };

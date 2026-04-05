@@ -36,6 +36,7 @@ namespace scl::feature::detail
     class cast_mixin<Caster, Refer, wrapper_cast_case::value>
     {
     public:
+        [[nodiscard]]
         operator Refer() && noexcept(noexcept(::std::declval<Caster &&>().template to<Refer>()))
         {
             return static_cast<Caster &&>(*this).template to<Refer>();
@@ -50,6 +51,7 @@ namespace scl::feature::detail
         : public cast_mixin<Caster, ::scl::forward_like_t<WrapperRefer, typename ::std::remove_cvref_t<WrapperRefer>::value_type>>
     {
     public:
+        [[nodiscard]]
         operator WrapperRefer() && noexcept(noexcept(::std::declval<Caster &&>().template to<WrapperRefer>()))
         {
             return static_cast<Caster &&>(*this).template to<WrapperRefer>();
@@ -89,6 +91,7 @@ namespace scl::feature::detail
         /// Called by cast_mixin's conversion operators.
         template <typename Type>
             requires ::scl::feature::concepts::convertible_from<Type, Refer>
+        [[nodiscard]]
         Type to() && noexcept(noexcept(::std::declval<lock_type &>().template lock_for<Type>()) &&
             noexcept(::std::declval<lock_type &>().template value_as<Type>()))
         {
