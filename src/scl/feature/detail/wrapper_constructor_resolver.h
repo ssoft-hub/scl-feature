@@ -40,7 +40,7 @@ namespace scl::feature::detail
     /// @tparam LeftWrapper  The target `wrapper<V,E>` being constructed.
     /// @tparam RightRefer   cv-ref-qualified reference to the source wrapper.
     template <typename LeftWrapper, typename RightRefer>
-        requires ::scl::feature::is_wrapper_v<::std::remove_cvref_t<RightRefer>>
+        requires ::scl::feature::is_wrapper_v<RightRefer>
     class guarded_wrapper_constructor_resolver
     {
         using guard_type = ::scl::wrapper_guard<RightRefer>;
@@ -145,10 +145,7 @@ namespace scl::feature::detail
                 using right_executor = typename right_type::executor_type;
                 using right_executor_refer = ::scl::forward_like_t<RightRefer, right_executor>;
 
-                constexpr bool has_unguard =
-                    requires(right_executor_refer e) {
-                        right_executor::template unguard<right_executor_refer>(e);
-                    };
+                constexpr bool has_unguard = ::scl::feature::has_unguard_v<right_executor, right_executor_refer>;
 
                 if constexpr (has_unguard)
                 {
@@ -164,9 +161,8 @@ namespace scl::feature::detail
                     // there is nothing to release; call guard() if present, then read value.
                     decltype(auto) executor = executor_access::get(::std::forward<RightRefer>(m_right));
 
-                    if constexpr (
-                        requires { right_executor::template guard<right_executor_refer>(executor); })
-                        right_executor::template guard<right_executor_refer>(executor);
+                    if constexpr (::scl::feature::has_guard_v<right_executor, right_executor_refer>)
+                        right_executor::guard(::std::forward<right_executor_refer>(executor));
 
                     decltype(auto) inner = right_executor::template value<right_executor_refer>(
                         ::std::forward<decltype(executor)>(executor));

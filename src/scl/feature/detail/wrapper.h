@@ -1,5 +1,6 @@
 #pragma once
 
+#include <scl/feature/concepts/executor.h>
 #include <scl/feature/detail/wrapper_constructor_resolver.h>
 #include <scl/feature/detail/wrapper_constructors.h>
 
@@ -9,6 +10,7 @@ namespace scl::feature::detail
 {
     // NOLINTBEGIN(cppcoreguidelines-special-member-functions)
     template <typename Value, template <typename> class Executor>
+        requires ::scl::feature::concepts::executor<Executor<Value>>
     class wrapper
     {
         using self_type = wrapper<Value, Executor>;
@@ -18,6 +20,7 @@ namespace scl::feature::detail
         using executor_type = Executor<value_type>;
 
     private:
+        [[no_unique_address]]
         executor_type m_executor;
 
         friend struct executor_access;

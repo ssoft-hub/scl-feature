@@ -27,6 +27,12 @@ struct counting_executor
         , m_counters{counters}
     {}
 
+    template <typename Self, typename Func, typename... Args>
+    static constexpr decltype(auto) execute(Self && self, Func && func, Args &&... args)
+    {
+        return ::std::invoke(::std::forward<Func>(func), ::std::forward<Args>(args)...);
+    }
+
     template <typename Self>
     static constexpr decltype(auto) value(Self && self)
         requires std::same_as<std::remove_cvref_t<Self>, counting_executor>

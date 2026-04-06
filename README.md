@@ -17,16 +17,30 @@ or deferred invocation without modifying the wrapped type. Licensed under [The U
   - Delegates all method calls to the held `Value` through a left-folded executor chain
   - Adjacent duplicate executors in the list are collapsed automatically
   - Defaults to `feature::inplace::plain` when no executor is specified
+  - Each executor must satisfy `concepts::executor`
 - **Executors** (`scl::feature::inplace`):
   - `inplace::plain` — stores `Value` in-place with zero overhead; serves as the default executor
   - `inplace::uninitialized` — holds `Value` in correctly sized and aligned raw storage,
     enabling deferred (lazy) construction
-- **Wrapper guard** — `scl::feature::wrapper_guard<Refer>`:
-  - RAII guard that calls `guard()` / `unguard()` on the executor at construction / destruction
-  - Works uniformly for wrapper references and plain value references
-  - Exposes `value()` preserving the cv- and ref-qualifiers of the incoming reference
+- **Locking utilities**:
+  - `scl::wrapper_guard<Refer>` — RAII guard that calls `guard()` / `unguard()` on the executor
+    at construction / destruction; works uniformly for wrapper and plain value references
+  - `scl::wrapper_lock<Refer>` — lazy RAII lock for a single wrapper layer; guard is activated
+    only when `lock()` is called explicitly and released by `unlock()` or destruction
+  - `scl::value_lock<Refer>` — recursive lazy lock through the entire wrapper chain; captures
+    references to every executor at construction (no guard acquired), activates guards for the
+    layers needed to reach a target type via `lock_for<Target>()`
+  - `scl::wrapper_cast(w)` — returns a `wrapper_caster<Refer>` proxy that lazily acquires guards
+    only at the moment of implicit conversion or explicit `.to<Target>()`
 - **Type traits** (`scl::feature`):
-  - `is_wrapper_v<T>` — checks whether `T` is a `wrapper` specialization (strips cv-qualifiers)
+  - `is_wrapper_v<T>` — checks whether `T` is a `wrapper` specialization (strips cv-ref qualifiers)
+  - `is_executor_v<T>` — checks whether `T` satisfies the executor interface (strips cv-ref qualifiers)
+  - `is_convertible_from_v<Target, Refer>` — checks whether a reference `Refer` can be converted
+    to `Target` by unwrapping through the wrapper chain
+  - `has_value_v<E, Self>`, `has_execute_v<E, Self>` — detects `value()` / `execute()` on executor `E`
+  - `has_guard_v<E, Self>`, `has_unguard_v<E, Self>` — detects `guard()` / `unguard()` on executor `E`
+  - `is_guard_noexcept_v<E, Self>`, `is_unguard_noexcept_v<E, Self>` — checks `noexcept` on
+    `guard()` / `unguard()` (true when the method is absent or marked `noexcept`)
   - `is_compatible_with_v<Expected, Test>` — `Test` is the same as or derived from `Expected`;
     for wrapper specialisations with the same executor the check is applied recursively to value types
   - `is_compatible_with_part_of_v<Expected, Test>` — `Expected` (a wrapper) recursively contains
@@ -34,7 +48,9 @@ or deferred invocation without modifying the wrapped type. Licensed under [The U
   - `is_part_compatible_with_v<Expected, Test>` — `Test` (a wrapper) recursively contains
     a value compatible with `Expected`
 - **Concepts** (`scl::feature::concepts`):
+  - `concepts::executor<T>` — satisfied when `T` satisfies the executor interface, strips cv-ref qualifiers (`is_executor_v`)
   - `concepts::wrapper<T>` — satisfied when `T` is a `wrapper` specialization
+  - `concepts::convertible_from<Target, Refer>` — satisfied when `Refer` can be unwrapped to `Target`
   - `concepts::compatible_with<Expected, T>`
   - `concepts::compatible_with_part_of<Expected, T>`
   - `concepts::part_compatible_with<Expected, T>`

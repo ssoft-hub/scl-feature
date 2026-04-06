@@ -76,4 +76,17 @@ namespace scl::feature::concepts
      */
     template <typename Expected, typename Type>
     concept part_compatible_with = ::scl::feature::is_part_compatible_with_v<Expected, Type>;
+
+    /**
+     * @ingroup scl_feature_concepts
+     * @brief Satisfied when @p Target is convertible from @p Refer directly or
+     *        through any level of the wrapper chain.
+     *
+     * @tparam Target  The desired reference type (cv-ref qualified).
+     * @tparam Refer   The starting reference type (outermost wrapper or plain value).
+     *
+     * @see scl::feature::is_convertible_from_v
+     */
+    template <typename Target, typename Refer>
+    concept convertible_from = ::scl::feature::is_convertible_from_v<Target, Refer>;
 } // namespace scl::feature::concepts

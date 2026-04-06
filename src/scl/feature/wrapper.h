@@ -47,15 +47,19 @@ namespace scl
     /**
      * @brief Composable proxy wrapper that delegates to @p Value through executors.
      *
-     * Each executor is a class template @c E such that @c E<Value> proxies
-     * method calls and may add cross-cutting behaviour (e.g. COW, thread
-     * safety, deferred invocation).  Executors are composed left-to-right;
+     * Each executor is a class template @c E such that @c E<Value> must satisfy
+     * @c concepts::executor — it must provide static @c value(Self&&) and
+     * @c execute(Self&&, Func&&) methods.  Executors are composed left-to-right;
      * adjacent duplicates in the list are collapsed.  Defaults to
      * @c feature::inplace::plain — a zero-overhead direct proxy — when no executor
      * is specified.
      *
      * @tparam Value      The wrapped value type.
-     * @tparam Executors  Zero or more executor class templates.
+     * @tparam Executors  Zero or more executor class templates.  Each @c E must
+     *                    satisfy @c concepts::executor<E<Value>>.
+     *
+     * @see scl::feature::concepts::executor
+     * @see scl::feature::is_executor_v
      *
      * @code{.cpp}
      *    wrapper<int> a{42};                                   // feature::inplace::plain (default)
@@ -143,10 +147,9 @@ namespace scl
          * @tparam Other  Source wrapper type (cv-ref qualifiers are deduced).
          * @param  other  Source wrapper.
          */
-        template <typename Other>
+        template <concepts::wrapper Other>
         constexpr wrapper(Other && other)
-            requires(::scl::feature::is_wrapper_v<::std::remove_cvref_t<Other>> &&
-                !::std::same_as<::std::remove_cvref_t<Other>, wrapper> &&
+            requires(!::std::same_as<::std::remove_cvref_t<Other>, wrapper> &&
                 ::std::constructible_from<executor_type,
                     decltype(wrapper_constructor_resolver<wrapper, Other &&>{other}.resolve())>);
     };

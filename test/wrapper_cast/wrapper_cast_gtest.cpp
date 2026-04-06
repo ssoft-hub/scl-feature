@@ -25,6 +25,12 @@ struct counting_executor
         , m_counters{counters}
     {}
 
+    template <typename Self, typename Func, typename... Args>
+    static constexpr decltype(auto) execute(Self && self, Func && func, Args &&... args)
+    {
+        return ::std::invoke(::std::forward<Func>(func), ::std::forward<Args>(args)...);
+    }
+
     template <typename Self>
     static constexpr decltype(auto) value(Self && self)
         requires ::std::same_as<std::remove_cvref_t<Self>, counting_executor>
@@ -159,8 +165,8 @@ TEST(WrapperCastCounting, GuardReleasedWhenCasterDestroyed)
     guard_counters ctrs;
     wrapper<int, counting_executor> w{42, ctrs};
     {
-        [[maybe_unused]]
         auto caster = wrapper_cast(w);
+        [[maybe_unused]]
         int val = ::std::move(caster);
         EXPECT_EQ(ctrs.unguard_count, 0); // caster still alive
     }
@@ -174,7 +180,7 @@ TEST(WrapperCastCounting, CastToWrapperRefNoGuard)
     using w_type = ::std::remove_reference_t<decltype(w)>;
     {
         [[maybe_unused]]
-        w_type & ref = wrapper_cast(w); // identity cast: no guard needed
+        w_type const & ref = wrapper_cast(w); // identity cast: no guard needed
         EXPECT_EQ(ctrs.guard_count, 0);
     }
     EXPECT_EQ(ctrs.unguard_count, 0);
@@ -187,9 +193,7 @@ TEST(WrapperCastCounting, CastToWrapperRefNoGuard)
 TEST(WrapperCastNested, CastToOuterWrapperRefNoGuard)
 {
     guard_counters inner_ctrs;
-    outer_w w{
-        inner_w{42, inner_ctrs}
-    };
+    outer_w w{inner_w{42, inner_ctrs}};
     outer_w & ref = wrapper_cast(w);
     EXPECT_EQ(&ref, &w);
     EXPECT_EQ(inner_ctrs.guard_count, 0);
@@ -198,20 +202,16 @@ TEST(WrapperCastNested, CastToOuterWrapperRefNoGuard)
 TEST(WrapperCastNested, CastToInnerWrapperRefNoGuard)
 {
     guard_counters inner_ctrs;
-    outer_w w{
-        inner_w{42, inner_ctrs}
-    };
+    outer_w w{inner_w{42, inner_ctrs}};
     [[maybe_unused]]
-    inner_w & ref = wrapper_cast(w);
+    inner_w const & ref = wrapper_cast(w);
     EXPECT_EQ(inner_ctrs.guard_count, 0); // inner identity: no guard
 }
 
 TEST(WrapperCastNested, CastToValueLocksInnerExecutor)
 {
     guard_counters inner_ctrs;
-    outer_w w{
-        inner_w{42, inner_ctrs}
-    };
+    outer_w w{inner_w{42, inner_ctrs}};
     int val = wrapper_cast(w);
     EXPECT_EQ(inner_ctrs.guard_count, 1);
     EXPECT_EQ(val, 42);
@@ -220,13 +220,115 @@ TEST(WrapperCastNested, CastToValueLocksInnerExecutor)
 TEST(WrapperCastNested, DestructorReleasesInnerGuard)
 {
     guard_counters inner_ctrs;
-    outer_w w{
-        inner_w{42, inner_ctrs}
-    };
+    outer_w w{inner_w{42, inner_ctrs}};
     {
         auto caster = wrapper_cast(w);
         [[maybe_unused]]
         int val = ::std::move(caster);
+        EXPECT_EQ(inner_ctrs.unguard_count, 0);
+    }
+    EXPECT_EQ(inner_ctrs.unguard_count, 1);
+}
+
+// ---------------------------------------------------------------------------
+// wrapper_caster::to<T>() — explicit named cast
+// ---------------------------------------------------------------------------
+
+TEST(WrapperCasterTo, PassThroughToReturnsRef)
+{
+    int x = 42;
+    int & r = wrapper_cast(x).to<int &>();
+    EXPECT_EQ(&r, &x);
+}
+
+TEST(WrapperCasterTo, ToWrapperRefNoGuard)
+{
+    guard_counters ctrs;
+    wrapper<int, counting_executor> w{42, ctrs};
+    using w_type = ::std::remove_reference_t<decltype(w)>;
+    w_type & ref = wrapper_cast(w).to<w_type &>();
+    EXPECT_EQ(&ref, &w);
+    EXPECT_EQ(ctrs.guard_count, 0);
+    EXPECT_EQ(ctrs.unguard_count, 0);
+}
+
+TEST(WrapperCasterTo, ToInnerValueAcquiresGuard)
+{
+    guard_counters ctrs;
+    wrapper<int, counting_executor> w{42, ctrs};
+    int val = wrapper_cast(w).to<int &>();
+    EXPECT_EQ(ctrs.guard_count, 1);
+    EXPECT_EQ(val, 42);
+}
+
+TEST(WrapperCasterTo, ToReleasedOnCasterDestroy)
+{
+    guard_counters ctrs;
+    wrapper<int, counting_executor> w{99, ctrs};
+    {
+        auto caster = wrapper_cast(w);
+        [[maybe_unused]]
+        int & r = ::std::move(caster).to<int &>();
+        EXPECT_EQ(ctrs.unguard_count, 0);
+    }
+    EXPECT_EQ(ctrs.unguard_count, 1);
+}
+
+TEST(WrapperCasterTo, WithoutCallNoGuard)
+{
+    guard_counters ctrs;
+    wrapper<int, counting_executor> w{0, ctrs};
+    {
+        [[maybe_unused]]
+        auto caster = wrapper_cast(w);
+        // .to<>() never called
+    }
+    EXPECT_EQ(ctrs.guard_count, 0);
+    EXPECT_EQ(ctrs.unguard_count, 0);
+}
+
+TEST(WrapperCasterTo, LvalueNotInvocable)
+{
+    using w_type = wrapper<int, feature::inplace::plain>;
+    using caster_type = wrapper_caster<w_type &>;
+    STATIC_EXPECT_FALSE((::std::is_invocable_v<decltype(&caster_type::template to<int &>), caster_type &>));
+}
+
+TEST(WrapperCasterTo, NestedToOuterRefNoGuard)
+{
+    guard_counters inner_ctrs;
+    outer_w w{inner_w{42, inner_ctrs}};
+    outer_w & ref = wrapper_cast(w).to<outer_w &>();
+    EXPECT_EQ(&ref, &w);
+    EXPECT_EQ(inner_ctrs.guard_count, 0);
+}
+
+TEST(WrapperCasterTo, NestedToInnerWrapperRefNoGuard)
+{
+    guard_counters inner_ctrs;
+    outer_w w{inner_w{42, inner_ctrs}};
+    [[maybe_unused]]
+    inner_w const & ref = wrapper_cast(w).to<inner_w &>();
+    EXPECT_EQ(inner_ctrs.guard_count, 0);
+}
+
+TEST(WrapperCasterTo, NestedToValueLocksInnerExecutor)
+{
+    guard_counters inner_ctrs;
+    outer_w w{inner_w{42, inner_ctrs}};
+    int val = wrapper_cast(w).to<int &>();
+    EXPECT_EQ(inner_ctrs.guard_count, 1);
+    EXPECT_EQ(val, 42);
+}
+
+TEST(WrapperCasterTo, NestedDestructorReleasesInnerGuard)
+{
+    guard_counters inner_ctrs;
+    outer_w w{inner_w{42, inner_ctrs}};
+    {
+        auto caster = wrapper_cast(w);
+        [[maybe_unused]]
+        int & r = ::std::move(caster).to<int &>();
         EXPECT_EQ(inner_ctrs.unguard_count, 0);
     }
     EXPECT_EQ(inner_ctrs.unguard_count, 1);

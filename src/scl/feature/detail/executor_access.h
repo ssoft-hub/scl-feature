@@ -1,9 +1,7 @@
 #pragma once
 
-#include <scl/feature/type_traits/wrapper.h>
+#include <scl/feature/concepts/wrapper.h>
 #include <scl/utility/type_traits/forward_like.h>
-
-#include <type_traits>
 
 namespace scl::feature::detail
 {
@@ -16,8 +14,8 @@ namespace scl::feature::detail
         /// @brief Returns the executor of @p w, preserving cv-ref qualifiers.
         // NOLINTBEGIN(cppcoreguidelines-missing-std-forward)
         template <typename Wrapper>
-            requires ::scl::feature::is_wrapper_v<::std::remove_cvref_t<Wrapper>>
         static constexpr decltype(auto) get(Wrapper && w) noexcept
+            requires ::scl::feature::concepts::wrapper<Wrapper>
         {
             return ::scl::forward_like<Wrapper>(w.m_executor);
         }
