@@ -23,6 +23,7 @@
  * @{
  */
 
+#include <scl/feature/reflection/access.h>
 #include <scl/feature/reflection/method.h>
 #include <scl/feature/reflection/type.h>
 
