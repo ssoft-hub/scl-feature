@@ -661,3 +661,240 @@ TEST(MethodQualifiers, NonReference_ReturnsFalse)
     constexpr auto rvalue_result = SCL_HAS_QUALIFIED_METHOD(rvalue_only, Qualified);
     STATIC_EXPECT_FALSE(rvalue_result);
 }
+
+// ============================================================================
+// Tests for SCL_HAS_QUALIFIED_METHOD with explicit template arguments
+// (SCL_FORWARD(template method<T>) syntax)
+// ============================================================================
+
+// Helper struct: template methods with various cv-ref qualifiers.
+// Return types must differ across qualifiers to allow discrimination.
+
+struct TemplateQualified
+{
+    // Only & overload
+    template <typename T>
+    bool temp_lvalue_only(T) &
+    {
+        return {};
+    }
+
+    // & (bool) and const& (int) overloads
+    template <typename T>
+    bool temp_mut_and_const(T) &
+    {
+        return {};
+    }
+    template <typename T>
+    int temp_mut_and_const(T) const &
+    {
+        return {};
+    }
+
+    // All four lvalue qualifiers with distinct return types
+    template <typename T>
+    bool temp_all_lvalue(T) &
+    {
+        return {};
+    }
+    template <typename T>
+    int temp_all_lvalue(T) const &
+    {
+        return {};
+    }
+    template <typename T>
+    float temp_all_lvalue(T) volatile &
+    {
+        return {};
+    }
+    template <typename T>
+    double temp_all_lvalue(T) const volatile &
+    {
+        return {};
+    }
+
+    // Only const&& overload
+    template <typename T>
+    bool temp_const_rvalue_only(T) const &&
+    {
+        return {};
+    }
+
+    // Two template parameters
+    template <typename T, typename U>
+    bool temp_multi(T, U) &
+    {
+        return {};
+    }
+    template <typename T, typename U>
+    int temp_multi(T, U) const &
+    {
+        return {};
+    }
+};
+
+// --- temp_lvalue_only: only & ---
+
+TEST(TemplateMethodQualifiers, LValueOnly_MatchesMutableLValue)
+{
+    constexpr auto result = SCL_HAS_QUALIFIED_METHOD(SCL_FORWARD(template temp_lvalue_only<float>),
+        TemplateQualified &, float);
+    STATIC_EXPECT_TRUE(result);
+}
+
+TEST(TemplateMethodQualifiers, LValueOnly_RejectsConstLValue)
+{
+    constexpr auto result = SCL_HAS_QUALIFIED_METHOD(SCL_FORWARD(template temp_lvalue_only<float>),
+        TemplateQualified const &, float);
+    STATIC_EXPECT_FALSE(result);
+}
+
+TEST(TemplateMethodQualifiers, LValueOnly_RejectsMutableRValue)
+{
+    constexpr auto result = SCL_HAS_QUALIFIED_METHOD(SCL_FORWARD(template temp_lvalue_only<float>),
+        TemplateQualified &&, float);
+    STATIC_EXPECT_FALSE(result);
+}
+
+TEST(TemplateMethodQualifiers, LValueOnly_RejectsWrongArgType)
+{
+    constexpr auto result = SCL_HAS_QUALIFIED_METHOD(SCL_FORWARD(template temp_lvalue_only<float>),
+        TemplateQualified &, int *);
+    STATIC_EXPECT_FALSE(result);
+}
+
+// --- temp_mut_and_const: & and const& ---
+
+TEST(TemplateMethodQualifiers, MutAndConst_MatchesMutableLValue)
+{
+    constexpr auto result = SCL_HAS_QUALIFIED_METHOD(SCL_FORWARD(template temp_mut_and_const<double>),
+        TemplateQualified &, double);
+    STATIC_EXPECT_TRUE(result);
+}
+
+TEST(TemplateMethodQualifiers, MutAndConst_MatchesConstLValue)
+{
+    constexpr auto result = SCL_HAS_QUALIFIED_METHOD(SCL_FORWARD(template temp_mut_and_const<double>),
+        TemplateQualified const &, double);
+    STATIC_EXPECT_TRUE(result);
+}
+
+TEST(TemplateMethodQualifiers, MutAndConst_RejectsMutableRValue)
+{
+    constexpr auto result = SCL_HAS_QUALIFIED_METHOD(SCL_FORWARD(template temp_mut_and_const<double>),
+        TemplateQualified &&, double);
+    STATIC_EXPECT_FALSE(result);
+}
+
+TEST(TemplateMethodQualifiers, MutAndConst_RejectsVolatileLValue)
+{
+    constexpr auto result = SCL_HAS_QUALIFIED_METHOD(SCL_FORWARD(template temp_mut_and_const<double>),
+        TemplateQualified volatile &, double);
+    STATIC_EXPECT_FALSE(result);
+}
+
+// --- temp_all_lvalue: &, const&, volatile&, const volatile& ---
+
+TEST(TemplateMethodQualifiers, AllLValue_MatchesMutableLValue)
+{
+    constexpr auto result = SCL_HAS_QUALIFIED_METHOD(SCL_FORWARD(template temp_all_lvalue<int>),
+        TemplateQualified &, int);
+    STATIC_EXPECT_TRUE(result);
+}
+
+TEST(TemplateMethodQualifiers, AllLValue_MatchesConstLValue)
+{
+    constexpr auto result = SCL_HAS_QUALIFIED_METHOD(SCL_FORWARD(template temp_all_lvalue<int>),
+        TemplateQualified const &, int);
+    STATIC_EXPECT_TRUE(result);
+}
+
+TEST(TemplateMethodQualifiers, AllLValue_MatchesVolatileLValue)
+{
+    constexpr auto result = SCL_HAS_QUALIFIED_METHOD(SCL_FORWARD(template temp_all_lvalue<int>),
+        TemplateQualified volatile &, int);
+    STATIC_EXPECT_TRUE(result);
+}
+
+TEST(TemplateMethodQualifiers, AllLValue_MatchesCVLValue)
+{
+    constexpr auto result = SCL_HAS_QUALIFIED_METHOD(SCL_FORWARD(template temp_all_lvalue<int>),
+        TemplateQualified const volatile &, int);
+    STATIC_EXPECT_TRUE(result);
+}
+
+TEST(TemplateMethodQualifiers, AllLValue_RejectsMutableRValue)
+{
+    constexpr auto result = SCL_HAS_QUALIFIED_METHOD(SCL_FORWARD(template temp_all_lvalue<int>),
+        TemplateQualified &&, int);
+    STATIC_EXPECT_FALSE(result);
+}
+
+TEST(TemplateMethodQualifiers, AllLValue_RejectsConstRValue)
+{
+    constexpr auto result = SCL_HAS_QUALIFIED_METHOD(SCL_FORWARD(template temp_all_lvalue<int>),
+        TemplateQualified const &&, int);
+    STATIC_EXPECT_FALSE(result);
+}
+
+// --- temp_const_rvalue_only: only const&& ---
+
+TEST(TemplateMethodQualifiers, ConstRValueOnly_MatchesConstRValue)
+{
+    constexpr auto result = SCL_HAS_QUALIFIED_METHOD(
+        SCL_FORWARD(template temp_const_rvalue_only<short>), TemplateQualified const &&, short);
+    STATIC_EXPECT_TRUE(result);
+}
+
+TEST(TemplateMethodQualifiers, ConstRValueOnly_RejectsMutableRValue)
+{
+    constexpr auto result = SCL_HAS_QUALIFIED_METHOD(
+        SCL_FORWARD(template temp_const_rvalue_only<short>), TemplateQualified &&, short);
+    STATIC_EXPECT_FALSE(result);
+}
+
+TEST(TemplateMethodQualifiers, ConstRValueOnly_RejectsConstLValue)
+{
+    constexpr auto result = SCL_HAS_QUALIFIED_METHOD(
+        SCL_FORWARD(template temp_const_rvalue_only<short>), TemplateQualified const &, short);
+    STATIC_EXPECT_FALSE(result);
+}
+
+// --- temp_multi: two template parameters ---
+
+TEST(TemplateMethodQualifiers, MultiParam_MatchesMutableLValue)
+{
+    constexpr auto result = SCL_HAS_QUALIFIED_METHOD(SCL_FORWARD(template temp_multi<float, int>),
+        TemplateQualified &, float, int);
+    STATIC_EXPECT_TRUE(result);
+}
+
+TEST(TemplateMethodQualifiers, MultiParam_MatchesConstLValue)
+{
+    constexpr auto result = SCL_HAS_QUALIFIED_METHOD(SCL_FORWARD(template temp_multi<float, int>),
+        TemplateQualified const &, float, int);
+    STATIC_EXPECT_TRUE(result);
+}
+
+TEST(TemplateMethodQualifiers, MultiParam_RejectsMutableRValue)
+{
+    constexpr auto result = SCL_HAS_QUALIFIED_METHOD(SCL_FORWARD(template temp_multi<float, int>),
+        TemplateQualified &&, float, int);
+    STATIC_EXPECT_FALSE(result);
+}
+
+TEST(TemplateMethodQualifiers, MultiParam_RejectsWrongArgs)
+{
+    constexpr auto result = SCL_HAS_QUALIFIED_METHOD(SCL_FORWARD(template temp_multi<float, int>),
+        TemplateQualified &, double *, long *);
+    STATIC_EXPECT_FALSE(result);
+}
+
+// --- non-reference type with template method always returns false ---
+
+TEST(TemplateMethodQualifiers, NonReference_ReturnsFalse)
+{
+    constexpr auto result = SCL_HAS_QUALIFIED_METHOD(SCL_FORWARD(template temp_lvalue_only<float>),
+        TemplateQualified, float);
+    STATIC_EXPECT_FALSE(result);
+}
