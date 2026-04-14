@@ -90,7 +90,7 @@ struct BoxingReflected
 {
     BoxingExecutor m_exec;
 
-    SCL_REFLECT_TYPE(BoxingReflected, m_exec);
+    SCL_REFLECT_TYPE(BoxingReflected, BoxingExecutor);
 
     constexpr explicit BoxingReflected(int v)
         : m_exec{v}
@@ -140,7 +140,7 @@ struct PlainReflected
 {
     PlainReflectedExecutor m_exec;
 
-    SCL_REFLECT_TYPE(PlainReflected, m_exec);
+    SCL_REFLECT_TYPE(PlainReflected, PlainReflectedExecutor);
 
     constexpr explicit PlainReflected(int v)
         : m_exec{v}

@@ -81,7 +81,7 @@ struct OverridingReflected
 {
     OverridingExecutor m_exec;
 
-    SCL_REFLECT_TYPE(OverridingReflected, m_exec);
+    SCL_REFLECT_TYPE(OverridingReflected, OverridingExecutor);
 
     constexpr explicit OverridingReflected(int v)
         : m_exec{Target{v}}
@@ -219,7 +219,7 @@ struct NoexceptReflected
 {
     NoexceptOverrideExecutor m_exec;
 
-    SCL_REFLECT_TYPE(NoexceptReflected, m_exec);
+    SCL_REFLECT_TYPE(NoexceptReflected, NoexceptOverrideExecutor);
 
     constexpr explicit NoexceptReflected(int v)
         : m_exec{Target{v}}
