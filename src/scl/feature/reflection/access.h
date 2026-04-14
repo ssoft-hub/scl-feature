@@ -7,7 +7,6 @@
 #include <scl/feature/type_traits/executor.h>
 
 #include <type_traits>
-#include <utility>
 
 /// @internal
 /// @ingroup scl_feature_reflection
@@ -28,7 +27,7 @@
 ///
 /// @param cv_ref  cv-ref qualifiers applied to the wrapper (@c *this).
 #define SCL_EXECUTOR_ACCESS(cv_ref) \
-    ::scl::feature::executor_trait<S_c_L_type_>::executor(::std::forward<S_c_L_type_ cv_ref>(*this))
+    ::scl::feature::executor_trait<S_c_L_type_>::executor(static_cast<S_c_L_type_ cv_ref>(*this))
 
 /// @internal
 /// @ingroup scl_feature_reflection
