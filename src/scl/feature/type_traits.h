@@ -3,6 +3,7 @@
 /**
  * @file
  * @brief ScL Feature type traits.
+ * @ingroup scl_feature_type_traits
  * @details This header aggregates all ScL Feature type trait utilities.
  */
 

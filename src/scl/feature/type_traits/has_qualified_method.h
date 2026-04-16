@@ -2,12 +2,14 @@
 
 /// @file
 /// @brief Compile-time predicate macro for cv-ref qualifier detection.
+/// @ingroup scl_feature_type_traits
 
 #include <scl/utility/preprocessor/forward.h>
 
 #include <type_traits>
 
 /// @internal
+/// @ingroup scl_feature_type_traits
 /// @brief Call expression for @p method on @c Obj with qualifier @p Q.
 ///
 /// Must appear only inside @c SCL_HAS_QUALIFIED_METHOD where @c Obj and
@@ -16,6 +18,7 @@
     ::std::declval<Obj quals>().method(::std::declval<S_c_L_Args_>()...)
 
 /// @internal
+/// @ingroup scl_feature_type_traits
 /// @brief True when calls through qualifiers @p Q1 and @p Q2 return the same type.
 ///
 /// Must appear only inside an @c if @c constexpr guard that ensures both
@@ -24,6 +27,7 @@
     ::std::is_same_v<decltype(SCL_HQM_CALL(method, left_quals)), decltype(SCL_HQM_CALL(method, right_quals))>
 
 /// @brief Compile-time predicate: checks whether @p Type has a **dedicated**
+/// @ingroup scl_feature_type_traits
 ///        overload of @p method whose cv-ref qualifiers exactly match those
 ///        of @p Type.
 ///
