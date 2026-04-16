@@ -1,5 +1,9 @@
 #pragma once
 
+/// @file
+/// @brief Executor that holds a value in uninitialized aligned storage.
+/// @ingroup scl_feature_executors
+
 #include <concepts>
 #include <cstddef>
 #include <functional>
@@ -28,6 +32,7 @@ namespace scl::feature::inplace
 {
     /**
      * @brief Executor that holds @p Value in uninitialized aligned storage.
+     * @ingroup scl_feature_executors
      *
      * Provides correctly sized and aligned storage without constructing or
      * destroying the object automatically, enabling deferred initialization.

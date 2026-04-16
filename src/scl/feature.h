@@ -6,6 +6,7 @@
  */
 
 #include <scl/feature/concepts.h>
+#include <scl/feature/executors.h>
 #include <scl/feature/type_traits.h>
 #include <scl/feature/value_lock.h>
 #include <scl/feature/wrapper.h>
@@ -98,6 +99,8 @@
  *
  * - **Wrapper** — @c scl::wrapper<Value, Tools...>, a composable
  *   adapter with orthogonal tool-based features.
+ * - **Executors** (@ref scl_feature_executors) — built-in executor strategies:
+ *   @c inplace::plain (direct) and @c inplace::uninitialized (raw storage).
  * - **Type traits** (@ref scl_feature_type_traits) — @c is_wrapper,
  *   @c is_executor, and related metaprogramming utilities.
  * - **Concepts** (@ref scl_feature_concepts) — C++20 concepts such as
