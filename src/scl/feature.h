@@ -7,6 +7,7 @@
 
 #include <scl/feature/concepts.h>
 #include <scl/feature/executors.h>
+#include <scl/feature/reflection.h>
 #include <scl/feature/type_traits.h>
 #include <scl/feature/value_lock.h>
 #include <scl/feature/wrapper.h>
@@ -109,4 +110,6 @@
  *   @c wrapper_lock, and @c value_lock for RAII access to wrapper chains.
  * - **Cast** (@ref scl_feature_wrapper_cast) — @c wrapper_cast() lazy-locking
  *   cast proxy for uniform access through wrapper and plain value references.
+ * - **Reflection** (@ref scl_feature_reflection) — @c SCL_REFLECT_TYPE / @c SCL_REFLECT_METHOD
+ *   macros and @c reflect mixin for compile-time proxy-member generation.
  */
