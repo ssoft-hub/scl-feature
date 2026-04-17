@@ -64,7 +64,7 @@ struct ReflectedTarget
 {
     TestExecutor m_impl;
 
-    SCL_REFLECT_TYPE(ReflectedTarget, m_impl);
+    SCL_REFLECT_TYPE(ReflectedTarget, TestExecutor);
 
     constexpr explicit ReflectedTarget(int v)
         : m_impl{v}

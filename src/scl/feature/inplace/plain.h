@@ -1,5 +1,9 @@
 #pragma once
 
+/// @file
+/// @brief Executor that proxies calls directly to the held value with no overhead.
+/// @ingroup scl_feature_executors
+
 #include <concepts>
 #include <functional>
 #include <utility>
@@ -32,6 +36,7 @@ namespace scl::feature::inplace
 {
     /**
      * @brief Executor that proxies calls directly to the held value with no overhead.
+     * @ingroup scl_feature_executors
      *
      * Stores @p Value in-place without indirection or additional wrapping.
      * Serves as the default executor when none is specified.

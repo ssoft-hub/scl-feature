@@ -3,6 +3,7 @@
 /**
  * @file
  * @brief ScL Feature C++20 concepts.
+ * @ingroup scl_feature_concepts
  * @details This header aggregates all ScL Feature C++20 concepts.
  */
 

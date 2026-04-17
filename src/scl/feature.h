@@ -6,6 +6,8 @@
  */
 
 #include <scl/feature/concepts.h>
+#include <scl/feature/executors.h>
+#include <scl/feature/reflection.h>
 #include <scl/feature/type_traits.h>
 #include <scl/feature/value_lock.h>
 #include <scl/feature/wrapper.h>
@@ -98,6 +100,8 @@
  *
  * - **Wrapper** — @c scl::wrapper<Value, Tools...>, a composable
  *   adapter with orthogonal tool-based features.
+ * - **Executors** (@ref scl_feature_executors) — built-in executor strategies:
+ *   @c inplace::plain (direct) and @c inplace::uninitialized (raw storage).
  * - **Type traits** (@ref scl_feature_type_traits) — @c is_wrapper,
  *   @c is_executor, and related metaprogramming utilities.
  * - **Concepts** (@ref scl_feature_concepts) — C++20 concepts such as
@@ -106,4 +110,6 @@
  *   @c wrapper_lock, and @c value_lock for RAII access to wrapper chains.
  * - **Cast** (@ref scl_feature_wrapper_cast) — @c wrapper_cast() lazy-locking
  *   cast proxy for uniform access through wrapper and plain value references.
+ * - **Reflection** (@ref scl_feature_reflection) — @c SCL_REFLECT_TYPE / @c SCL_REFLECT_METHOD
+ *   macros and @c reflect mixin for compile-time proxy-member generation.
  */
