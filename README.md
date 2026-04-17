@@ -30,8 +30,11 @@ or deferred invocation without modifying the wrapped type. Licensed under [The U
   - `scl::value_lock<Refer>` — recursive lazy lock through the entire wrapper chain; captures
     references to every executor at construction (no guard acquired), activates guards for the
     layers needed to reach a target type via `lock_for<Target>()`
-  - `scl::wrapper_cast(w)` — returns a `wrapper_caster<Refer>` proxy that lazily acquires guards
-    only at the moment of implicit conversion or explicit `.to<Target>()`
+- **Casts**:
+  - `scl::wrapper_cast(w)` — returns a `wrapper_caster<Refer>` proxy that implicitly converts
+    to any type reachable in the wrapper chain; pass-through for non-wrapper types; used in
+    generic code to forward `wrapper<T>` arguments to functions expecting `T`; conversion
+    operators are `&&`-qualified so the proxy must be used as an rvalue
 - **Type traits** (`scl::feature`):
   - `is_wrapper_v<T>` — checks whether `T` is a `wrapper` specialization (strips cv-ref qualifiers)
   - `is_executor_v<T>` — checks whether `T` satisfies the executor interface (strips cv-ref qualifiers)
@@ -54,11 +57,24 @@ or deferred invocation without modifying the wrapped type. Licensed under [The U
   - `concepts::compatible_with<Expected, T>`
   - `concepts::compatible_with_part_of<Expected, T>`
   - `concepts::part_compatible_with<Expected, T>`
-- **Reflection macros** (`scl/feature/reflection/`):
-  - `SCL_REFLECT_TYPE(Type, Member)` — declares the wrapper identity alias required by method reflection
-  - `SCL_REFLECT_METHOD(method)` — generates 16 proxy overloads (8 cv-ref qualifications × 2:
-    deduced and explicit template arguments); each overload is constrained so only overloads
-    that actually exist on the wrapped type are exposed
+- **Reflection** (`scl/feature/reflection/`):
+  - `scl::feature::reflect<Wrapper, Executor, Type>` — CRTP mixin base for the reflection
+    inheritance chain; `detail::wrapper` inherits from it automatically; provide a partial
+    specialisation for a concrete `Type` to inject proxy members into every wrapper holding it
+  - `SCL_REFLECT_TYPE(Type, ExecutorType)` — declares the wrapper and executor type aliases
+    (`S_c_L_type_` / `S_c_L_executor_type_`) required by `SCL_REFLECT_METHOD`; the second
+    argument is the **executor type name** (e.g. `executor_type`), not a member expression
+  - `SCL_REFLECT_METHOD(method)` — generates 24 proxy overloads (3 per cv-ref × 8
+    qualifications): an *executor-override* overload (active when the executor provides a
+    `static method_##method(...)` member), an *execute-path* overload (dispatches through
+    `Executor::execute`), and an *explicit-template-args* overload; the first two are mutually
+    exclusive — at most 16 are active per executor; each overload is constrained so only
+    overloads that actually exist on the wrapped type are exposed
+- **Constructor macros** (`scl/feature/detail/wrapper_constructors.h`):
+  - `SCL_WRAPPER_CONSTRUCTOR_FOR_SELF` — expands to eight constructors (all cv-ref
+    qualifications of `self_type`) that forward through the executor
+  - `SCL_WRAPPER_CONSTRUCTOR_FOR_OTHER` — single forwarding-reference constructor for any
+    other wrapper type; uses `wrapper_constructor_resolver` for strategy-based construction
 
 ## Requirements
 
@@ -75,9 +91,43 @@ add_subdirectory(module/feature)
 target_link_libraries(your_target PRIVATE scl::feature)
 ```
 
-## Quick example
+## Quick examples
 
-### Reflection
+### Reflection via `scl::wrapper`
+
+The simplest approach — specialise `scl::feature::reflect` for the value type.
+`scl::wrapper` wires the chain automatically.
+
+```cpp
+#include <scl/feature/wrapper.h>
+#include <scl/feature/reflection/method.h>
+#include <scl/feature/inplace/plain.h>
+
+struct Target {
+    short get() &;
+    int   get() const &;
+    float get() &&;
+};
+
+// Inject proxy members into every wrapper<Target, ...>.
+template <typename Wrapper, typename Executor>
+class scl::feature::reflect<Wrapper, Executor, Target>
+{
+    SCL_REFLECT_TYPE(Wrapper, Executor)
+    SCL_REFLECT_METHOD(get)  // generates 24 overloads (3×8), 3 survive constraints
+};
+
+using MyWrapper = scl::wrapper<Target, scl::feature::inplace::plain>;
+
+MyWrapper w{42};
+w.get();                // Target::get() &       → short
+std::as_const(w).get(); // Target::get() const & → int
+std::move(w).get();     // Target::get() &&      → float
+```
+
+### Reflection in a custom wrapper class
+
+For hand-written wrappers, specialise `executor_trait` and use both macros directly:
 
 ```cpp
 #include <scl/feature/reflection/method.h>
@@ -89,17 +139,59 @@ struct Target {
     float get() &&;
 };
 
-struct MyWrapper {
-    Executor<Target> m_executor; // any executor
-    SCL_REFLECT_TYPE(MyWrapper, m_executor);
+struct MyWrapper;
+template <>
+struct scl::feature::executor_trait<MyWrapper> {
+    template <typename Self>
+    static constexpr decltype(auto) executor(Self && self) noexcept
+    { return ::scl::forward_like<Self>(self.m_executor); }
+};
 
-    SCL_REFLECT_METHOD(get)  // generates 16 overloads, 3 survive constraints
+struct MyWrapper {
+    using executor_type = scl::feature::inplace::plain<Target>;
+    executor_type m_executor;
+
+    SCL_REFLECT_TYPE(MyWrapper, executor_type)
+    SCL_REFLECT_METHOD(get)  // generates 24 overloads (3×8), 3 survive constraints
 };
 
 MyWrapper w{42};
 w.get();               // Target::get() &       → short
 std::as_const(w).get() // Target::get() const & → int
 std::move(w).get();    // Target::get() &&      → float
+```
+
+### Unwrapping a wrapper — `wrapper_cast`
+
+`scl::wrapper_cast(x)` returns a proxy that implicitly converts to any type
+reachable in the wrapper chain.  For non-wrapper types it is a pass-through with
+no overhead.  The primary use case: pass a `wrapper<T>` to a function that expects `T`.
+
+```cpp
+#include <scl/feature/wrapper.h>
+#include <scl/feature/wrapper_cast.h>
+#include <scl/feature/inplace/plain.h>
+
+void increment(int & v) { ++v; }
+
+scl::wrapper<int, scl::feature::inplace::plain> w{41};
+
+// Pass wrapper<int> to a function expecting int&.
+increment(scl::wrapper_cast(w));  // w now holds 42
+
+// Explicit conversion via .to<T>():
+int & ref = scl::wrapper_cast(w).to<int &>();
+
+// Pass-through for non-wrapper types — no allocation, no overhead:
+int x = 7;
+int & r = scl::wrapper_cast(x);  // r == x
+
+// In generic code wrapper_cast works uniformly on both:
+template <typename Arg>
+void process(Arg && arg)
+{
+    use(scl::wrapper_cast(std::forward<Arg>(arg)));  // wrapper → value; non-wrapper → as-is
+}
 ```
 
 ## Doxygen
