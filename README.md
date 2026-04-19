@@ -1,10 +1,10 @@
 # ScL.Feature
 
-[![GitLab Pipeline](https://gitlab.com/ssoft-scl/scl-feature/badges/main/pipeline.svg)](https://gitlab.com/ssoft-scl/scl-feature/-/pipelines)
+[![GitLab Pipeline](https://gitlab.com/ssoft-scl/scl-feature/badges/dev/pipeline.svg)](https://gitlab.com/ssoft-scl/scl-feature/-/pipelines)
 [![GitLab Pages](https://img.shields.io/badge/pages-gitlab-orange)](https://ssoft-scl.gitlab.io/scl-feature/)
 [![GitHub Pages](https://img.shields.io/badge/pages-github-blue)](https://ssoft-hub.github.io/scl-feature/)
 
-C++20 header-only library. Part of the [ScL Toolkit](../scl-kit).
+C++20 header-only library. Part of the ScL Toolkit.
 
 ScL.Feature provides `scl::wrapper<Value, Executors...>` — a composable proxy wrapper that
 delegates method calls to the held value through a chain of executor templates. Each executor
@@ -196,8 +196,8 @@ void process(Arg && arg)
 
 ## Doxygen
 
-- [GitLab Pages](https://ssoft-scl.gitlab.io/scl-feature/)
-- [GitHub Pages](https://ssoft-hub.github.io/scl-feature/)
+- [GitLab Pages](https://ssoft-scl.gitlab.io/scl-feature/dev/)
+- [GitHub Pages](https://ssoft-hub.github.io/scl-feature/dev/)
 
 ## See also
 
