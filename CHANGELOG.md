@@ -42,6 +42,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   all calls route through `Executor::execute`; wrapper arguments are unwrapped via
   `scl::wrapper_cast`
 
+### CI
+
+- `script/ci/deploy_versioned_docs.sh` — builds versioned Doxygen HTML for
+  all version tags (immutable) and `dev` (latest); injects version-selector
+  nav bar; manages `versions.json` and root `index.html` on the pages branch.
+- `.gitlab-ci.yml` pages job: switched to `archlinux:latest` for up-to-date
+  Doxygen; triggers on version tags; deploys via `deploy_versioned_docs.sh`.
+- `.github/workflows/docs.yml`: runs in `archlinux:latest` container; installs
+  git before checkout; deploys to `gh-pages` via `deploy_versioned_docs.sh`.
+- `script/ci/mirror_github.sh`: exclude `pages` branch from GitHub mirror;
+  preserve `gh-pages` from `--prune`; add `--prune-tags`.
+- `AGENTS.md` — development guidelines for contributors and agents:
+  code conventions, branching rules, required pre-commit checks
+  (clang-format, clang-tidy, cppcheck), commit message format,
+  Doxygen documentation requirements, and compatibility constraints.
+
 ### Fixed
 
 - `is_compatible_with_v`, `is_compatible_with_part_of_v`, `is_part_compatible_with_v`:

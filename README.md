@@ -1,4 +1,4 @@
-# ScL.Feature
+# ScL Feature
 
 [![GitLab Pipeline](https://gitlab.com/ssoft-scl/scl-feature/badges/dev/pipeline.svg)](https://gitlab.com/ssoft-scl/scl-feature/-/pipelines)
 [![GitLab Pages](https://img.shields.io/badge/pages-gitlab-orange)](https://ssoft-scl.gitlab.io/scl-feature/)
@@ -6,7 +6,7 @@
 
 C++20 header-only library. Part of the ScL Toolkit.
 
-ScL.Feature provides `scl::wrapper<Value, Executors...>` — a composable proxy wrapper that
+ScL Feature provides `scl::wrapper<Value, Executors...>` — a composable proxy wrapper that
 delegates method calls to the held value through a chain of executor templates. Each executor
 can transparently add cross-cutting behaviour such as copy-on-write semantics, thread safety,
 or deferred invocation without modifying the wrapped type. Licensed under [The Unlicense](LICENSE.md).
