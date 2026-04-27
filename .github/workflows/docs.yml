@@ -2,35 +2,43 @@ name: Documentation
 
 on:
   push:
-    branches: [main]
+    branches: [dev]
+    tags: ['v[0-9]*']
 
 permissions:
   contents: read
   pages: write
   id-token: write
 
-concurrency:
-  group: pages
-  cancel-in-progress: true
-
 jobs:
   build:
     runs-on: ubuntu-latest
+    container: archlinux:latest
+    env:
+      GIT_DISCOVERY_ACROSS_FILESYSTEM: 1
     steps:
+      - name: Install git
+        run: pacman -Sy --noconfirm git ca-certificates
+
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Configure git
+        run: git config --global --add safe.directory '*'
+
+      - name: Fetch tags
+        run: git fetch --prune --tags
 
       - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y doxygen graphviz
+        run: pacman -S --noconfirm doxygen graphviz python
 
-      - name: Generate Doxygen HTML
-        run: |
-          mkdir -p docs/_build/html
-          (cat project/doxygen/Doxyfile; printf '\nGENERATE_HTML=YES\nGENERATE_XML=NO\nHTML_OUTPUT=.\nOUTPUT_DIRECTORY=docs/_build/html\n') | doxygen -
+      - name: Build versioned docs
+        run: sh script/ci/deploy_versioned_docs.sh public
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v4
+      - uses: actions/upload-pages-artifact@v5
         with:
-          path: docs/_build/html
+          path: public
 
   deploy:
     needs: build
@@ -39,6 +47,5 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy to GitHub Pages
+      - uses: actions/deploy-pages@v5
         id: deployment
-        uses: actions/deploy-pages@v5

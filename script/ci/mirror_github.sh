@@ -27,7 +27,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-git fetch --all --tags --prune
+git fetch --all --tags --prune --prune-tags
 git remote remove github 2>/dev/null || true
 git remote add github "$GITHUB_AUTH_URL"
 git push github 'refs/remotes/origin/*:refs/heads/*' --force --prune
