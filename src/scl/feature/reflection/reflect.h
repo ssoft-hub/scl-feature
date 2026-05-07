@@ -47,6 +47,7 @@
 /// @endcode
 
 #include <scl/feature/reflection/method.h>
+#include <scl/feature/reflection/operator.h>
 
 namespace scl::feature
 {
@@ -74,5 +75,77 @@ namespace scl::feature
     template <typename Wrapper, typename Executor, typename Type>
     class reflect
     {};
+
+    /// @brief CRTP mixin that reflects all standard C++ operators through the executor.
+    /// @ingroup scl_feature_reflection
+    ///
+    /// Inherit from this class to give a wrapper operator forwarding for every
+    /// standard C++ operator, constrained by the wrapped type's actual overloads.
+    ///
+    /// @tparam Wrapper   The outermost wrapper type (CRTP).
+    /// @tparam Executor  The executor instantiation for @p Wrapper.
+    // NOLINTBEGIN(readability-function-cognitive-complexity, readability-inconsistent-ifelse-braces, cppcoreguidelines-missing-std-forward)
+    template <typename Wrapper, typename Executor>
+    class reflect_operators
+    {
+    public:
+        SCL_REFLECT_TYPE(Wrapper, Executor)
+
+        SCL_REFLECT_PREFIX_UNARY_OPERATOR(&, address_of)
+        SCL_REFLECT_PREFIX_UNARY_OPERATOR(*, indirection)
+        SCL_REFLECT_OPERATOR_WITH_ARGUMENTS(->*, arrow_to_pointer)
+        SCL_REFLECT_PREFIX_UNARY_OPERATOR(->, arrow)
+
+        SCL_REFLECT_BINARY_OPERATOR(SCL_FORWARD(, ), comma)
+        SCL_REFLECT_OPERATOR_WITH_ARGUMENTS([], subscript)
+        SCL_REFLECT_OPERATOR_WITH_ARGUMENTS((), call)
+
+        SCL_REFLECT_PREFIX_UNARY_OPERATOR(+, unary_plus)
+        SCL_REFLECT_PREFIX_UNARY_OPERATOR(-, unary_minus)
+        SCL_REFLECT_PREFIX_UNARY_OPERATOR(++, prefix_increment)
+        SCL_REFLECT_PREFIX_UNARY_OPERATOR(--, prefix_decrement)
+        SCL_REFLECT_PREFIX_UNARY_OPERATOR(~, bitwise_not)
+        SCL_REFLECT_PREFIX_UNARY_OPERATOR(!, logical_not)
+
+        SCL_REFLECT_POSTFIX_UNARY_OPERATOR(++, postfix_increment)
+        SCL_REFLECT_POSTFIX_UNARY_OPERATOR(--, postfix_decrement)
+
+        SCL_REFLECT_BINARY_OPERATOR(==, equal_to)
+        SCL_REFLECT_BINARY_OPERATOR(!=, not_equal_to)
+        SCL_REFLECT_BINARY_OPERATOR(<, less)
+        SCL_REFLECT_BINARY_OPERATOR(<=, less_equal)
+        SCL_REFLECT_BINARY_OPERATOR(>, greater)
+        SCL_REFLECT_BINARY_OPERATOR(>=, greater_equal)
+
+        SCL_REFLECT_BINARY_OPERATOR(*, multiply)
+        SCL_REFLECT_BINARY_OPERATOR(/, divide)
+        SCL_REFLECT_BINARY_OPERATOR(%, modulo)
+        SCL_REFLECT_BINARY_OPERATOR(+, plus)
+        SCL_REFLECT_BINARY_OPERATOR(-, minus)
+
+        SCL_REFLECT_BINARY_OPERATOR(<<, left_shift)
+        SCL_REFLECT_BINARY_OPERATOR(>>, right_shift)
+
+        SCL_REFLECT_BINARY_OPERATOR(&, bitwise_and)
+        SCL_REFLECT_BINARY_OPERATOR(|, bitwise_or)
+        SCL_REFLECT_BINARY_OPERATOR(^, bitwise_xor)
+
+        SCL_REFLECT_BINARY_OPERATOR(&&, logical_and)
+        SCL_REFLECT_BINARY_OPERATOR(||, logical_or)
+
+        // cppcheck-suppress syntaxError
+        SCL_REFLECT_BINARY_OPERATOR(=, assign) // NOLINT(cppcoreguidelines-c-copy-assignment-signature)
+        SCL_REFLECT_BINARY_OPERATOR(*=, multiply_assign)
+        SCL_REFLECT_BINARY_OPERATOR(/=, divide_assign)
+        SCL_REFLECT_BINARY_OPERATOR(%=, modulo_assign)
+        SCL_REFLECT_BINARY_OPERATOR(+=, plus_assign)
+        SCL_REFLECT_BINARY_OPERATOR(-=, minus_assign)
+        SCL_REFLECT_BINARY_OPERATOR(<<=, left_shift_assign)
+        SCL_REFLECT_BINARY_OPERATOR(>>=, right_shift_assign)
+        SCL_REFLECT_BINARY_OPERATOR(&=, bitwise_and_assign)
+        SCL_REFLECT_BINARY_OPERATOR(|=, bitwise_or_assign)
+        SCL_REFLECT_BINARY_OPERATOR(^=, bitwise_xor_assign)
+    };
+    // NOLINTEND(readability-function-cognitive-complexity, readability-inconsistent-ifelse-braces, cppcoreguidelines-missing-std-forward)
 
 } // namespace scl::feature

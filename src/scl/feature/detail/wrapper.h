@@ -17,6 +17,7 @@ namespace scl::feature::detail
         requires ::scl::feature::concepts::executor<Executor<Value>>
     class wrapper
         : public ::scl::feature::reflect<wrapper<Value, Executor>, Executor<Value>, wrapper<Value, Executor>>
+        , public ::scl::feature::reflect_operators<wrapper<Value, Executor>, Executor<Value>>
     {
         using self_type = wrapper<Value, Executor>;
 
