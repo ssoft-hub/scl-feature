@@ -3,6 +3,7 @@
 #include <scl/feature/concepts/wrapper.h>
 #include <scl/feature/detail/value_lock.h>
 #include <scl/feature/type_traits/wrapper.h>
+#include <scl/utility/concepts/reference.h>
 #include <scl/utility/type_traits/forward_like.h>
 
 #include <type_traits>
@@ -25,18 +26,17 @@ namespace scl::feature::detail
     // -------------------------------------------------------------------------
 
     template <typename Caster,
-        typename Refer,
+        ::scl::concepts::reference Refer,
         wrapper_cast_case Case = ::scl::feature::is_wrapper_v<Refer> ? wrapper_cast_case::wrapper : wrapper_cast_case::value>
-        requires ::std::is_reference_v<Refer>
     class cast_mixin;
 
     // Non-wrapper leaf: one operator for the plain reference type.
-    template <typename Caster, typename Refer>
-        requires ::std::is_reference_v<Refer>
+    template <typename Caster, ::scl::concepts::reference Refer>
     class cast_mixin<Caster, Refer, wrapper_cast_case::value>
     {
     public:
         [[nodiscard]]
+        constexpr
         operator Refer() && noexcept(noexcept(::std::declval<Caster &&>().template to<Refer>()))
         {
             return static_cast<Caster &&>(*this).template to<Refer>();
@@ -45,8 +45,7 @@ namespace scl::feature::detail
 
     // Wrapper level: one operator for the wrapper reference itself plus
     // inherited operators for every inner level via recursive base.
-    template <typename Caster, concepts::wrapper WrapperRefer>
-        requires ::std::is_reference_v<WrapperRefer>
+    template <typename Caster, concepts::wrapper_reference WrapperRefer>
     class cast_mixin<Caster, WrapperRefer, wrapper_cast_case::wrapper>
         : public cast_mixin<Caster, ::scl::forward_like_t<WrapperRefer, typename ::std::remove_cvref_t<WrapperRefer>::value_type>>
     {
@@ -69,9 +68,9 @@ namespace scl::feature::detail
     // Copy and move constructors are deleted to prevent moving the lock state.
     // -------------------------------------------------------------------------
 
-    template <typename Refer>
-        requires ::std::is_reference_v<Refer>
-    class [[nodiscard]] wrapper_caster : public cast_mixin<wrapper_caster<Refer>, Refer>
+    template <::scl::concepts::reference Refer>
+    class [[nodiscard]]
+    wrapper_caster : public cast_mixin<wrapper_caster<Refer>, Refer>
     {
         using lock_type = ::scl::feature::detail::value_lock<Refer,
             ::scl::feature::is_wrapper_v<Refer> ? value_lock_case::wrapper : value_lock_case::value>;
@@ -89,10 +88,10 @@ namespace scl::feature::detail
 
         /// Activates guards for layers needed to reach @p Type, then returns the value.
         /// Called by cast_mixin's conversion operators.
-        template <typename Type>
-            requires ::scl::feature::concepts::convertible_from<Type, Refer>
+        template <concepts::convertible_from<Refer> Type>
         [[nodiscard]]
-        Type to() && noexcept(noexcept(::std::declval<lock_type &>().template lock_for<Type>()) &&
+        constexpr Type
+        to() && noexcept(noexcept(::std::declval<lock_type &>().template lock_for<Type>()) &&
             noexcept(::std::declval<lock_type &>().template value_as<Type>()))
         {
             m_lock.template lock_for<Type>();

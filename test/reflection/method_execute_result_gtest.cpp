@@ -301,7 +301,7 @@ TEST(ReflectMethodWrapperArg, SetWithConstWrapperLValueSetsValue)
 TEST(ReflectMethodWrapperArg, RawShortStillAccepted)
 {
     // Passing a raw short must keep working alongside the wrapper path.
-    // STATIC_EXPECT_TRUE((can_call_set_v<PlainReflected &, short>));
+    STATIC_EXPECT_TRUE((can_call_set_v<PlainReflected &, short>));
 
     PlainReflected r{0};
     r.set(short{33});
