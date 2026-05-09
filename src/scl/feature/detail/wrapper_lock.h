@@ -4,6 +4,7 @@
 #include <scl/feature/detail/executor_access.h>
 #include <scl/feature/type_traits/executor.h>
 #include <scl/feature/type_traits/wrapper.h>
+#include <scl/utility/concepts/reference.h>
 #include <scl/utility/type_traits/forward_like.h>
 
 #include <type_traits>
@@ -17,17 +18,15 @@ namespace scl::feature::detail
         wrapper = true,
     };
 
-    template <typename Refer,
+    template <::scl::concepts::reference Refer,
         wrapper_lock_case Case = ::scl::feature::is_wrapper_v<Refer> ? wrapper_lock_case::wrapper : wrapper_lock_case::value>
-        requires ::std::is_reference_v<Refer>
     class wrapper_lock;
 
     // -------------------------------------------------------------------------
     // Non-wrapper specialisation — no-op lock, just holds the reference.
     // -------------------------------------------------------------------------
 
-    template <typename Refer>
-        requires ::std::is_reference_v<Refer>
+    template <::scl::concepts::reference Refer>
     class wrapper_lock<Refer, wrapper_lock_case::value>
     {
     public:
@@ -41,9 +40,9 @@ namespace scl::feature::detail
             : m_ref{::std::forward<Refer>(ref)}
         {}
 
-        constexpr void lock() noexcept {}
+        static constexpr void lock() noexcept {}
 
-        constexpr void unlock() noexcept {}
+        static constexpr void unlock() noexcept {}
 
         /// Returns the held reference (identity).
         [[nodiscard]]
@@ -60,8 +59,7 @@ namespace scl::feature::detail
     // Wrapper specialisation — lazy guard: lock()/unlock() call guard()/unguard().
     // -------------------------------------------------------------------------
 
-    template <concepts::wrapper WrapperRefer>
-        requires ::std::is_reference_v<WrapperRefer>
+    template <concepts::wrapper_reference WrapperRefer>
     class wrapper_lock<WrapperRefer, wrapper_lock_case::wrapper>
     {
         using wrapper_type = ::std::remove_cvref_t<WrapperRefer>;

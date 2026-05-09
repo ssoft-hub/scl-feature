@@ -2,6 +2,7 @@
 
 #include <scl/feature/concepts/wrapper.h>
 #include <scl/feature/detail/wrapper_lock.h>
+#include <scl/utility/concepts/reference.h>
 #include <scl/utility/type_traits/forward_like.h>
 
 namespace scl::feature::detail
@@ -12,17 +13,15 @@ namespace scl::feature::detail
         wrapper = true,
     };
 
-    template <typename Refer,
+    template <::scl::concepts::reference Refer,
         value_lock_case Case = ::scl::feature::is_wrapper_v<Refer> ? value_lock_case::wrapper : value_lock_case::value>
-        requires ::std::is_reference_v<Refer>
     class value_lock;
 
     // -------------------------------------------------------------------------
     // Non-wrapper specialisation — no-op lock, just holds the reference.
     // -------------------------------------------------------------------------
 
-    template <typename Refer>
-        requires ::std::is_reference_v<Refer>
+    template <::scl::concepts::reference Refer>
     class value_lock<Refer, value_lock_case::value>
     {
     public:
@@ -36,15 +35,13 @@ namespace scl::feature::detail
             : m_ref{::std::forward<Refer>(ref)}
         {}
 
-        template <typename Target>
-        constexpr void lock_for() noexcept
-            requires ::std::convertible_to<Refer, Target>
+        template <::std::convertible_to<Refer> Target>
+        static constexpr void lock_for() noexcept
         {}
 
-        template <typename Target>
+        template <::std::convertible_to<Refer> Target>
         [[nodiscard]]
         constexpr Target value_as() noexcept(::std::is_nothrow_convertible_v<Refer, Target>)
-            requires ::std::convertible_to<Refer, Target>
         {
             return ::std::forward<Refer>(m_ref);
         }
@@ -57,8 +54,7 @@ namespace scl::feature::detail
     // Wrapper specialisation — recursive lazy lock through the wrapper chain.
     // -------------------------------------------------------------------------
 
-    template <concepts::wrapper WrapperRefer>
-        requires ::std::is_reference_v<WrapperRefer>
+    template <concepts::wrapper_reference WrapperRefer>
     class value_lock<WrapperRefer, value_lock_case::wrapper>
     {
         using wrapper_type = ::std::remove_cvref_t<WrapperRefer>;
@@ -84,9 +80,8 @@ namespace scl::feature::detail
 
         /// Activates guards for all wrapper layers needed to reach @p Target.
         /// If @p Target is @p WrapperRefer itself no guard is acquired.
-        template <typename Target>
+        template <concepts::convertible_from<WrapperRefer> Target>
         constexpr void lock_for() noexcept(lock_for_noexcept<Target>())
-            requires ::scl::feature::concepts::convertible_from<Target, WrapperRefer>
         {
             if constexpr (!::std::is_convertible_v<WrapperRefer, Target>)
             {
@@ -96,10 +91,9 @@ namespace scl::feature::detail
         }
 
         /// Returns the value at the level matching @p Target (lock_for should be held by the caller).
-        template <typename Target>
+        template <concepts::convertible_from<WrapperRefer> Target>
         [[nodiscard]]
         constexpr Target value_as() noexcept(value_as_noexcept<Target>())
-            requires ::scl::feature::concepts::convertible_from<Target, WrapperRefer>
         {
             if constexpr (!::std::is_convertible_v<WrapperRefer, Target>)
                 return m_inner_lock.template value_as<Target>();
