@@ -18,7 +18,7 @@ jobs:
         run: apt-get update && apt-get install -y git
 
       - name: Clone scl-utility
-        run: git clone --depth=1 https://github.com/ssoft-hub/scl-utility.git /tmp/scl-utility
+        run: git clone --depth=1 --branch dev https://github.com/ssoft-hub/scl-utility.git /tmp/scl-utility
 
       - name: Run clang-tidy
         run: |
