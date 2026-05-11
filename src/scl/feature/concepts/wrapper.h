@@ -1,6 +1,7 @@
 #pragma once
 
 #include <scl/feature/type_traits/wrapper.h>
+#include <scl/utility/concepts/reference.h>
 
 namespace scl::feature::concepts
 {
@@ -17,6 +18,39 @@ namespace scl::feature::concepts
      */
     template <typename Type>
     concept wrapper = ::scl::feature::is_wrapper_v<Type>;
+
+    /**
+     * @ingroup scl_feature_concepts
+     * @brief Satisfied when @p Type is a reference to a @c wrapper specialization.
+     *
+     * Combines @c scl::concepts::reference and @c wrapper: the type must be
+     * both a reference (lvalue or rvalue) and a wrapper instantiation.
+     *
+     * @tparam Type  Type to check.
+     *
+     * @code{.cpp}
+     *    static_assert( wrapper_reference<wrapper<int> &>);
+     *    static_assert( wrapper_reference<wrapper<int> &&>);
+     *    static_assert(!wrapper_reference<wrapper<int>>);
+     *    static_assert(!wrapper_reference<int &>);
+     * @endcode
+     */
+    template <typename Type>
+    concept wrapper_reference = ::scl::concepts::reference<Type> && wrapper<Type>;
+
+    /**
+     * @ingroup scl_feature_concepts
+     * @brief Satisfied when @p T is not a @c wrapper specialization.
+     *
+     * @tparam T  Type to check.
+     *
+     * @code{.cpp}
+     *    static_assert(!non_wrapper<wrapper<int>>);
+     *    static_assert( non_wrapper<int>);
+     * @endcode
+     */
+    template <typename Type>
+    concept non_wrapper = !::scl::feature::is_wrapper_v<Type>;
 
     /**
      * @ingroup scl_feature_concepts

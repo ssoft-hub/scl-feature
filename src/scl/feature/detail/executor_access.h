@@ -13,9 +13,8 @@ namespace scl::feature::detail
     {
         /// @brief Returns the executor of @p w, preserving cv-ref qualifiers.
         // NOLINTBEGIN(cppcoreguidelines-missing-std-forward)
-        template <typename Wrapper>
+        template <concepts::wrapper Wrapper>
         static constexpr decltype(auto) get(Wrapper && w) noexcept
-            requires ::scl::feature::concepts::wrapper<Wrapper>
         {
             return ::scl::forward_like<Wrapper>(w.m_executor);
         }

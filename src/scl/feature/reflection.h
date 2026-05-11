@@ -26,6 +26,7 @@
 
 #include <scl/feature/reflection/access.h>
 #include <scl/feature/reflection/method.h>
+#include <scl/feature/reflection/operator.h>
 #include <scl/feature/reflection/reflect.h>
 #include <scl/feature/reflection/type.h>
 

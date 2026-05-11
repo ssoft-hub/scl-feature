@@ -6,7 +6,7 @@
 
 #include <string>
 
-using namespace ::scl;
+using ::scl::wrapper;
 using namespace ::scl::feature;
 
 template <typename Type>

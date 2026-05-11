@@ -11,7 +11,7 @@ clang-tidy:
     - if: $CI_COMMIT_BRANCH =~ /^(main|dev)$/
   before_script:
     - apt-get update -qq && apt-get install -y -qq git
-    - git clone --depth=1 "https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_NAMESPACE}/scl-utility.git" /tmp/scl-utility
+    - git clone --depth=1 --branch dev "https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_NAMESPACE}/scl-utility.git" /tmp/scl-utility
   script:
     - |
       [ -d "$SCL_SRC_DIR" ] || { echo "No sources, skipping."; exit 0; }
