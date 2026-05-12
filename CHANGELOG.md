@@ -45,6 +45,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `scl::feature::reflect<Wrapper, Executor, Type>` — CRTP mixin base for the reflection chain;
   `detail::wrapper` inherits from it automatically; user-provided partial specialisations for
   concrete value types inject proxy members into every wrapper holding that type
+- `SCL_REFLECT_PROPERTY(prop)` — generates a `wrapper` data member that proxies a single field
+  of the wrapped object through the executor for read and write, preserving cv-ref qualifiers;
+  supports an executor override via a static `property_<name>(exec cv_ref)` member (per cv-ref
+  qualification, analogous to `SCL_REFLECT_METHOD`). Copy/move-safe; not usable in constant
+  expressions
 
 ### Changed
 
