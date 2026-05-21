@@ -12,10 +12,8 @@ Declares the wrapper and executor type aliases required by reflection macros.
 #define SCL_REFLECT_TYPE(type, executor)
 ```
 
-Generates two type aliases inside the enclosing class:
-
-- `S_c_L_type_` — the wrapper class name (`type`)
-- `S_c_L_executor_type_` — the executor type (`executor`)
+Establishes the internal type context required by all subsequent reflection macros.
+The generated aliases are implementation details — do not reference them directly.
 
 Must appear **inside the class body**, before any other reflection macros
 (`SCL_REFLECT_METHOD`, `SCL_REFLECT_OPERATOR`, `SCL_REFLECT_PROPERTY`, …).

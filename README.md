@@ -61,9 +61,10 @@ or deferred invocation without modifying the wrapped type. Licensed under [The U
   - `scl::feature::reflect<Wrapper, Executor, Type>` — CRTP mixin base for the reflection
     inheritance chain; `detail::wrapper` inherits from it automatically; provide a partial
     specialisation for a concrete `Type` to inject proxy members into every wrapper holding it
-  - `SCL_REFLECT_TYPE(Type, ExecutorType)` — declares the wrapper and executor type aliases
-    (`S_c_L_type_` / `S_c_L_executor_type_`) required by `SCL_REFLECT_METHOD`; the second
-    argument is the **executor type name** (e.g. `executor_type`), not a member expression
+  - `SCL_REFLECT_TYPE(Type, ExecutorType)` — establishes the internal type context required by
+    `SCL_REFLECT_METHOD` and the other reflection macros (the generated aliases are
+    implementation details — do not reference them directly); the second argument is the
+    **executor type name** (e.g. `executor_type`), not a member expression
   - `SCL_REFLECT_METHOD(method)` — generates 24 proxy overloads (3 per cv-ref × 8
     qualifications): an *executor-override* overload (active when the executor provides a
     `static method_##method(...)` member), an *execute-path* overload (dispatches through
