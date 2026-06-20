@@ -69,8 +69,8 @@ namespace scl::feature
 {
     /// @brief Strips cv/ref qualifiers from a cv/ref-qualified inner wrapper.
     ///
-    /// Matches @c detail::wrapper\<QualifiedInner_, OuterExecutor_\> when
-    /// @c QualifiedInner_ is a cv/ref-qualified wrapper type, and forwards to
+    /// Matches @c detail::wrapper\<QualifiedInner, OuterExecutor\> when
+    /// @c QualifiedInner is a cv/ref-qualified wrapper type, and forwards to
     /// the unqualified specialization.  This collapses all 12 cv/ref variants
     /// into one rule so that qualifiers on the stored type do not produce a
     /// separate, incompatible reflection chain.
@@ -83,7 +83,7 @@ namespace scl::feature
 
     /// @brief Reflection chain for a plain (non-nested) wrapper.
     ///
-    /// Delegates to @c reflect\<Wrapper_, Executor_, Value_\> so
+    /// Delegates to @c reflect\<Wrapper, Executor, Value\> so
     /// that the outer wrapper exposes all methods reflected for the held
     /// value type.
     template <typename Wrapper, typename Executor, typename Value, template <typename> class OuterExecutor>
