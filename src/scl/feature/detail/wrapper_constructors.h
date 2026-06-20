@@ -10,11 +10,11 @@
 /// Using a macro eliminates eight near-identical definitions and eliminates the risk of
 /// copy-paste mistakes (wrong cv-qualifier, wrong forward cast, wrong resolver argument).
 // cppcheck-suppress noExplicitConstructor
-#define SCL_WRAPPER_CONSTRUCTOR_FOR_SELF_PROTOTYPE(cv_ref)                       \
-    constexpr wrapper(self_type cv_ref other) noexcept(                          \
-        ::std::is_nothrow_constructible_v<executor_type, executor_type cv_ref>)  \
-        requires(::std::constructible_from<executor_type, executor_type cv_ref>) \
-        : m_executor{::scl::forward_like<self_type cv_ref>(other.m_executor)}    \
+#define SCL_WRAPPER_CONSTRUCTOR_FOR_SELF_PROTOTYPE(cv_ref)                               \
+    constexpr wrapper(self_type cv_ref other) /**/                                       \
+        noexcept(::std::is_nothrow_constructible_v<executor_type, executor_type cv_ref>) \
+        requires(::std::constructible_from<executor_type, executor_type cv_ref>)         \
+        : m_executor{::scl::forward_like<self_type cv_ref>(other.m_executor)}            \
     {}
 
 /// @internal
@@ -41,8 +41,8 @@
 // cppcheck-suppress noExplicitConstructor
 #define SCL_WRAPPER_CONSTRUCTOR_FOR_OTHER                                                                           \
     template <typename Other>                                                                                       \
-    constexpr wrapper(Other && other) noexcept(                                                                     \
-        noexcept(::std::declval<wrapper_constructor_resolver<self_type, Other &&>>().resolve()))                    \
+    constexpr wrapper(Other && other) /**/                                                                          \
+        noexcept(noexcept(::std::declval<wrapper_constructor_resolver<self_type, Other &&>>().resolve()))           \
         requires(::scl::feature::is_wrapper_v<Other> && !::std::same_as<::std::remove_cvref_t<Other>, self_type> && \
             ::std::constructible_from<executor_type,                                                                \
                 decltype(::std::declval<wrapper_constructor_resolver<self_type, Other &&>>().resolve())>)           \

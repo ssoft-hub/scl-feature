@@ -83,16 +83,16 @@ namespace scl::feature::detail
             unlock();
         }
 
-        constexpr void
-        lock() noexcept(::scl::feature::is_guard_noexcept_v<executor_type, executor_refer>)
+        constexpr void lock() /**/
+            noexcept(::scl::feature::is_guard_noexcept_v<executor_type, executor_refer>)
         {
             if (!::std::exchange(m_locked, true))
                 if constexpr (::scl::feature::has_guard_v<executor_type, executor_refer>)
                     executor_type::guard(executor());
         }
 
-        constexpr void
-        unlock() noexcept(::scl::feature::is_unguard_noexcept_v<executor_type, executor_refer>)
+        constexpr void unlock() /**/
+            noexcept(::scl::feature::is_unguard_noexcept_v<executor_type, executor_refer>)
         {
             if (::std::exchange(m_locked, false))
                 if constexpr (::scl::feature::has_unguard_v<executor_type, executor_refer>)
@@ -108,8 +108,8 @@ namespace scl::feature::detail
 
         /// Returns the inner value through the executor (lock should be held by the caller).
         [[nodiscard]]
-        constexpr value_refer value() const noexcept(noexcept(
-            executor_type::template value<executor_refer>(::std::declval<executor_refer>())))
+        constexpr value_refer value() const /**/
+            noexcept(noexcept(executor_type::template value<executor_refer>(::std::declval<executor_refer>())))
             requires requires {
                          executor_type::template value<executor_refer>(::std::declval<executor_refer>());
                      }
