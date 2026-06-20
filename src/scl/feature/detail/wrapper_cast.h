@@ -90,9 +90,9 @@ namespace scl::feature::detail
         /// Called by cast_mixin's conversion operators.
         template <concepts::convertible_from<Refer> Type>
         [[nodiscard]]
-        constexpr Type
-        to() && noexcept(noexcept(::std::declval<lock_type &>().template lock_for<Type>()) &&
-            noexcept(::std::declval<lock_type &>().template value_as<Type>()))
+        constexpr Type to() && /**/
+            noexcept(noexcept(::std::declval<lock_type &>().template lock_for<Type>()) &&
+                noexcept(::std::declval<lock_type &>().template value_as<Type>()))
         {
             m_lock.template lock_for<Type>();
             return m_lock.template value_as<Type>();

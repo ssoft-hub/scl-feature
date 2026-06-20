@@ -42,41 +42,41 @@
 ///
 /// Produces per-operator static variable templates that check whether the executor
 /// exposes an @c operator_##name override and whether that override is @c noexcept.
-/// The executor type is taken as a template parameter @c S_c_L_E__ so that the
-/// qualified member lookup @c remove_cvref_t\<S_c_L_E__\>::operator_##name is a
+/// The executor type is taken as a template parameter @c ScLExec so that the
+/// qualified member lookup @c remove_cvref_t\<ScLExec\>::operator_##name is a
 /// *dependent* name — lookup is deferred to Phase 2 and caught by @c requires.
 ///
 /// Generated variable templates:
 ///
-/// - @c operator_##name##_S_c_L_has_exec_override_\<S_c_L_E__, S_c_L_A___...\>
-///   @c true iff @c remove_cvref_t\<S_c_L_E__\>::operator_##name can be cast to a
-///   function pointer with exact first-parameter type @c S_c_L_E__.
+/// - @c operator_##name##_scl_has_exec_override\<ScLExec, ScLArgs...\>
+///   @c true iff @c remove_cvref_t\<ScLExec\>::operator_##name can be cast to a
+///   function pointer with exact first-parameter type @c ScLExec.
 ///
-/// - @c operator_##name##_S_c_L_exec_noexcept_\<S_c_L_E__, S_c_L_A___...\>
+/// - @c operator_##name##_scl_exec_noexcept\<ScLExec, ScLArgs...\>
 ///   @c true iff the above check passes and the call is @c noexcept.
 ///
 /// @param name  Short unique name identifying the operator (plain identifier, e.g. @c op_add).
-#define SCL_REFLECT_OPERATOR_EXEC_HELPERS(name)                                                 \
-    template <typename S_c_L_E__, typename... S_c_L_A___>                                       \
-    static constexpr bool operator_##name##_S_c_L_has_exec_override_ =                          \
-        requires {                                                                              \
-            static_cast<                                                                        \
-                decltype(::std::remove_cvref_t<S_c_L_E__>::operator_##name(                     \
-                    ::std::declval<S_c_L_E__>(), ::std::declval<S_c_L_A___>()...))              \
-                (*)(S_c_L_E__, S_c_L_A___...)                                                   \
-            >(&::std::remove_cvref_t<S_c_L_E__>::operator_##name);                              \
-        };                                                                                      \
-    template <typename S_c_L_E__, typename... S_c_L_A___>                                       \
-    static constexpr bool operator_##name##_S_c_L_exec_noexcept_ =                              \
-        []() constexpr noexcept -> bool {                                                       \
-            if constexpr (operator_##name##_S_c_L_has_exec_override_<S_c_L_E__, S_c_L_A___...>) \
-                return noexcept(::std::remove_cvref_t<S_c_L_E__>::operator_##name(              \
-                    ::std::declval<S_c_L_E__>(), ::std::declval<S_c_L_A___>()...));             \
-            return false;                                                                       \
+#define SCL_REFLECT_OPERATOR_EXEC_HELPERS(name)                                         \
+    template <typename ScLExec, typename... ScLArgs>                                    \
+    static constexpr bool operator_##name##_scl_has_exec_override =                     \
+        requires {                                                                      \
+            static_cast<                                                                \
+                decltype(::std::remove_cvref_t<ScLExec>::operator_##name(               \
+                    ::std::declval<ScLExec>(), ::std::declval<ScLArgs>()...))           \
+                (*)(ScLExec, ScLArgs...)                                                \
+            >(&::std::remove_cvref_t<ScLExec>::operator_##name);                        \
+        };                                                                              \
+    template <typename ScLExec, typename... ScLArgs>                                    \
+    static constexpr bool operator_##name##_scl_exec_noexcept =                         \
+        []() constexpr noexcept -> bool {                                               \
+            if constexpr (operator_##name##_scl_has_exec_override<ScLExec, ScLArgs...>) \
+                return noexcept(::std::remove_cvref_t<ScLExec>::operator_##name(        \
+                    ::std::declval<ScLExec>(), ::std::declval<ScLArgs>()...));          \
+            return false;                                                               \
         }();
 
 /// @internal
-/// @brief Generates the @c operator_##name##_S_c_L_caller_ helper struct inside the enclosing class.
+/// @brief Generates the @c operator_##name##_scl_caller helper struct inside the enclosing class.
 /// @ingroup scl_feature_reflection
 ///
 /// The struct exposes a single static function template
@@ -88,20 +88,20 @@
 ///
 /// @param op    The C++ operator token (e.g. @c +, @c [], @c ()).
 /// @param name  Short unique name identifying the operator (plain identifier, e.g. @c op_add).
-#define SCL_REFLECT_OPERATOR_CALLER(op, name)                                            \
-    struct operator_##name##_S_c_L_caller_                                               \
-    {                                                                                    \
-        template <typename P_a_r_a_m___, typename... P_a_r_a_m_s___,                     \
-                  typename O_b_j___, typename... A_r_g_s___>                             \
-        static constexpr auto call(O_b_j___ && o_b_j___, A_r_g_s___ &&... a_r_g_s___)    \
-            -> decltype(::std::forward<O_b_j___>(o_b_j___)                               \
-                    .template operator op/**/<P_a_r_a_m___, P_a_r_a_m_s___...>(          \
-                        ::scl::wrapper_cast(::std::forward<A_r_g_s___>(a_r_g_s___))...)) \
-        {                                                                                \
-            return ::std::forward<O_b_j___>(o_b_j___)                                    \
-                .template operator op/**/<P_a_r_a_m___, P_a_r_a_m_s___...>(              \
-                    ::scl::wrapper_cast(::std::forward<A_r_g_s___>(a_r_g_s___))...);     \
-        }                                                                                \
+#define SCL_REFLECT_OPERATOR_CALLER(op, name)                                       \
+    struct operator_##name##_scl_caller                                             \
+    {                                                                               \
+        template <typename ScLParam, typename... ScLParams,                         \
+                  typename ScLObj, typename... ScLArgs>                             \
+        static constexpr auto call(ScLObj && scl_obj, ScLArgs &&... scl_args)       \
+            -> decltype(::std::forward<ScLObj>(scl_obj)                             \
+                    .template operator op/**/<ScLParam, ScLParams...>(              \
+                        ::scl::wrapper_cast(::std::forward<ScLArgs>(scl_args))...)) \
+        {                                                                           \
+            return ::std::forward<ScLObj>(scl_obj)                                  \
+                .template operator op/**/<ScLParam, ScLParams...>(                  \
+                    ::scl::wrapper_cast(::std::forward<ScLArgs>(scl_args))...);     \
+        }                                                                           \
     };
 
 /// @internal
@@ -110,53 +110,53 @@
 ///
 /// Produces two constructs:
 ///
-/// - @c operator_##name##_S_c_L_quals_\<V,As...\> — variable template that evaluates
+/// - @c operator_##name##_scl_quals\<V,As...\> — variable template that evaluates
 ///   @c SCL_HAS_QUALIFIED_METHOD for the non-template (deduced-args) overload.
 ///
-/// - @c operator_##name##_S_c_L_template_quals_\<P,Ps...\>::value\<V,As...\> — nested
+/// - @c operator_##name##_scl_template_quals\<P,Ps...\>::value\<V,As...\> — nested
 ///   variable template that evaluates @c SCL_HAS_QUALIFIED_METHOD with the token
 ///   sequence @c template @c operator\ op\<P,Ps...\> (assembled via @c SCL_FORWARD),
 ///   so the check accounts for explicit template arguments.
 ///
 /// @param op    The C++ operator token (e.g. @c +, @c [], @c ()).
 /// @param name  Short unique name identifying the operator (plain identifier, e.g. @c op_add).
-#define SCL_REFLECT_OPERATOR_QUALS(op, name)                                           \
-    template <typename S_c_L_V___, typename... S_c_L_A___>                             \
-    static constexpr bool operator_##name##_S_c_L_quals_ =                             \
-        SCL_HAS_QUALIFIED_METHOD(SCL_FORWARD(operator op), S_c_L_V___, S_c_L_A___...); \
-    template <typename S_c_L_P___, typename... S_c_L_Ps___>                            \
-    struct operator_##name##_S_c_L_template_quals_                                     \
-    {                                                                                  \
-        template <typename S_c_L_V___, typename... S_c_L_A___>                         \
-        static constexpr bool value =                                                  \
-            SCL_HAS_QUALIFIED_METHOD(                                                  \
-                SCL_FORWARD(template operator op/**/<S_c_L_P___, S_c_L_Ps___...>),     \
-                S_c_L_V___, S_c_L_A___...);                                            \
+#define SCL_REFLECT_OPERATOR_QUALS(op, name)                                    \
+    template <typename ScLVal, typename... ScLArgs>                             \
+    static constexpr bool operator_##name##_scl_quals =                         \
+        SCL_HAS_QUALIFIED_METHOD(SCL_FORWARD(operator op), ScLVal, ScLArgs...); \
+    template <typename ScLParam, typename... ScLParams>                         \
+    struct operator_##name##_scl_template_quals                                 \
+    {                                                                           \
+        template <typename ScLVal, typename... ScLArgs>                         \
+        static constexpr bool value =                                           \
+            SCL_HAS_QUALIFIED_METHOD(                                           \
+                SCL_FORWARD(template operator op/**/<ScLParam, ScLParams...>),  \
+                ScLVal, ScLArgs...);                                            \
     };
 
 /// @internal
 /// @brief Generates the executor-override operator overload for one cv-ref qualifier.
 /// @ingroup scl_feature_reflection
 ///
-/// Introduces a hidden template parameter @c S_c_L_E__ defaulting to
-/// @c S_c_L_executor_type_ so that @c S_c_L_E__::operator_##name is a *dependent*
+/// Introduces a hidden template parameter @c ScLExec defaulting to
+/// @c s_c_l_executor_type so that @c ScLExec::operator_##name is a *dependent*
 /// name — lookup is deferred to Phase 2.  The @c is_same_v guard prevents
-/// users from specifying @c S_c_L_E__ explicitly.
+/// users from specifying @c ScLExec explicitly.
 ///
 /// @param op     The C++ operator token (e.g. @c +, @c [], @c ()).
 /// @param name   Short unique name identifying the operator (plain identifier).
 /// @param cv_ref cv-ref qualifiers applied to the wrapper.
-#define SCL_REFLECT_OPERATOR_EXECUTOR_OVERRIDE_BASE(op, name, cv_ref)                  \
-    template <typename S_c_L_E__ = S_c_L_executor_type_ cv_ref, typename... A_r_g_s__> \
-    constexpr decltype(auto) operator op(A_r_g_s__ &&... a_r_g_s__) cv_ref             \
-    noexcept(operator_##name##_S_c_L_exec_noexcept_<S_c_L_E__, A_r_g_s__...>)          \
-    requires                                                                           \
-        (::std::is_same_v<S_c_L_E__, S_c_L_executor_type_ cv_ref>                      \
-            && operator_##name##_S_c_L_has_exec_override_<S_c_L_E__, A_r_g_s__...>)    \
-    {                                                                                  \
-        return ::std::remove_cvref_t<S_c_L_E__>::operator_##name(                      \
-            SCL_EXECUTOR_ACCESS(cv_ref),                                               \
-            ::std::forward<A_r_g_s__>(a_r_g_s__)...);                                  \
+#define SCL_REFLECT_OPERATOR_EXECUTOR_OVERRIDE_BASE(op, name, cv_ref)             \
+    template <typename ScLExec = s_c_l_executor_type cv_ref, typename... ScLArgs> \
+    constexpr decltype(auto) operator op(ScLArgs &&... scl_args) cv_ref           \
+    noexcept(operator_##name##_scl_exec_noexcept<ScLExec, ScLArgs...>)            \
+    requires                                                                      \
+        (::std::is_same_v<ScLExec, s_c_l_executor_type cv_ref>                    \
+            && operator_##name##_scl_has_exec_override<ScLExec, ScLArgs...>)      \
+    {                                                                             \
+        return ::std::remove_cvref_t<ScLExec>::operator_##name(                   \
+            SCL_EXECUTOR_ACCESS(cv_ref),                                          \
+            ::std::forward<ScLArgs>(scl_args)...);                                \
     }
 
 /// @internal
@@ -164,24 +164,24 @@
 /// @ingroup scl_feature_reflection
 ///
 /// Active only when the executor does **not** provide a dedicated @c operator_##name
-/// override (i.e. @c operator_##name##_S_c_L_has_exec_override_ is @c false).
+/// override (i.e. @c operator_##name##_scl_has_exec_override is @c false).
 ///
 /// @param op     The C++ operator token (e.g. @c +, @c [], @c ()).
 /// @param name   Short unique name identifying the operator (plain identifier).
 /// @param cv_ref cv-ref qualifiers applied to the wrapper.
-#define SCL_REFLECT_OPERATOR_BASE(op, name, cv_ref)                               \
-    noexcept (noexcept(SCL_EXECUTE_OVERRIDED(SCL_FORWARD(operator op), cv_ref)))  \
-    requires                                                                      \
-        (!operator_##name##_S_c_L_has_exec_override_<S_c_L_executor_type_ cv_ref, \
-                                                      A_r_g_s__...> &&            \
-        requires                                                                  \
-        {                                                                         \
-            SCL_VALUE_DECLVAL(cv_ref).operator op(                                \
-                ::scl::wrapper_cast(::std::declval<A_r_g_s__>())...);             \
-        } && operator_##name##_S_c_L_quals_<decltype(SCL_VALUE_DECLVAL(cv_ref)),  \
-                 decltype(::scl::wrapper_cast(::std::declval<A_r_g_s__>()))...>)  \
-    {                                                                             \
-        return SCL_EXECUTE_OVERRIDED(SCL_FORWARD(operator op), cv_ref);           \
+#define SCL_REFLECT_OPERATOR_BASE(op, name, cv_ref)                              \
+    noexcept (noexcept(SCL_EXECUTE_OVERRIDED(SCL_FORWARD(operator op), cv_ref))) \
+    requires                                                                     \
+        (!operator_##name##_scl_has_exec_override<s_c_l_executor_type cv_ref,    \
+                                                      ScLArgs...> &&             \
+        requires                                                                 \
+        {                                                                        \
+            SCL_VALUE_DECLVAL(cv_ref).operator op(                               \
+                ::scl::wrapper_cast(::std::declval<ScLArgs>())...);              \
+        } && operator_##name##_scl_quals<decltype(SCL_VALUE_DECLVAL(cv_ref)),    \
+                 decltype(::scl::wrapper_cast(::std::declval<ScLArgs>()))...>)   \
+    {                                                                            \
+        return SCL_EXECUTE_OVERRIDED(SCL_FORWARD(operator op), cv_ref);          \
     }
 
 /// @internal
@@ -195,18 +195,18 @@
 /// @param name   Short unique name identifying the operator (plain identifier).
 /// @param caller Helper struct generated by @c SCL_REFLECT_OPERATOR_CALLER.
 /// @param cv_ref cv-ref qualifiers applied to the wrapper.
-#define SCL_REFLECT_TEMPLATE_OPERATOR_BASE(name, caller, cv_ref)                    \
-    noexcept(noexcept(SCL_EXECUTE_TEMPLATE_OVERRIDED(caller, cv_ref)))              \
-    requires                                                                        \
-        requires                                                                    \
-        {                                                                           \
-            caller::template call<P_a_r_a_m__, P_a_r_a_m_s__...>(                   \
-                SCL_VALUE_DECLVAL(cv_ref), ::std::declval<A_r_g_s__>()...);         \
-        } && operator_##name##_S_c_L_template_quals_<P_a_r_a_m__, P_a_r_a_m_s__...> \
-                 ::template value<decltype(SCL_VALUE_DECLVAL(cv_ref)),              \
-                     decltype(::scl::wrapper_cast(::std::declval<A_r_g_s__>()))...> \
-    {                                                                               \
-        return SCL_EXECUTE_TEMPLATE_OVERRIDED(caller, cv_ref);                      \
+#define SCL_REFLECT_TEMPLATE_OPERATOR_BASE(name, caller, cv_ref)                  \
+    noexcept(noexcept(SCL_EXECUTE_TEMPLATE_OVERRIDED(caller, cv_ref)))            \
+    requires                                                                      \
+        requires                                                                  \
+        {                                                                         \
+            caller::template call<ScLParam, ScLParams...>(                        \
+                SCL_VALUE_DECLVAL(cv_ref), ::std::declval<ScLArgs>()...);         \
+        } && operator_##name##_scl_template_quals<ScLParam, ScLParams...>         \
+                 ::template value<decltype(SCL_VALUE_DECLVAL(cv_ref)),            \
+                     decltype(::scl::wrapper_cast(::std::declval<ScLArgs>()))...> \
+    {                                                                             \
+        return SCL_EXECUTE_TEMPLATE_OVERRIDED(caller, cv_ref);                    \
     }
 
 /// @internal
@@ -218,13 +218,13 @@
 /// @param name   Short unique name identifying the operator (plain identifier).
 /// @param caller Helper struct generated by @c SCL_REFLECT_OPERATOR_CALLER.
 /// @param cv_ref cv-ref qualifiers applied to the wrapper.
-#define SCL_REFLECT_OPERATOR_HELPER(op, name, caller, cv_ref)                         \
-    SCL_REFLECT_OPERATOR_EXECUTOR_OVERRIDE_BASE(SCL_FORWARD(op), name, cv_ref)        \
-    template <typename... A_r_g_s__>                                                  \
-    constexpr decltype(auto) operator op(A_r_g_s__ &&... a_r_g_s__) cv_ref            \
-        SCL_REFLECT_OPERATOR_BASE(SCL_FORWARD(op), name, cv_ref)                      \
-    template <typename P_a_r_a_m__, typename... P_a_r_a_m_s__, typename... A_r_g_s__> \
-    constexpr decltype(auto) operator op(A_r_g_s__ &&... a_r_g_s__) cv_ref            \
+#define SCL_REFLECT_OPERATOR_HELPER(op, name, caller, cv_ref)                  \
+    SCL_REFLECT_OPERATOR_EXECUTOR_OVERRIDE_BASE(SCL_FORWARD(op), name, cv_ref) \
+    template <typename... ScLArgs>                                             \
+    constexpr decltype(auto) operator op(ScLArgs &&... scl_args) cv_ref        \
+        SCL_REFLECT_OPERATOR_BASE(SCL_FORWARD(op), name, cv_ref)               \
+    template <typename ScLParam, typename... ScLParams, typename... ScLArgs>   \
+    constexpr decltype(auto) operator op(ScLArgs &&... scl_args) cv_ref        \
         SCL_REFLECT_TEMPLATE_OPERATOR_BASE(name, caller, cv_ref)
 
 /// @internal
@@ -233,18 +233,18 @@
 ///
 /// @param op    The C++ operator token (e.g. @c +, @c [], @c ()).
 /// @param name  Short unique name identifying the operator (plain identifier).
-#define SCL_REFLECT_OPERATOR_IMPL(op, name)                                                               \
-    SCL_REFLECT_OPERATOR_QUALS(SCL_FORWARD(op), name)                                                     \
-    SCL_REFLECT_OPERATOR_CALLER(SCL_FORWARD(op), name)                                                    \
-    SCL_REFLECT_OPERATOR_EXEC_HELPERS(name)                                                               \
-    SCL_REFLECT_OPERATOR_HELPER(SCL_FORWARD(op), name, operator_##name##_S_c_L_caller_, &)                \
-    SCL_REFLECT_OPERATOR_HELPER(SCL_FORWARD(op), name, operator_##name##_S_c_L_caller_, &&)               \
-    SCL_REFLECT_OPERATOR_HELPER(SCL_FORWARD(op), name, operator_##name##_S_c_L_caller_, const &)          \
-    SCL_REFLECT_OPERATOR_HELPER(SCL_FORWARD(op), name, operator_##name##_S_c_L_caller_, const &&)         \
-    SCL_REFLECT_OPERATOR_HELPER(SCL_FORWARD(op), name, operator_##name##_S_c_L_caller_, volatile &)       \
-    SCL_REFLECT_OPERATOR_HELPER(SCL_FORWARD(op), name, operator_##name##_S_c_L_caller_, volatile &&)      \
-    SCL_REFLECT_OPERATOR_HELPER(SCL_FORWARD(op), name, operator_##name##_S_c_L_caller_, const volatile &) \
-    SCL_REFLECT_OPERATOR_HELPER(SCL_FORWARD(op), name, operator_##name##_S_c_L_caller_, const volatile &&)
+#define SCL_REFLECT_OPERATOR_IMPL(op, name)                                                            \
+    SCL_REFLECT_OPERATOR_QUALS(SCL_FORWARD(op), name)                                                  \
+    SCL_REFLECT_OPERATOR_CALLER(SCL_FORWARD(op), name)                                                 \
+    SCL_REFLECT_OPERATOR_EXEC_HELPERS(name)                                                            \
+    SCL_REFLECT_OPERATOR_HELPER(SCL_FORWARD(op), name, operator_##name##_scl_caller, &)                \
+    SCL_REFLECT_OPERATOR_HELPER(SCL_FORWARD(op), name, operator_##name##_scl_caller, &&)               \
+    SCL_REFLECT_OPERATOR_HELPER(SCL_FORWARD(op), name, operator_##name##_scl_caller, const &)          \
+    SCL_REFLECT_OPERATOR_HELPER(SCL_FORWARD(op), name, operator_##name##_scl_caller, const &&)         \
+    SCL_REFLECT_OPERATOR_HELPER(SCL_FORWARD(op), name, operator_##name##_scl_caller, volatile &)       \
+    SCL_REFLECT_OPERATOR_HELPER(SCL_FORWARD(op), name, operator_##name##_scl_caller, volatile &&)      \
+    SCL_REFLECT_OPERATOR_HELPER(SCL_FORWARD(op), name, operator_##name##_scl_caller, const volatile &) \
+    SCL_REFLECT_OPERATOR_HELPER(SCL_FORWARD(op), name, operator_##name##_scl_caller, const volatile &&)
 
 /// @internal
 /// @brief Generates the prefix-unary operator overload for one cv-ref qualifier.
@@ -258,27 +258,27 @@
 /// @param op     The C++ operator token (e.g. @c -, @c ++, @c *).
 /// @param name   Short unique name identifying the operator (plain identifier).
 /// @param cv_ref cv-ref qualifiers applied to the wrapper.
-#define SCL_REFLECT_PREFIX_UNARY_OPERATOR_BASE(op, name, cv_ref)                          \
-    template <typename S_c_L_E__ = S_c_L_executor_type_ cv_ref>                           \
-    constexpr decltype(auto) operator op() cv_ref                                         \
-    noexcept(operator_##name##_S_c_L_exec_noexcept_<S_c_L_E__>)                           \
-    requires                                                                              \
-        (::std::is_same_v<S_c_L_E__, S_c_L_executor_type_ cv_ref>                         \
-            && (operator_##name##_S_c_L_has_exec_override_<S_c_L_E__>                     \
-                || operator_##name##_S_c_L_quals_<decltype(SCL_VALUE_DECLVAL(cv_ref))>))  \
-    {                                                                                     \
-        if constexpr (operator_##name##_S_c_L_has_exec_override_<S_c_L_E__>)              \
-        {                                                                                  \
-            return ::std::remove_cvref_t<S_c_L_E__>::operator_##name(                     \
-                SCL_EXECUTOR_ACCESS(cv_ref));                                             \
-        }                                                                                  \
-        else                                                                              \
-        {                                                                                  \
-            return ::std::remove_cvref_t<S_c_L_E__>::execute(SCL_EXECUTOR_ACCESS(cv_ref), \
-                [](auto && S_c_L_v__) -> decltype(auto)                                   \
-                { return ::std::forward<decltype(S_c_L_v__)>(S_c_L_v__).operator op(); }, \
-                ::std::remove_cvref_t<S_c_L_E__>::value(SCL_EXECUTOR_ACCESS(cv_ref)));    \
-        }                                                                                  \
+#define SCL_REFLECT_PREFIX_UNARY_OPERATOR_BASE(op, name, cv_ref)                        \
+    template <typename ScLExec = s_c_l_executor_type cv_ref>                            \
+    constexpr decltype(auto) operator op() cv_ref                                       \
+    noexcept(operator_##name##_scl_exec_noexcept<ScLExec>)                              \
+    requires                                                                            \
+        (::std::is_same_v<ScLExec, s_c_l_executor_type cv_ref>                          \
+            && (operator_##name##_scl_has_exec_override<ScLExec>                        \
+                || operator_##name##_scl_quals<decltype(SCL_VALUE_DECLVAL(cv_ref))>))   \
+    {                                                                                   \
+        if constexpr (operator_##name##_scl_has_exec_override<ScLExec>)                 \
+        {                                                                               \
+            return ::std::remove_cvref_t<ScLExec>::operator_##name(                     \
+                SCL_EXECUTOR_ACCESS(cv_ref));                                           \
+        }                                                                               \
+        else                                                                            \
+        {                                                                               \
+            return ::std::remove_cvref_t<ScLExec>::execute(SCL_EXECUTOR_ACCESS(cv_ref), \
+                [](auto && scl_v) -> decltype(auto)                                     \
+                { return ::std::forward<decltype(scl_v)>(scl_v).operator op(); },       \
+                ::std::remove_cvref_t<ScLExec>::value(SCL_EXECUTOR_ACCESS(cv_ref)));    \
+        }                                                                               \
     }
 
 /// @internal
@@ -292,27 +292,27 @@
 /// @param op     The C++ operator token (e.g. @c ++, @c --).
 /// @param name   Short unique name identifying the operator (plain identifier).
 /// @param cv_ref cv-ref qualifiers applied to the wrapper.
-#define SCL_REFLECT_POSTFIX_UNARY_OPERATOR_BASE(op, name, cv_ref)                              \
-    template <typename S_c_L_E__ = S_c_L_executor_type_ cv_ref>                                \
-    constexpr decltype(auto) operator op(int) cv_ref                                           \
-    noexcept(operator_##name##_S_c_L_exec_noexcept_<S_c_L_E__>)                                \
-    requires                                                                                   \
-        (::std::is_same_v<S_c_L_E__, S_c_L_executor_type_ cv_ref>                              \
-            && (operator_##name##_S_c_L_has_exec_override_<S_c_L_E__>                          \
-                || operator_##name##_S_c_L_quals_<decltype(SCL_VALUE_DECLVAL(cv_ref)), int>))  \
-    {                                                                                          \
-        if constexpr (operator_##name##_S_c_L_has_exec_override_<S_c_L_E__>)                   \
-        {                                                                                       \
-            return ::std::remove_cvref_t<S_c_L_E__>::operator_##name(                          \
-                SCL_EXECUTOR_ACCESS(cv_ref));                                                  \
-        }                                                                                       \
-        else                                                                                   \
-        {                                                                                       \
-            return ::std::remove_cvref_t<S_c_L_E__>::execute(SCL_EXECUTOR_ACCESS(cv_ref),      \
-                [](auto && S_c_L_v__) -> decltype(auto)                                        \
-                { return ::std::forward<decltype(S_c_L_v__)>(S_c_L_v__).operator op(int{}); }, \
-                ::std::remove_cvref_t<S_c_L_E__>::value(SCL_EXECUTOR_ACCESS(cv_ref)));         \
-        }                                                                                       \
+#define SCL_REFLECT_POSTFIX_UNARY_OPERATOR_BASE(op, name, cv_ref)                          \
+    template <typename ScLExec = s_c_l_executor_type cv_ref>                               \
+    constexpr decltype(auto) operator op(int) cv_ref                                       \
+    noexcept(operator_##name##_scl_exec_noexcept<ScLExec>)                                 \
+    requires                                                                               \
+        (::std::is_same_v<ScLExec, s_c_l_executor_type cv_ref>                             \
+            && (operator_##name##_scl_has_exec_override<ScLExec>                           \
+                || operator_##name##_scl_quals<decltype(SCL_VALUE_DECLVAL(cv_ref)), int>)) \
+    {                                                                                      \
+        if constexpr (operator_##name##_scl_has_exec_override<ScLExec>)                    \
+        {                                                                                  \
+            return ::std::remove_cvref_t<ScLExec>::operator_##name(                        \
+                SCL_EXECUTOR_ACCESS(cv_ref));                                              \
+        }                                                                                  \
+        else                                                                               \
+        {                                                                                  \
+            return ::std::remove_cvref_t<ScLExec>::execute(SCL_EXECUTOR_ACCESS(cv_ref),    \
+                [](auto && scl_v) -> decltype(auto)                                        \
+                { return ::std::forward<decltype(scl_v)>(scl_v).operator op(int{}); },     \
+                ::std::remove_cvref_t<ScLExec>::value(SCL_EXECUTOR_ACCESS(cv_ref)));       \
+        }                                                                                  \
     }
 
 /// @brief Generates proxy prefix-unary operators that reflect @p op from the wrapped object

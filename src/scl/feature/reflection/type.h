@@ -25,5 +25,5 @@
 ///
 /// @sa scl::feature::executor_trait
 #define SCL_REFLECT_TYPE(type, executor) \
-    using S_c_L_type_ = type;            \
-    using S_c_L_executor_type_ = executor;
+    using s_c_l_type = type;             \
+    using s_c_l_executor_type = executor;

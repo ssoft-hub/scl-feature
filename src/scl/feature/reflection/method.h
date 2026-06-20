@@ -60,42 +60,42 @@
 ///
 /// Produces per-method static variable templates that check whether the executor
 /// exposes a @c method_##name override and whether that override is @c noexcept.
-/// The executor type is taken as a template parameter @c S_c_L_E__ so that the
-/// qualified member lookup @c remove_cvref_t\<S_c_L_E__\>::method_##name is a
+/// The executor type is taken as a template parameter @c ScLExec so that the
+/// qualified member lookup @c remove_cvref_t\<ScLExec\>::method_##name is a
 /// *dependent* name — lookup is deferred to Phase 2 and caught by @c requires.
 ///
 /// Generated variable templates:
 ///
-/// - @c method_##name##_S_c_L_has_exec_override_\<S_c_L_E__, S_c_L_A___...\>
-///   @c true iff @c remove_cvref_t\<S_c_L_E__\>::method_##name can be cast to a
-///   function pointer with exact first-parameter type @c S_c_L_E__ (same technique
+/// - @c method_##name##_scl_has_exec_override\<ScLExec, ScLArgs...\>
+///   @c true iff @c remove_cvref_t\<ScLExec\>::method_##name can be cast to a
+///   function pointer with exact first-parameter type @c ScLExec (same technique
 ///   as @c has_guard_v / @c has_execute_v).
 ///
-/// - @c method_##name##_S_c_L_exec_noexcept_\<S_c_L_E__, S_c_L_A___...\>
+/// - @c method_##name##_scl_exec_noexcept\<ScLExec, ScLArgs...\>
 ///   @c true iff the above check passes and the call is @c noexcept.
 ///
 /// @param name  Unqualified method name (plain identifier).
-#define SCL_REFLECT_METHOD_EXEC_HELPERS(name)                                                 \
-    template <typename S_c_L_E__, typename... S_c_L_A___>                                     \
-    static constexpr bool method_##name##_S_c_L_has_exec_override_ =                          \
-        requires {                                                                            \
-            static_cast<                                                                      \
-                decltype(::std::remove_cvref_t<S_c_L_E__>::method_##name(                     \
-                    ::std::declval<S_c_L_E__>(), ::std::declval<S_c_L_A___>()...))            \
-                (*)(S_c_L_E__, S_c_L_A___...)                                                 \
-            >(&::std::remove_cvref_t<S_c_L_E__>::method_##name);                              \
-        };                                                                                    \
-    template <typename S_c_L_E__, typename... S_c_L_A___>                                     \
-    static constexpr bool method_##name##_S_c_L_exec_noexcept_ =                              \
-        []() constexpr noexcept -> bool {                                                     \
-            if constexpr (method_##name##_S_c_L_has_exec_override_<S_c_L_E__, S_c_L_A___...>) \
-                return noexcept(::std::remove_cvref_t<S_c_L_E__>::method_##name(              \
-                    ::std::declval<S_c_L_E__>(), ::std::declval<S_c_L_A___>()...));           \
-            return false;                                                                     \
+#define SCL_REFLECT_METHOD_EXEC_HELPERS(name)                                         \
+    template <typename ScLExec, typename... ScLArgs>                                  \
+    static constexpr bool method_##name##_scl_has_exec_override =                     \
+        requires {                                                                    \
+            static_cast<                                                              \
+                decltype(::std::remove_cvref_t<ScLExec>::method_##name(               \
+                    ::std::declval<ScLExec>(), ::std::declval<ScLArgs>()...))         \
+                (*)(ScLExec, ScLArgs...)                                              \
+            >(&::std::remove_cvref_t<ScLExec>::method_##name);                        \
+        };                                                                            \
+    template <typename ScLExec, typename... ScLArgs>                                  \
+    static constexpr bool method_##name##_scl_exec_noexcept =                         \
+        []() constexpr noexcept -> bool {                                             \
+            if constexpr (method_##name##_scl_has_exec_override<ScLExec, ScLArgs...>) \
+                return noexcept(::std::remove_cvref_t<ScLExec>::method_##name(        \
+                    ::std::declval<ScLExec>(), ::std::declval<ScLArgs>()...));        \
+            return false;                                                             \
         }();
 
 /// @internal
-/// @brief Generates the @c method_##name##_S_c_L_caller_ helper struct inside the enclosing class.
+/// @brief Generates the @c method_##name##_scl_caller helper struct inside the enclosing class.
 /// @ingroup scl_feature_reflection
 ///
 /// The struct exposes a single static function template
@@ -106,18 +106,18 @@
 /// error when @p method is not a template on the concrete wrapped type.
 ///
 /// @param name  Unqualified method name (plain identifier).
-#define SCL_REFLECT_METHOD_CALLER(name)                                                                         \
-    struct method_##name##_S_c_L_caller_                                                                        \
-    {                                                                                                           \
-        template <typename P_a_r_a_m___, typename... P_a_r_a_m_s___, typename O_b_j___, typename... A_r_g_s___> \
-        static constexpr auto call(O_b_j___ && o_b_j___, A_r_g_s___ &&... a_r_g_s___)                           \
-            -> decltype(::std::forward<O_b_j___>(o_b_j___).template name<P_a_r_a_m___, P_a_r_a_m_s___...>(      \
-                ::scl::wrapper_cast(::std::forward<A_r_g_s___>(a_r_g_s___))...))                                \
-        {                                                                                                       \
-            return ::std::forward<O_b_j___>(o_b_j___).template name<P_a_r_a_m___, P_a_r_a_m_s___...>(           \
-                ::scl::wrapper_cast(::std::forward<A_r_g_s___>(a_r_g_s___))...);                                \
-        }                                                                                                       \
-    };                                                                                                          \
+#define SCL_REFLECT_METHOD_CALLER(name)                                                           \
+    struct method_##name##_scl_caller                                                             \
+    {                                                                                             \
+        template <typename ScLParam, typename... ScLParams, typename ScLObj, typename... ScLArgs> \
+        static constexpr auto call(ScLObj && scl_obj, ScLArgs &&... scl_args)                     \
+            -> decltype(::std::forward<ScLObj>(scl_obj).template name<ScLParam, ScLParams...>(    \
+                ::scl::wrapper_cast(::std::forward<ScLArgs>(scl_args))...))                       \
+        {                                                                                         \
+            return ::std::forward<ScLObj>(scl_obj).template name<ScLParam, ScLParams...>(         \
+                ::scl::wrapper_cast(::std::forward<ScLArgs>(scl_args))...);                       \
+        }                                                                                         \
+    };                                                                                            \
 
 /// @internal
 /// @brief Generates the qualifier-discrimination predicates for @p method.
@@ -125,58 +125,58 @@
 ///
 /// Produces two constructs inside the enclosing class:
 ///
-/// - @c method_##name##_S_c_L_quals_\<V,As...\> — variable template that evaluates
+/// - @c method_##name##_scl_quals\<V,As...\> — variable template that evaluates
 ///   @c SCL_HAS_QUALIFIED_METHOD for the non-template (deduced-args) overload.
 ///   Defined once here; the 16 generated overloads reference it by instantiation
 ///   rather than re-expanding the macro body each time.
 ///
-/// - @c method_##name##_S_c_L_template_quals_\<P,Ps...\>::value\<V,As...\> — nested
+/// - @c method_##name##_scl_template_quals\<P,Ps...\>::value\<V,As...\> — nested
 ///   variable template that evaluates @c SCL_HAS_QUALIFIED_METHOD with the token
 ///   sequence @c template @c method\<P,Ps...\> (assembled via @c SCL_FORWARD),
 ///   so the check accounts for explicit template arguments.
 ///
 /// @param name  Unqualified method name (plain identifier).
-#define SCL_REFLECT_METHOD_QUALS(name)                                          \
-    template <typename S_c_L_V___, typename... S_c_L_A___>                      \
-    static constexpr bool method_##name##_S_c_L_quals_ =                        \
-        SCL_HAS_QUALIFIED_METHOD(SCL_FORWARD(name), S_c_L_V___, S_c_L_A___...); \
-    template <typename S_c_L_P___, typename... S_c_L_Ps___>                     \
-    struct method_##name##_S_c_L_template_quals_                                \
-    {                                                                           \
-        template <typename S_c_L_V___, typename... S_c_L_A___>                  \
-        static constexpr bool value =                                           \
-            SCL_HAS_QUALIFIED_METHOD(                                           \
-                SCL_FORWARD(template name<S_c_L_P___, S_c_L_Ps___...>),         \
-                S_c_L_V___, S_c_L_A___...);                                     \
+#define SCL_REFLECT_METHOD_QUALS(name)                                   \
+    template <typename ScLVal, typename... ScLArgs>                      \
+    static constexpr bool method_##name##_scl_quals =                    \
+        SCL_HAS_QUALIFIED_METHOD(SCL_FORWARD(name), ScLVal, ScLArgs...); \
+    template <typename ScLParam, typename... ScLParams>                  \
+    struct method_##name##_scl_template_quals                            \
+    {                                                                    \
+        template <typename ScLVal, typename... ScLArgs>                  \
+        static constexpr bool value =                                    \
+            SCL_HAS_QUALIFIED_METHOD(                                    \
+                SCL_FORWARD(template name<ScLParam, ScLParams...>),      \
+                ScLVal, ScLArgs...);                                     \
     };
 
 /// @internal
 /// @brief Generates the complete executor-method-override function template for one cv-ref.
 /// @ingroup scl_feature_reflection
 ///
-/// Introduces a hidden template parameter @c S_c_L_E__ defaulting to
-/// @c S_c_L_executor_type_ so that @c S_c_L_E__::method_##name is a *dependent*
+/// Introduces a hidden template parameter @c ScLExec defaulting to
+/// @c s_c_l_executor_type so that @c ScLExec::method_##name is a *dependent*
 /// name — lookup is deferred to Phase 2.  The class-level
-/// @c method_##name##_S_c_L_has_exec_override_ and @c method_##name##_S_c_L_exec_noexcept_
+/// @c method_##name##_scl_has_exec_override and @c method_##name##_scl_exec_noexcept
 /// helpers (generated by @c SCL_REFLECT_METHOD_EXEC_HELPERS) are used for the
-/// requires-clause and noexcept-specifier respectively; they also take @c S_c_L_E__
+/// requires-clause and noexcept-specifier respectively; they also take @c ScLExec
 /// as a template parameter, keeping all references to the executor type dependent.
 ///
-/// The @c is_same_v guard prevents users from specifying @c S_c_L_E__ explicitly.
+/// The @c is_same_v guard prevents users from specifying @c ScLExec explicitly.
 ///
 /// @param name    Unqualified method name (plain identifier).
 /// @param cv_ref  cv-ref qualifiers applied to the wrapper.
-#define SCL_REFLECT_METHOD_EXECUTOR_OVERRIDE_BASE(name, cv_ref)                        \
-    template <typename S_c_L_E__ = S_c_L_executor_type_ cv_ref, typename... A_r_g_s__> \
-    constexpr decltype(auto) name(A_r_g_s__ &&... a_r_g_s__) cv_ref                    \
-    noexcept(method_##name##_S_c_L_exec_noexcept_<S_c_L_E__, A_r_g_s__...>)            \
-    requires                                                                           \
-        (::std::is_same_v<S_c_L_E__, S_c_L_executor_type_ cv_ref>                      \
-            && method_##name##_S_c_L_has_exec_override_<S_c_L_E__, A_r_g_s__...>)      \
-    {                                                                                  \
-        return ::std::remove_cvref_t<S_c_L_E__>::method_##name(                        \
-            SCL_EXECUTOR_ACCESS(cv_ref),                                               \
-            ::std::forward<A_r_g_s__>(a_r_g_s__)...);                                  \
+#define SCL_REFLECT_METHOD_EXECUTOR_OVERRIDE_BASE(name, cv_ref)                   \
+    template <typename ScLExec = s_c_l_executor_type cv_ref, typename... ScLArgs> \
+    constexpr decltype(auto) name(ScLArgs &&... scl_args) cv_ref                  \
+    noexcept(method_##name##_scl_exec_noexcept<ScLExec, ScLArgs...>)              \
+    requires                                                                      \
+        (::std::is_same_v<ScLExec, s_c_l_executor_type cv_ref>                    \
+            && method_##name##_scl_has_exec_override<ScLExec, ScLArgs...>)        \
+    {                                                                             \
+        return ::std::remove_cvref_t<ScLExec>::method_##name(                     \
+            SCL_EXECUTOR_ACCESS(cv_ref),                                          \
+            ::std::forward<ScLArgs>(scl_args)...);                                \
     }
 
 /// @internal
@@ -193,32 +193,32 @@
 ///
 /// This overload is active only when the executor does **not** provide a
 /// dedicated @c method_##name override for the given cv-ref qualification
-/// (i.e. @c method_##name##_S_c_L_has_exec_override_ is @c false).  When an
+/// (i.e. @c method_##name##_scl_has_exec_override is @c false).  When an
 /// executor override exists the @c SCL_REFLECT_METHOD_EXECUTOR_OVERRIDE_BASE
 /// overload takes precedence and this one is suppressed via its
-/// @c !has_exec_override_ requires-condition.
+/// @c !_scl_has_exec_override requires-condition.
 ///
 /// @param name    Unqualified method name (plain identifier).
 /// @param cv_ref  cv-ref qualifiers applied to the wrapper.
-#define SCL_REFLECT_METHOD_BASE(name, cv_ref)                                                    \
-    noexcept (noexcept(SCL_EXECUTE_OVERRIDED(SCL_FORWARD(name), cv_ref)))                        \
-    requires                                                                                     \
-        (!method_##name##_S_c_L_has_exec_override_<S_c_L_executor_type_ cv_ref, A_r_g_s__...> && \
-        requires                                                                                 \
-        {                                                                                        \
-            SCL_VALUE_DECLVAL(cv_ref).name(                                                      \
-                ::scl::wrapper_cast(::std::declval<A_r_g_s__>())...);                            \
-        } && method_##name##_S_c_L_quals_<decltype(SCL_VALUE_DECLVAL(cv_ref)),                   \
-            decltype(::scl::wrapper_cast(::std::declval<A_r_g_s__>()))...>)                      \
-    {                                                                                            \
-        return SCL_EXECUTE_OVERRIDED(SCL_FORWARD(name), cv_ref);                                 \
+#define SCL_REFLECT_METHOD_BASE(name, cv_ref)                                              \
+    noexcept (noexcept(SCL_EXECUTE_OVERRIDED(SCL_FORWARD(name), cv_ref)))                  \
+    requires                                                                               \
+        (!method_##name##_scl_has_exec_override<s_c_l_executor_type cv_ref, ScLArgs...> && \
+        requires                                                                           \
+        {                                                                                  \
+            SCL_VALUE_DECLVAL(cv_ref).name(                                                \
+                ::scl::wrapper_cast(::std::declval<ScLArgs>())...);                        \
+        } && method_##name##_scl_quals<decltype(SCL_VALUE_DECLVAL(cv_ref)),                \
+            decltype(::scl::wrapper_cast(::std::declval<ScLArgs>()))...>)                  \
+    {                                                                                      \
+        return SCL_EXECUTE_OVERRIDED(SCL_FORWARD(name), cv_ref);                           \
     }
 
 /// @internal
 /// @brief requires-clause + body for an explicit-template-args overload.
 /// @ingroup scl_feature_reflection
 ///
-/// Uses @p caller (a struct whose static @c call\<P_a_r_a_m__,P_a_r_a_m_s__...\>(obj,args...)
+/// Uses @p caller (a struct whose static @c call\<ScLParam,ScLParams...\>(obj,args...)
 /// wraps the @c .template method\<...\> call) so that the @c template keyword
 /// appears only in a dependent context, avoiding a hard parse error when
 /// @p method is not a template.
@@ -227,8 +227,8 @@
 /// (e.g. locking executors) can intercept every call.
 ///
 /// @note Unlike @c SCL_REFLECT_METHOD_BASE, qualifier discrimination here uses
-///       @c method_##name##_S_c_L_template_quals_ rather than @c method_##name##_S_c_L_quals_.
-///       Internally @c method_##name##_S_c_L_template_quals_\<P,Ps...\>::value\<V,As...\>
+///       @c method_##name##_scl_template_quals rather than @c method_##name##_scl_quals.
+///       Internally @c method_##name##_scl_template_quals\<P,Ps...\>::value\<V,As...\>
 ///       delegates to @c SCL_HAS_QUALIFIED_METHOD with the token sequence
 ///       @c template @c method\<P,Ps...\> (assembled via @c SCL_FORWARD) so that
 ///       the unevaluated call expressions inside the predicate include explicit
@@ -239,18 +239,18 @@
 /// @param name    Unqualified method name (plain identifier).
 /// @param caller  Helper struct generated by @c SCL_REFLECT_METHOD_CALLER.
 /// @param cv_ref  cv-ref qualifiers applied to the wrapper.
-#define SCL_REFLECT_TEMPLATE_METHOD_BASE(name, caller, cv_ref)                      \
-    noexcept(noexcept(SCL_EXECUTE_TEMPLATE_OVERRIDED(caller, cv_ref)))              \
-    requires                                                                        \
-        requires                                                                    \
-        {                                                                           \
-            caller::template call<P_a_r_a_m__, P_a_r_a_m_s__...>(                   \
-                SCL_VALUE_DECLVAL(cv_ref), ::std::declval<A_r_g_s__>()...);         \
-        } && method_##name##_S_c_L_template_quals_<P_a_r_a_m__, P_a_r_a_m_s__...>   \
-                 ::template value<decltype(SCL_VALUE_DECLVAL(cv_ref)),              \
-                     decltype(::scl::wrapper_cast(::std::declval<A_r_g_s__>()))...> \
-    {                                                                               \
-        return SCL_EXECUTE_TEMPLATE_OVERRIDED(caller, cv_ref);                      \
+#define SCL_REFLECT_TEMPLATE_METHOD_BASE(name, caller, cv_ref)                    \
+    noexcept(noexcept(SCL_EXECUTE_TEMPLATE_OVERRIDED(caller, cv_ref)))            \
+    requires                                                                      \
+        requires                                                                  \
+        {                                                                         \
+            caller::template call<ScLParam, ScLParams...>(                        \
+                SCL_VALUE_DECLVAL(cv_ref), ::std::declval<ScLArgs>()...);         \
+        } && method_##name##_scl_template_quals<ScLParam, ScLParams...>           \
+                 ::template value<decltype(SCL_VALUE_DECLVAL(cv_ref)),            \
+                     decltype(::scl::wrapper_cast(::std::declval<ScLArgs>()))...> \
+    {                                                                             \
+        return SCL_EXECUTE_TEMPLATE_OVERRIDED(caller, cv_ref);                    \
     }
 
 /// @internal
@@ -261,13 +261,13 @@
 /// @param name    Unqualified method name (plain identifier).
 /// @param caller  Helper struct generated by @c SCL_REFLECT_METHOD_CALLER.
 /// @param cv_ref  cv-ref qualifiers applied to the wrapper.
-#define SCL_REFLECT_METHOD_HELPER(name, caller, cv_ref)                               \
-    SCL_REFLECT_METHOD_EXECUTOR_OVERRIDE_BASE(name, cv_ref)                           \
-    template <typename... A_r_g_s__>                                                  \
-    constexpr decltype(auto) name(A_r_g_s__ &&... a_r_g_s__) cv_ref                   \
-        SCL_REFLECT_METHOD_BASE(name, cv_ref)                                         \
-    template <typename P_a_r_a_m__, typename... P_a_r_a_m_s__, typename... A_r_g_s__> \
-    constexpr decltype(auto) name(A_r_g_s__ &&... a_r_g_s__) cv_ref                   \
+#define SCL_REFLECT_METHOD_HELPER(name, caller, cv_ref)                      \
+    SCL_REFLECT_METHOD_EXECUTOR_OVERRIDE_BASE(name, cv_ref)                  \
+    template <typename... ScLArgs>                                           \
+    constexpr decltype(auto) name(ScLArgs &&... scl_args) cv_ref             \
+        SCL_REFLECT_METHOD_BASE(name, cv_ref)                                \
+    template <typename ScLParam, typename... ScLParams, typename... ScLArgs> \
+    constexpr decltype(auto) name(ScLArgs &&... scl_args) cv_ref             \
         SCL_REFLECT_TEMPLATE_METHOD_BASE(name, caller, cv_ref)
 
 /// @brief Generates proxy methods that reflect @p method from the wrapped object
@@ -279,11 +279,11 @@
 /// @c volatile&, @c volatile&&, @c const @c volatile&, @c const @c volatile&&)
 /// three overloads are generated:
 /// - one **executor-override** overload —
-///   @c template\<typename...\ A_r_g_s__\>, active when @c Executor::method_##name exists
+///   @c template\<typename...\ ScLArgs\>, active when @c Executor::method_##name exists
 /// - one **execute-path** overload —
-///   @c template\<typename...\ A_r_g_s__\>, active when no executor override is found
+///   @c template\<typename...\ ScLArgs\>, active when no executor override is found
 /// - one with **explicit** template arguments —
-///   @c template\<typename\ P_a_r_a_m__,\ typename...\ P_a_r_a_m_s__,\ typename...\ A_r_g_s__\>
+///   @c template\<typename\ ScLParam,\ typename...\ ScLParams,\ typename...\ ScLArgs\>
 ///
 /// This gives 24 overloads in total (3 × 8); the executor-override and execute-path
 /// overloads are mutually exclusive via their @c requires clauses, so at most 16 are
@@ -324,8 +324,8 @@
 ///    proxy from being generated when only a mutable @c & overload
 ///    exists on the target.
 ///
-/// Explicit-template overloads use @c method_##name##_S_c_L_template_quals_ for
-/// qualifier discrimination instead of @c method_##name##_S_c_L_quals_.  The struct
+/// Explicit-template overloads use @c method_##name##_scl_template_quals for
+/// qualifier discrimination instead of @c method_##name##_scl_quals.  The struct
 /// template forwards to @c SCL_HAS_QUALIFIED_METHOD with the token sequence
 /// @c template @c method\<P,Ps...\> (assembled via @c SCL_FORWARD) so it works
 /// even for purely-template methods where deduction without explicit arguments
@@ -357,19 +357,19 @@
 /// the enclosing class by @c SCL_REFLECT_METHOD_CALLER and
 /// @c SCL_REFLECT_METHOD_QUALS:
 ///
-/// - @c method_##name##_S_c_L_caller_ — a struct whose static
+/// - @c method_##name##_scl_caller — a struct whose static
 ///   @c call\<P,Ps...\>(obj, args...) wraps the
 ///   @c .template @c method\<P,Ps...\>(args...) call.  The object
-///   parameter (@c O_b_j___) is dependent, so the @c template keyword
+///   parameter (@c ScLObj) is dependent, so the @c template keyword
 ///   appears only in a **dependent** context and name lookup is deferred
 ///   to instantiation.  Without this indirection,
 ///   @c .template @c foo\<...\> on a non-dependent type would be a hard
 ///   parse error (not SFINAE) when @c foo is not a template.
 ///
-/// - @c method_##name##_S_c_L_quals_ — a variable template that computes the
+/// - @c method_##name##_scl_quals — a variable template that computes the
 ///   qualifier-discrimination predicate for the deduced-args overload.
 ///
-/// - @c method_##name##_S_c_L_template_quals_ — a struct template parameterised
+/// - @c method_##name##_scl_template_quals — a struct template parameterised
 ///   over @c \<P,Ps...\> with an inner @c value\<V,As...\> variable template.
 ///   Delegates to @c SCL_HAS_QUALIFIED_METHOD with the token sequence
 ///   @c template @c method\<P,Ps...\> so that the predicate evaluates the
@@ -424,17 +424,17 @@
 ///
 /// @sa SCL_REFLECT_TYPE
 /// @sa scl::feature::executor_trait
-#define SCL_REFLECT_METHOD(name)                                                                  \
-    SCL_REFLECT_METHOD_QUALS(name)                                                                \
-    SCL_REFLECT_METHOD_CALLER(name)                                                               \
-    SCL_REFLECT_METHOD_EXEC_HELPERS(name)                                                         \
-    SCL_REFLECT_METHOD_HELPER(SCL_FORWARD(name), method_##name##_S_c_L_caller_, &)                \
-    SCL_REFLECT_METHOD_HELPER(SCL_FORWARD(name), method_##name##_S_c_L_caller_, &&)               \
-    SCL_REFLECT_METHOD_HELPER(SCL_FORWARD(name), method_##name##_S_c_L_caller_, const &)          \
-    SCL_REFLECT_METHOD_HELPER(SCL_FORWARD(name), method_##name##_S_c_L_caller_, const &&)         \
-    SCL_REFLECT_METHOD_HELPER(SCL_FORWARD(name), method_##name##_S_c_L_caller_, volatile &)       \
-    SCL_REFLECT_METHOD_HELPER(SCL_FORWARD(name), method_##name##_S_c_L_caller_, volatile &&)      \
-    SCL_REFLECT_METHOD_HELPER(SCL_FORWARD(name), method_##name##_S_c_L_caller_, const volatile &) \
-    SCL_REFLECT_METHOD_HELPER(SCL_FORWARD(name), method_##name##_S_c_L_caller_, const volatile &&)
+#define SCL_REFLECT_METHOD(name)                                                               \
+    SCL_REFLECT_METHOD_QUALS(name)                                                             \
+    SCL_REFLECT_METHOD_CALLER(name)                                                            \
+    SCL_REFLECT_METHOD_EXEC_HELPERS(name)                                                      \
+    SCL_REFLECT_METHOD_HELPER(SCL_FORWARD(name), method_##name##_scl_caller, &)                \
+    SCL_REFLECT_METHOD_HELPER(SCL_FORWARD(name), method_##name##_scl_caller, &&)               \
+    SCL_REFLECT_METHOD_HELPER(SCL_FORWARD(name), method_##name##_scl_caller, const &)          \
+    SCL_REFLECT_METHOD_HELPER(SCL_FORWARD(name), method_##name##_scl_caller, const &&)         \
+    SCL_REFLECT_METHOD_HELPER(SCL_FORWARD(name), method_##name##_scl_caller, volatile &)       \
+    SCL_REFLECT_METHOD_HELPER(SCL_FORWARD(name), method_##name##_scl_caller, volatile &&)      \
+    SCL_REFLECT_METHOD_HELPER(SCL_FORWARD(name), method_##name##_scl_caller, const volatile &) \
+    SCL_REFLECT_METHOD_HELPER(SCL_FORWARD(name), method_##name##_scl_caller, const volatile &&)
 
 // clang-format on

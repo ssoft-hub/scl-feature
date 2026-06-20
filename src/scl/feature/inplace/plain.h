@@ -10,11 +10,11 @@
 
 #include <scl/utility/type_traits/forward_like.h>
 
-#define SCL_EXECUTOR_CONSTRUCTOR_FOR_SELF_PROTOTYPE(cv_ref)                \
-    constexpr explicit plain(self_type cv_ref other) noexcept(             \
-        ::std::is_nothrow_constructible_v<value_type, value_type cv_ref>)  \
-        requires(::std::constructible_from<value_type, value_type cv_ref>) \
-        : m_value{::std::forward<value_type cv_ref>(other.m_value)}        \
+#define SCL_EXECUTOR_CONSTRUCTOR_FOR_SELF_PROTOTYPE(cv_ref)                        \
+    constexpr explicit plain(self_type cv_ref other) /**/                          \
+        noexcept(::std::is_nothrow_constructible_v<value_type, value_type cv_ref>) \
+        requires(::std::constructible_from<value_type, value_type cv_ref>)         \
+        : m_value{::std::forward<value_type cv_ref>(other.m_value)}                \
     {}
 
 /// @internal
