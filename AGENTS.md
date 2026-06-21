@@ -54,9 +54,9 @@ clang-format -i <files>
 clang-tidy <file> -- -std=c++20 -xc++ -Isrc -I<path-to-scl-utility>/src
 cppcheck --enable=warning,style,performance,portability \
   --std=c++20 --language=c++ --inline-suppr \
-  --error-exitcode=1 --suppress=missingIncludeSystem \
-  --suppress=unusedFunction \
-  -Isrc -UDOXYGEN <files>
+  --error-exitcode=1 --suppressions-list=.cppcheck \
+  -Isrc -I<path-to-scl-utility>/src -UDOXYGEN \
+  <files>
 ```
 
 ## Branching

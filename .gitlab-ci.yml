@@ -50,8 +50,7 @@ cppcheck:
         --language=c++ \
         --inline-suppr \
         --error-exitcode=1 \
-        --suppress=missingIncludeSystem \
-        --suppress=unusedFunction \
+        --suppressions-list=.cppcheck \
         -I$SCL_SRC_DIR \
         -UDOXYGEN \
         {} +
