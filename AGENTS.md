@@ -17,7 +17,7 @@ src/scl/feature/     — public headers
   reflection/        — SCL_REFLECT_TYPE / SCL_REFLECT_METHOD macros
   concepts/          — executor/wrapper concepts
   type_traits/       — is_wrapper_v, is_executor_v, etc.
-  detail/            — internal: resolver, constructor macros
+  detail/            — internal: wrapper_constructor_resolver, constructor macros
 test/                — unit tests
 project/cmake/       — CMakeLists.txt
 project/doxygen/     — Doxyfile
@@ -25,7 +25,7 @@ project/doxygen/     — Doxyfile
 
 ## Key Files
 - `src/scl/feature/wrapper.h` — start here for the core abstraction
-- `src/scl/feature/detail/resolver.h` — 4 construction strategies
+- `src/scl/feature/detail/wrapper_constructor_resolver.h` — 4 construction strategies
 - `src/scl/feature/reflection/method.h` — SCL_REFLECT_METHOD (generates 24 overloads)
 - `src/scl/feature/inplace/plain.h` — simplest executor, zero overhead
 
@@ -41,23 +41,26 @@ project/doxygen/     — Doxyfile
 - All source comments and identifiers in **English**
 
 ## Required Checks Before Every Commit
-Run on every changed `.h` / `.hpp` file:
+Run the lint scripts in `script/lint/`. They are the **single source of truth** — CI
+(`.gitlab-ci.yml`, `.github/workflows/lint.yml`) invokes these exact scripts, so a green
+local run matches CI.
 
 ```sh
-# Format check
-clang-format --dry-run --Werror <files>
+# Run the whole lint stage (clang-format, clang-tidy, cppcheck)
+bash script/lint/lint.sh
 
-# Apply format
-clang-format -i <files>
-
-# Static analysis (scl-utility headers must be available at /tmp/scl-utility/src or similar)
-clang-tidy <file> -- -std=c++20 -xc++ -Isrc -I<path-to-scl-utility>/src
-cppcheck --enable=warning,style,performance,portability \
-  --std=c++20 --language=c++ --inline-suppr \
-  --error-exitcode=1 --suppress=missingIncludeSystem \
-  --suppress=unusedFunction \
-  -Isrc -UDOXYGEN <files>
+# ...or a single tool
+bash script/lint/clang_format.sh
+bash script/lint/clang_tidy.sh
+bash script/lint/cppcheck.sh
 ```
+
+The clang-tidy and cppcheck scripts need the `scl-utility` headers. They are auto-detected
+from `../utility/src` (monorepo checkout) or `/tmp/scl-utility/src` (CI clone); override with
+`SCL_UTILITY_SRC=/path/to/scl-utility/src`. Tool executables can be overridden via
+`CLANG_FORMAT` / `CLANG_TIDY` / `CPPCHECK` (e.g. on Windows where they are not on `PATH`).
+
+To auto-apply formatting: `clang-format -i <files>`.
 
 ## Branching
 - Branch name format: `{user}/feat/{subject}`, `{user}/fix/{subject}`, `{user}/refactor/{subject}`
@@ -127,5 +130,5 @@ class wrapper;
 ## Do Not
 - Add runtime dependencies beyond `scl::utility`
 - Break C++20 compatibility (MSVC 19.30+, GCC 13+, Clang 16+)
-- Commit without running clang-format and clang-tidy
+- Commit without running `script/lint/lint.sh` (clang-format, clang-tidy, cppcheck)
 - Add implementation (.cpp) files — library is header-only

@@ -133,7 +133,6 @@ namespace scl::feature
         SCL_REFLECT_BINARY_OPERATOR(&&, logical_and)
         SCL_REFLECT_BINARY_OPERATOR(||, logical_or)
 
-        // cppcheck-suppress syntaxError
         SCL_REFLECT_BINARY_OPERATOR(=, assign) // NOLINT(cppcoreguidelines-c-copy-assignment-signature)
         SCL_REFLECT_BINARY_OPERATOR(*=, multiply_assign)
         SCL_REFLECT_BINARY_OPERATOR(/=, divide_assign)
