@@ -6,6 +6,8 @@ variables:
 clang-tidy:
   stage: lint
   image: silkeh/clang:21
+  variables:
+    SCL_UTILITY_SRC: /tmp/scl-utility/src
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH =~ /^(main|dev)$/
@@ -13,11 +15,7 @@ clang-tidy:
     - apt-get update -qq && apt-get install -y -qq git
     - git clone --depth=1 --branch dev "https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_NAMESPACE}/scl-utility.git" /tmp/scl-utility
   script:
-    - |
-      [ -d "$SCL_SRC_DIR" ] || { echo "No sources, skipping."; exit 0; }
-      find $SCL_SRC_DIR \( -name '*.h' -o -name '*.hpp' \) | while IFS= read -r f; do
-        clang-tidy "$f" --quiet --warnings-as-errors='*' -- -std=c++20 -xc++ -I$SCL_SRC_DIR -I/tmp/scl-utility/src || exit 1
-      done
+    - bash script/lint/clang_tidy.sh
 
 clang-format:
   stage: lint
@@ -26,34 +24,22 @@ clang-format:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH =~ /^(main|dev)$/
   script:
-    - |
-      [ -d "$SCL_SRC_DIR" ] || { echo "No sources, skipping."; exit 0; }
-      find $SCL_SRC_DIR \( -name '*.h' -o -name '*.hpp' \) | xargs --no-run-if-empty clang-format \
-        --dry-run \
-        --Werror
+    - bash script/lint/clang_format.sh
 
 cppcheck:
   stage: lint
   image: ubuntu:latest
+  variables:
+    SCL_UTILITY_SRC: /tmp/scl-utility/src
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH =~ /^(main|dev)$/
   before_script:
-    - apt-get update && apt-get install -y cppcheck
+    - apt-get update && apt-get install -y cppcheck git
     - cppcheck --version
+    - git clone --depth=1 --branch dev "https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_NAMESPACE}/scl-utility.git" /tmp/scl-utility
   script:
-    - |
-      [ -d "$SCL_SRC_DIR" ] || { echo "No sources, skipping."; exit 0; }
-      find $SCL_SRC_DIR \( -name '*.h' -o -name '*.hpp' \) -exec cppcheck \
-        --enable=warning,style,performance,portability \
-        --std=c++20 \
-        --language=c++ \
-        --inline-suppr \
-        --error-exitcode=1 \
-        --suppressions-list=.cppcheck \
-        -I$SCL_SRC_DIR \
-        -UDOXYGEN \
-        {} +
+    - bash script/lint/cppcheck.sh
 
 # ---------------------
 # Documentation
