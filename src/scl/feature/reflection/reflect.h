@@ -33,9 +33,8 @@
 /// ## Extending for a custom type
 ///
 /// Specialise `reflect` for your value type.
-/// `SCL_REFLECT_TYPE` must appear first to introduce the
-/// `s_c_l_type` / `s_c_l_executor_type` aliases that
-/// `SCL_REFLECT_METHOD` depends on:
+/// `SCL_REFLECT_TYPE` must appear first to establish the internal type
+/// context that `SCL_REFLECT_METHOD` depends on:
 ///
 /// @code{.cpp}
 /// template <typename Wrapper, typename Executor>
@@ -66,8 +65,8 @@ namespace scl::feature
     ///                   Used by `SCL_REFLECT_TYPE` to locate the executor at
     ///                   call time via `scl::feature::executor_trait<Wrapper>`.
     /// @tparam Executor  The outermost executor instantiation
-    ///                   (`Executor<Wrapper::value_type>`).  Exposed as
-    ///                   `s_c_l_executor_type` inside generated proxy methods.
+    ///                   (`Executor<Wrapper::value_type>`).  Used internally by
+    ///                   the generated proxy methods.
     /// @tparam Type      The type whose reflected members are mixed in.
     ///                   Partial specialisations handle `detail::wrapper`
     ///                   layers (delegating to the inner value type) and
