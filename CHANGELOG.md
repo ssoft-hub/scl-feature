@@ -57,6 +57,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   code conventions, branching rules, required pre-commit checks
   (clang-format, clang-tidy, cppcheck), commit message format,
   Doxygen documentation requirements, and compatibility constraints.
+- `.cppcheck` — suppress `internalError`: cppcheck 2.13 on the GitHub Actions
+  runners fails to analyse the macro-heavy reflection headers (`internalError`
+  on `reflection/reflect.h`), unblocking the mirror's Lint workflow; cppcheck
+  2.19 on the GitLab runners is unaffected.
 
 ### Fixed
 
