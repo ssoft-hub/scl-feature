@@ -18,8 +18,9 @@
  *
  * | Symbol | Purpose |
  * |--------|---------|
- * | @c SCL_REFLECT_TYPE(Wrapper, Executor) | Declares the type aliases required by @c SCL_REFLECT_METHOD. Must appear first inside the wrapper class body. |
+ * | @c SCL_REFLECT_TYPE(Wrapper, Executor) | Declares the type aliases required by @c SCL_REFLECT_METHOD and @c SCL_REFLECT_PROPERTY. Must appear first inside the wrapper class body. |
  * | @c SCL_REFLECT_METHOD(method) | Generates 24 proxy overloads (3 × 8 cv-ref) that dispatch through the executor. |
+ * | @c SCL_REFLECT_PROPERTY(prop) | Generates a @c wrapper data member that proxies a single field through the executor, with optional executor override via @c property_\<name\>. |
  * | @c scl::feature::reflect | CRTP mixin base class; specialisations inject reflected members. |
  * @{
  */
@@ -27,6 +28,7 @@
 #include <scl/feature/reflection/access.h>
 #include <scl/feature/reflection/method.h>
 #include <scl/feature/reflection/operator.h>
+#include <scl/feature/reflection/property.h>
 #include <scl/feature/reflection/reflect.h>
 #include <scl/feature/reflection/type.h>
 

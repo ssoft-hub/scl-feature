@@ -83,6 +83,13 @@ or deferred invocation without modifying the wrapped type. Licensed under [The U
   - `SCL_REFLECT_FRIEND_BINARY_OPERATOR(op, name)` / `SCL_REFLECT_FRIEND_PREFIX_UNARY_OPERATOR`
     / `SCL_REFLECT_FRIEND_POSTFIX_UNARY_OPERATOR` — hidden-friend (ADL-only) only, no member
     counterpart; the wrapper is the explicit first parameter
+  - `SCL_REFLECT_PROPERTY(prop)` — exposes a **data field** (`wrapper.prop`) rather than a
+    method; generates a nested `wrapper` member that proxies field `prop` of the wrapped value
+    through the executor, preserving cv-ref qualifiers. Read access uses implicit conversion via
+    `wrapper_cast(w.prop)`; write access uses `wrapper_cast(w.prop).to<FieldType&>()` (or
+    `operator=` for class types). Supports the same executor-override path as `SCL_REFLECT_METHOD`
+    via a static `property_<name>(exec)` member. The member stores a byte offset to the outer
+    executor, so it is copy/move-safe but not usable in a constant expression
 - **Constructor and assignment macros** (`scl/feature/detail/wrapper_constructors.h`):
   - `SCL_WRAPPER_CONSTRUCTOR_FOR_SELF` — expands to eight constructors (all cv-ref
     qualifications of `self_type`) that forward through the executor
