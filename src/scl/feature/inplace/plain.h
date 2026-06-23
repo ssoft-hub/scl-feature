@@ -32,6 +32,25 @@
     SCL_EXECUTOR_CONSTRUCTOR_FOR_SELF_PROTOTYPE(volatile &&)      \
     SCL_EXECUTOR_CONSTRUCTOR_FOR_SELF_PROTOTYPE(const volatile &&)
 
+#define SCL_EXECUTOR_ASSIGNMENT_FOR_SELF_PROTOTYPE(cv_ref)                        \
+    constexpr plain & operator=(self_type cv_ref other) /**/                      \
+        noexcept(::std::is_nothrow_assignable_v<value_type &, value_type cv_ref>) \
+        requires(::std::assignable_from<value_type &, value_type cv_ref>)         \
+    {                                                                             \
+        m_value = ::scl::forward_like<self_type cv_ref>(other.m_value);           \
+        return *this;                                                             \
+    }
+
+#define SCL_EXECUTOR_ASSIGNMENT_FOR_SELF                         \
+    SCL_EXECUTOR_ASSIGNMENT_FOR_SELF_PROTOTYPE(&)                \
+    SCL_EXECUTOR_ASSIGNMENT_FOR_SELF_PROTOTYPE(const &)          \
+    SCL_EXECUTOR_ASSIGNMENT_FOR_SELF_PROTOTYPE(volatile &)       \
+    SCL_EXECUTOR_ASSIGNMENT_FOR_SELF_PROTOTYPE(const volatile &) \
+    SCL_EXECUTOR_ASSIGNMENT_FOR_SELF_PROTOTYPE(&&)               \
+    SCL_EXECUTOR_ASSIGNMENT_FOR_SELF_PROTOTYPE(const &&)         \
+    SCL_EXECUTOR_ASSIGNMENT_FOR_SELF_PROTOTYPE(volatile &&)      \
+    SCL_EXECUTOR_ASSIGNMENT_FOR_SELF_PROTOTYPE(const volatile &&)
+
 namespace scl::feature::inplace
 {
     /**
@@ -47,7 +66,7 @@ namespace scl::feature::inplace
      *    wrapper<int, feature::inplace::plain> w{42};
      * @endcode
      */
-    // NOLINTBEGIN(cppcoreguidelines-special-member-functions, cppcoreguidelines-missing-std-forward)
+    // NOLINTBEGIN(cppcoreguidelines-special-member-functions, cppcoreguidelines-missing-std-forward, cppcoreguidelines-c-copy-assignment-signature)
     template <typename Value>
     class plain
     {
@@ -63,6 +82,7 @@ namespace scl::feature::inplace
         {}
 
         SCL_EXECUTOR_CONSTRUCTOR_FOR_SELF
+        SCL_EXECUTOR_ASSIGNMENT_FOR_SELF
 
     public:
         template <typename Self, typename Func, typename... Args>
@@ -82,8 +102,10 @@ namespace scl::feature::inplace
     private:
         value_type m_value;
     };
-    // NOLINTEND(cppcoreguidelines-special-member-functions, cppcoreguidelines-missing-std-forward)
+    // NOLINTEND(cppcoreguidelines-special-member-functions, cppcoreguidelines-missing-std-forward, cppcoreguidelines-c-copy-assignment-signature)
 } // namespace scl::feature::inplace
 
 #undef SCL_EXECUTOR_CONSTRUCTOR_FOR_SELF
 #undef SCL_EXECUTOR_CONSTRUCTOR_FOR_SELF_PROTOTYPE
+#undef SCL_EXECUTOR_ASSIGNMENT_FOR_SELF
+#undef SCL_EXECUTOR_ASSIGNMENT_FOR_SELF_PROTOTYPE
