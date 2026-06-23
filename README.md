@@ -71,11 +71,15 @@ or deferred invocation without modifying the wrapped type. Licensed under [The U
     `Executor::execute`), and an *explicit-template-args* overload; the first two are mutually
     exclusive — at most 16 are active per executor; each overload is constrained so only
     overloads that actually exist on the wrapped type are exposed
-- **Constructor macros** (`scl/feature/detail/wrapper_constructors.h`):
+- **Constructor and assignment macros** (`scl/feature/detail/wrapper_constructors.h`):
   - `SCL_WRAPPER_CONSTRUCTOR_FOR_SELF` — expands to eight constructors (all cv-ref
     qualifications of `self_type`) that forward through the executor
   - `SCL_WRAPPER_CONSTRUCTOR_FOR_OTHER` — single forwarding-reference constructor for any
     other wrapper type; uses `wrapper_constructor_resolver` for strategy-based construction
+  - `SCL_WRAPPER_ASSIGNMENT_FOR_SELF` — eight assignment operators for all cv-ref
+    qualifications of `self_type`; delegates to the executor's `operator=`
+  - `SCL_WRAPPER_ASSIGNMENT_FOR_OTHER` — forwarding-reference assignment for any other
+    compatible wrapper type; uses `wrapper_constructor_resolver` to select the source value
 
 ## Requirements
 

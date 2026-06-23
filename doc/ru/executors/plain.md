@@ -35,6 +35,11 @@ struct plain
     // Немедленно вызывает func(args...) и возвращает результат.
     template <typename Self, typename Func, typename... Args>
     static constexpr decltype(auto) execute(Self && self, Func && func, Args &&... args);
+
+    // Присваивание (копирование и перемещение) — 8 перегрузок по одной на
+    // каждую cv-ref квалификацию. Каждая ограничена на присваиваемость T
+    // и noexcept когда присваивание T noexcept.
+    constexpr plain & operator=(plain cv_ref other);  // × 8 cv-ref квалификаций
 };
 ```
 

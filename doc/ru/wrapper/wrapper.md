@@ -49,6 +49,28 @@ template <typename Other>
 constexpr wrapper(Other && other);
 ```
 
+## Операторы присваивания
+
+```cpp
+// Копирование/перемещение из того же типа wrapper (все 8 cv-ref квалификаций).
+// Генерируется макросом SCL_WRAPPER_ASSIGNMENT_FOR_SELF.
+// Ограничен на присваиваемость executor_type из executor_type cv_ref.
+// noexcept когда присваивание исполнителя noexcept.
+constexpr wrapper & operator=(wrapper cv_ref other);  // × 8
+
+// Конвертирующее присваивание из любого другого типа wrapper.
+// Генерируется макросом SCL_WRAPPER_ASSIGNMENT_FOR_OTHER.
+// Использует wrapper_constructor_resolver для выбора источника значения.
+// Ограничен на присваиваемость executor_type из разрешённого значения.
+template <typename Other>
+constexpr wrapper & operator=(Other && other);
+```
+
+Явно объявленные конструкторы (`SCL_WRAPPER_CONSTRUCTOR_FOR_SELF`) подавляют
+неявно сгенерированные операторы копирующего и перемещающего присваивания.
+Эти макросы восстанавливают данную функциональность для всех восьми
+cv-ref квалификаций.
+
 ## Доступ к исполнителю
 
 Член-исполнитель приватный; доступ осуществляется через

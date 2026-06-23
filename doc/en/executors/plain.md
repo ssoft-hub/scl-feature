@@ -35,6 +35,11 @@ struct plain
     // Invokes func(args...) immediately and returns the result.
     template <typename Self, typename Func, typename... Args>
     static constexpr decltype(auto) execute(Self && self, Func && func, Args &&... args);
+
+    // Copy and move assignment — 8 overloads, one per cv-ref qualification.
+    // Each overload is constrained on T being assignable from the corresponding
+    // qualification of T and is noexcept when the underlying assignment is.
+    constexpr plain & operator=(plain cv_ref other);  // × 8 cv-ref qualifications
 };
 ```
 
