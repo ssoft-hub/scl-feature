@@ -40,6 +40,11 @@ struct uninitialized
     // Invokes func(args...) immediately and returns the result.
     template <typename Self, typename Func, typename... Args>
     static constexpr decltype(auto) execute(Self && self, Func && func, Args &&... args);
+
+    // Raw-storage copy — 8 overloads, one per cv-ref qualification.
+    // Copies the underlying bytes via std::ranges::copy regardless of whether T
+    // has been constructed. Does not call T's assignment operator.
+    constexpr uninitialized & operator=(uninitialized cv_ref other);  // × 8
 };
 ```
 

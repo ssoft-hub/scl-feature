@@ -12,7 +12,7 @@
 
 namespace scl::feature::detail
 {
-    // NOLINTBEGIN(cppcoreguidelines-special-member-functions)
+    // NOLINTBEGIN(cppcoreguidelines-special-member-functions, cppcoreguidelines-c-copy-assignment-signature)
     template <typename Value, template <typename> class Executor>
         requires ::scl::feature::concepts::executor<Executor<Value>>
     class wrapper
@@ -45,9 +45,11 @@ namespace scl::feature::detail
         SCL_WRAPPER_CONSTRUCTOR_FOR_SELF // NOLINT(performance-noexcept-move-constructor)
         // cppcheck-suppress noExplicitConstructor
         SCL_WRAPPER_CONSTRUCTOR_FOR_OTHER
+        SCL_WRAPPER_ASSIGNMENT_FOR_SELF
+        SCL_WRAPPER_ASSIGNMENT_FOR_OTHER
         // clang-format on
     };
-    // NOLINTEND(cppcoreguidelines-special-member-functions)
+    // NOLINTEND(cppcoreguidelines-special-member-functions, cppcoreguidelines-c-copy-assignment-signature)
 } // namespace scl::feature::detail
 
 /// @brief @c executor_trait specialization for @c detail::wrapper.

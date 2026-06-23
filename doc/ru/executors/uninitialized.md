@@ -39,6 +39,11 @@ struct uninitialized
     // Немедленно вызывает func(args...) и возвращает результат.
     template <typename Self, typename Func, typename... Args>
     static constexpr decltype(auto) execute(Self && self, Func && func, Args &&... args);
+
+    // Побайтовое копирование хранилища — 8 перегрузок на cv-ref квалификацию.
+    // Копирует байты через std::ranges::copy вне зависимости от того,
+    // был ли T сконструирован. Оператор присваивания T не вызывается.
+    constexpr uninitialized & operator=(uninitialized cv_ref other);  // × 8
 };
 ```
 

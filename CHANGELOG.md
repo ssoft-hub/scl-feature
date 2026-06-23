@@ -8,6 +8,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Assignment operators for `inplace::plain` — eight cv-ref overloads via
+  `SCL_EXECUTOR_ASSIGNMENT_FOR_SELF`; constrained on `assignable_from<value_type>`, `noexcept`-propagating,
+  value forwarded with `scl::forward_like`
+- Assignment operators for `inplace::uninitialized` — eight cv-ref overloads via
+  `SCL_EXECUTOR_ASSIGNMENT_FOR_SELF`; copies raw storage bytes via `std::ranges::copy`,
+  constrained (together with the copy/move constructor) to `std::is_trivially_copyable_v`
+  value types — byte-copying a non-trivially-copyable object is undefined behaviour
+- Assignment operators for `scl::wrapper` — eight self-type cv-ref overloads
+  (`SCL_WRAPPER_ASSIGNMENT_FOR_SELF`) plus a forwarding-reference overload for compatible
+  wrapper types (`SCL_WRAPPER_ASSIGNMENT_FOR_OTHER`)
 - `scl::wrapper_lock<Refer>` — lazy RAII lock for a single wrapper layer; `lock()`/`unlock()`
   call `guard()`/`unguard()` on the executor; non-copyable and non-movable
 - `scl::value_lock<Refer>` — recursive lazy lock through the entire wrapper chain; captures

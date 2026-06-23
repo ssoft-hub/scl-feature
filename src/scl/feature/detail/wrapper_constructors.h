@@ -48,3 +48,40 @@
                 decltype(::std::declval<wrapper_constructor_resolver<self_type, Other &&>>().resolve())>)           \
         : m_executor{wrapper_constructor_resolver<self_type, Other &&>{::std::forward<Other>(other)}.resolve()}     \
     {}
+
+/// @internal
+/// @brief Generates one assignment operator for `self_type cv_ref` source.
+#define SCL_WRAPPER_ASSIGNMENT_FOR_SELF_PROTOTYPE(cv_ref)                               \
+    constexpr wrapper & operator=(self_type cv_ref other) /**/                          \
+        noexcept(::std::is_nothrow_assignable_v<executor_type &, executor_type cv_ref>) \
+        requires(::std::assignable_from<executor_type &, executor_type cv_ref>)         \
+    {                                                                                   \
+        m_executor = ::scl::forward_like<self_type cv_ref>(other.m_executor);           \
+        return *this;                                                                   \
+    }
+
+/// @internal
+/// @brief Expands to assignment operators for all eight cv-ref qualifications of `self_type`.
+#define SCL_WRAPPER_ASSIGNMENT_FOR_SELF                         \
+    SCL_WRAPPER_ASSIGNMENT_FOR_SELF_PROTOTYPE(&)                \
+    SCL_WRAPPER_ASSIGNMENT_FOR_SELF_PROTOTYPE(const &)          \
+    SCL_WRAPPER_ASSIGNMENT_FOR_SELF_PROTOTYPE(volatile &)       \
+    SCL_WRAPPER_ASSIGNMENT_FOR_SELF_PROTOTYPE(const volatile &) \
+    SCL_WRAPPER_ASSIGNMENT_FOR_SELF_PROTOTYPE(&&)               \
+    SCL_WRAPPER_ASSIGNMENT_FOR_SELF_PROTOTYPE(const &&)         \
+    SCL_WRAPPER_ASSIGNMENT_FOR_SELF_PROTOTYPE(volatile &&)      \
+    SCL_WRAPPER_ASSIGNMENT_FOR_SELF_PROTOTYPE(const volatile &&)
+
+/// @internal
+/// @brief Single forwarding-reference assignment for any other wrapper type.
+#define SCL_WRAPPER_ASSIGNMENT_FOR_OTHER                                                                            \
+    template <typename Other>                                                                                       \
+    constexpr wrapper & operator=(Other && other) /**/                                                              \
+        noexcept(noexcept(::std::declval<wrapper_constructor_resolver<self_type, Other &&>>().resolve()))           \
+        requires(::scl::feature::is_wrapper_v<Other> && !::std::same_as<::std::remove_cvref_t<Other>, self_type> && \
+            ::std::assignable_from<executor_type &,                                                                 \
+                decltype(::std::declval<wrapper_constructor_resolver<self_type, Other &&>>().resolve())>)           \
+    {                                                                                                               \
+        m_executor = wrapper_constructor_resolver<self_type, Other &&>{::std::forward<Other>(other)}.resolve();     \
+        return *this;                                                                                               \
+    }
