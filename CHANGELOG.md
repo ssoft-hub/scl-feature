@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- `SCL_REFLECT_MEMBER_BINARY_OPERATOR(op, name)`, `SCL_REFLECT_MEMBER_PREFIX_UNARY_OPERATOR`,
+  `SCL_REFLECT_MEMBER_POSTFIX_UNARY_OPERATOR` — member-only operator reflection; required for
+  operators C++ mandates as non-static member functions (`=`, `->`, compound assigns)
+- `SCL_REFLECT_FRIEND_BINARY_OPERATOR(op, name)`, `SCL_REFLECT_FRIEND_PREFIX_UNARY_OPERATOR`,
+  `SCL_REFLECT_FRIEND_POSTFIX_UNARY_OPERATOR` — hidden-friend (ADL-only) operator reflection
+  with no member counterpart; the wrapper is the explicit first parameter
 - Assignment operators for `inplace::plain` — eight cv-ref overloads via
   `SCL_EXECUTOR_ASSIGNMENT_FOR_SELF`; constrained on `assignable_from<value_type>`, `noexcept`-propagating,
   value forwarded with `scl::forward_like`
@@ -42,6 +48,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- `SCL_REFLECT_BINARY_OPERATOR` — now emits the 24 member overloads (wrapper-left) plus 8
+  reverse-operand hidden-friend overloads (wrapper-right, `x op w`), making the reflected
+  operator symmetric; the reverse friend is constrained out when the left operand is itself a
+  wrapper (`is_wrapper_v`), so `w1 op w2` stays unambiguous. The reverse direction has no
+  executor-override path but still routes through `Executor::execute`
+- `SCL_REFLECT_PREFIX_UNARY_OPERATOR`, `SCL_REFLECT_POSTFIX_UNARY_OPERATOR` — emit member
+  overloads only (a unary operator has no reverse-operand case); use `SCL_REFLECT_FRIEND_*`
+  for an ADL-only unary operator
+- `reflect_operators` — `operator=`, `operator->`, and all compound-assignment operators
+  switched to `SCL_REFLECT_MEMBER_BINARY_OPERATOR` / `SCL_REFLECT_MEMBER_PREFIX_UNARY_OPERATOR`
+  to comply with the C++ requirement that these operators be non-static member functions
 - `scl::feature::wrapper_guard` alias moved to `scl::wrapper_guard`
 - `scl::wrapper`: Executor template parameter is now constrained with `concepts::executor`
 - `scl::wrapper`: executor member marked `[[no_unique_address]]`
