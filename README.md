@@ -71,6 +71,18 @@ or deferred invocation without modifying the wrapped type. Licensed under [The U
     `Executor::execute`), and an *explicit-template-args* overload; the first two are mutually
     exclusive — at most 16 are active per executor; each overload is constrained so only
     overloads that actually exist on the wrapped type are exposed
+  - `SCL_REFLECT_BINARY_OPERATOR(op, name)` — generates 24 member overloads (wrapper-left,
+    `w op x`) plus 8 reverse-operand hidden-friend overloads (wrapper-right, `x op w`), making
+    the reflected operator symmetric; the reverse friend is constrained out when the left
+    operand is itself a wrapper
+  - `SCL_REFLECT_PREFIX_UNARY_OPERATOR` / `SCL_REFLECT_POSTFIX_UNARY_OPERATOR` — member-only
+    (a unary operator has no reverse-operand case)
+  - `SCL_REFLECT_MEMBER_BINARY_OPERATOR(op, name)` / `SCL_REFLECT_MEMBER_PREFIX_UNARY_OPERATOR`
+    / `SCL_REFLECT_MEMBER_POSTFIX_UNARY_OPERATOR` — member-only; required for operators C++
+    mandates as non-static member functions (`=`, `->`, compound assigns)
+  - `SCL_REFLECT_FRIEND_BINARY_OPERATOR(op, name)` / `SCL_REFLECT_FRIEND_PREFIX_UNARY_OPERATOR`
+    / `SCL_REFLECT_FRIEND_POSTFIX_UNARY_OPERATOR` — hidden-friend (ADL-only) only, no member
+    counterpart; the wrapper is the explicit first parameter
 - **Constructor and assignment macros** (`scl/feature/detail/wrapper_constructors.h`):
   - `SCL_WRAPPER_CONSTRUCTOR_FOR_SELF` — expands to eight constructors (all cv-ref
     qualifications of `self_type`) that forward through the executor
