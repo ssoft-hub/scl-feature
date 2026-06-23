@@ -429,3 +429,107 @@ TEST(ReflectOperator, NoexceptNotPropagatedWhenNoExecutorOverride)
     WrappedNx const w{1};
     STATIC_EXPECT_FALSE(noexcept(w - 1));
 }
+
+// ============================================================================
+// Reverse-operand (wrapper-right) tests for SCL_REFLECT_BINARY_OPERATOR
+//
+// SymTarget has BOTH a member operator+ (enables wrapper-left `w + x`) and a free
+// hidden friend operator+(int, SymTarget) (enables wrapper-right `x + w`).  Distinct
+// return types prove which path ran:
+//   w + 5  → member  → short
+//   5 + w  → reverse → long   (+1000 marker)
+// ============================================================================
+
+struct SymTarget
+{
+    int value = 0;
+
+    // Member: wrapper-left  (distinct return types per cv-ref for SCL_HAS_QUALIFIED_*)
+    constexpr short operator+(int rhs) & { return static_cast<short>(value + rhs); }
+    constexpr int operator+(int rhs) const & { return value + rhs + 50; }
+
+    // Free hidden friend: wrapper-right reverse path, distinct return type + marker
+    friend constexpr long operator+(int lhs, SymTarget const & self)
+    {
+        return static_cast<long>(lhs + self.value + 1000);
+    }
+};
+
+struct SymExecutor
+{
+    SymTarget m_value;
+
+    template <typename Self, typename Func, typename... Args>
+    static constexpr decltype(auto) execute(Self &&, Func && func, Args &&... args)
+    {
+        return ::std::forward<Func>(func)(::std::forward<Args>(args)...);
+    }
+
+    template <typename Self>
+    static constexpr decltype(auto) value(Self && self)
+    {
+        return ::scl::forward_like<Self>(self.m_value);
+    }
+};
+
+struct SymWrapped;
+
+template <>
+struct scl::feature::executor_trait<SymWrapped>
+{
+    template <typename Self>
+    static constexpr decltype(auto) executor(Self && self)
+    {
+        return ::scl::forward_like<Self>(self.m_exec);
+    }
+};
+
+struct SymWrapped
+{
+    SymExecutor m_exec;
+
+    SCL_REFLECT_TYPE(SymWrapped, SymExecutor);
+
+    constexpr explicit SymWrapped(int v)
+        : m_exec{SymTarget{v}}
+    {}
+
+    SCL_REFLECT_BINARY_OPERATOR(+, op_add)
+};
+
+template <typename Lhs, typename Rhs>
+constexpr bool sym_can_add_v = requires { ::std::declval<Lhs>() + ::std::declval<Rhs>(); };
+
+TEST(ReflectReverseOperator, WrapperLeftCallsMember)
+{
+    SymWrapped w{10};
+    auto result = w + 5;
+    static_assert(::std::same_as<decltype(result), short>, "wrapper-left must use the member overload");
+    EXPECT_EQ(result, static_cast<short>(15));
+}
+
+TEST(ReflectReverseOperator, WrapperRightCallsReverseFriend)
+{
+    SymWrapped w{10};
+    auto result = 5 + w;
+    static_assert(::std::same_as<decltype(result), long>, "wrapper-right must use the reverse friend");
+    EXPECT_EQ(result, 1015L); // 5 + 10 + 1000
+}
+
+TEST(ReflectReverseOperator, ReverseFriendIsAdlFound)
+{
+    // Both directions resolve, through different overload sets.
+    STATIC_EXPECT_TRUE((sym_can_add_v<int, SymWrapped &>)); // reverse friend
+    STATIC_EXPECT_TRUE((sym_can_add_v<SymWrapped &, int>)); // member
+    // The reverse friend reflects `lhs + value`, not the wrapper itself.
+    STATIC_EXPECT_FALSE((::std::same_as<decltype(5 + ::std::declval<SymWrapped &>()),
+        decltype(::std::declval<SymWrapped &>() + 5)>));
+}
+
+TEST(ReflectReverseOperator, WrapperLhsUsesMemberNotReverseFriend)
+{
+    // For w1 + w2 the reverse friend is constrained out (lhs is a wrapper); since
+    // SymTarget has no operator+(SymTarget) the whole expression is ill-formed —
+    // i.e. the reverse friend does not silently hijack wrapper-on-the-left calls.
+    STATIC_EXPECT_FALSE((sym_can_add_v<SymWrapped &, SymWrapped &>));
+}
