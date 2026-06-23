@@ -100,7 +100,7 @@ struct WrappedTarget
     SCL_REFLECT_POSTFIX_UNARY_OPERATOR(++, op_postinc)
 
     // Member: operator=
-    SCL_REFLECT_BINARY_OPERATOR(=, op_assign)
+    SCL_REFLECT_MEMBER_BINARY_OPERATOR(=, op_assign)
 
     // Member: operator[]
     SCL_REFLECT_OPERATOR_WITH_ARGUMENTS([], op_subscript)

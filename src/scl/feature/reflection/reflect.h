@@ -83,7 +83,7 @@ namespace scl::feature
     ///
     /// @tparam Wrapper   The outermost wrapper type (CRTP).
     /// @tparam Executor  The executor instantiation for @p Wrapper.
-    // NOLINTBEGIN(readability-function-cognitive-complexity, readability-inconsistent-ifelse-braces, cppcoreguidelines-missing-std-forward)
+    // NOLINTBEGIN(readability-function-cognitive-complexity, readability-inconsistent-ifelse-braces, cppcoreguidelines-missing-std-forward, cppcoreguidelines-rvalue-reference-param-not-moved)
     template <typename Wrapper, typename Executor>
     class reflect_operators
     {
@@ -93,7 +93,7 @@ namespace scl::feature
         SCL_REFLECT_PREFIX_UNARY_OPERATOR(&, address_of)
         SCL_REFLECT_PREFIX_UNARY_OPERATOR(*, indirection)
         SCL_REFLECT_OPERATOR_WITH_ARGUMENTS(->*, arrow_to_pointer)
-        SCL_REFLECT_PREFIX_UNARY_OPERATOR(->, arrow)
+        SCL_REFLECT_MEMBER_PREFIX_UNARY_OPERATOR(->, arrow)
 
         SCL_REFLECT_BINARY_OPERATOR(SCL_FORWARD(, ), comma)
         SCL_REFLECT_OPERATOR_WITH_ARGUMENTS([], subscript)
@@ -132,18 +132,18 @@ namespace scl::feature
         SCL_REFLECT_BINARY_OPERATOR(&&, logical_and)
         SCL_REFLECT_BINARY_OPERATOR(||, logical_or)
 
-        SCL_REFLECT_BINARY_OPERATOR(=, assign) // NOLINT(cppcoreguidelines-c-copy-assignment-signature)
-        SCL_REFLECT_BINARY_OPERATOR(*=, multiply_assign)
-        SCL_REFLECT_BINARY_OPERATOR(/=, divide_assign)
-        SCL_REFLECT_BINARY_OPERATOR(%=, modulo_assign)
-        SCL_REFLECT_BINARY_OPERATOR(+=, plus_assign)
-        SCL_REFLECT_BINARY_OPERATOR(-=, minus_assign)
-        SCL_REFLECT_BINARY_OPERATOR(<<=, left_shift_assign)
-        SCL_REFLECT_BINARY_OPERATOR(>>=, right_shift_assign)
-        SCL_REFLECT_BINARY_OPERATOR(&=, bitwise_and_assign)
-        SCL_REFLECT_BINARY_OPERATOR(|=, bitwise_or_assign)
-        SCL_REFLECT_BINARY_OPERATOR(^=, bitwise_xor_assign)
+        SCL_REFLECT_MEMBER_BINARY_OPERATOR(=, assign) // NOLINT(cppcoreguidelines-c-copy-assignment-signature)
+        SCL_REFLECT_MEMBER_BINARY_OPERATOR(*=, multiply_assign)
+        SCL_REFLECT_MEMBER_BINARY_OPERATOR(/=, divide_assign)
+        SCL_REFLECT_MEMBER_BINARY_OPERATOR(%=, modulo_assign)
+        SCL_REFLECT_MEMBER_BINARY_OPERATOR(+=, plus_assign)
+        SCL_REFLECT_MEMBER_BINARY_OPERATOR(-=, minus_assign)
+        SCL_REFLECT_MEMBER_BINARY_OPERATOR(<<=, left_shift_assign)
+        SCL_REFLECT_MEMBER_BINARY_OPERATOR(>>=, right_shift_assign)
+        SCL_REFLECT_MEMBER_BINARY_OPERATOR(&=, bitwise_and_assign)
+        SCL_REFLECT_MEMBER_BINARY_OPERATOR(|=, bitwise_or_assign)
+        SCL_REFLECT_MEMBER_BINARY_OPERATOR(^=, bitwise_xor_assign)
     };
-    // NOLINTEND(readability-function-cognitive-complexity, readability-inconsistent-ifelse-braces, cppcoreguidelines-missing-std-forward)
+    // NOLINTEND(readability-function-cognitive-complexity, readability-inconsistent-ifelse-braces, cppcoreguidelines-missing-std-forward, cppcoreguidelines-rvalue-reference-param-not-moved)
 
 } // namespace scl::feature
