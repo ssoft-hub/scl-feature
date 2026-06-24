@@ -2,17 +2,34 @@
 
 /**
  * @file
- * @brief Aggregates all ScL Feature executor headers.
+ * @brief ScL Feature built-in executor implementations.
+ * @ingroup scl_feature_executors
+ * @details This header aggregates all ScL Feature built-in executor types.
  */
 
 /**
  * @defgroup scl_feature_executors ScL Feature Executors
- * @brief Pluggable executor strategies for scl::feature::wrapper.
+ * @brief Built-in executor strategies for @c scl::wrapper.
+ *
+ * @details
+ * An executor is a class template that controls how the wrapper stores the
+ * held value and dispatches method calls to it.  Each executor must provide
+ * two static member function templates:
+ *
+ * - @c execute(self, func, args...) — runs @p func with @p args and returns
+ *   its result; may add cross-cutting behaviour around the call.
+ * - @c value(self) — returns a reference to the held value, propagating
+ *   the cv-ref qualifiers of @p self.
+ *
+ * | Executor | Storage | Overhead |
+ * |----------|---------|----------|
+ * | @c scl::feature::inplace::plain | in-place, direct | none |
+ * | @c scl::feature::inplace::uninitialized | in-place, raw aligned storage | none |
  * @{
  */
 
-#include <scl/feature/heap/indirect.h>
 #include <scl/feature/inplace/plain.h>
 #include <scl/feature/inplace/uninitialized.h>
 
+#include <scl/feature/heap/indirect.h>
 /** @} */ // end of group scl_feature_executors

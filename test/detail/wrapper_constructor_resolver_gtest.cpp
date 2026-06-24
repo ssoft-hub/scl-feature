@@ -1,18 +1,10 @@
-#include <gtest/gtest.h>
+#include <gtest_utils.h>
 
 #include <scl/feature/detail/wrapper_constructor_resolver.h>
 #include <scl/feature/inplace/plain.h>
 #include <scl/feature/wrapper.h>
 
 #include <memory>
-
-#define TEST_EXPECT_TRUE(X) \
-    static_assert(X, #X);   \
-    EXPECT_TRUE(X);
-
-#define TEST_EXPECT_FALSE(X) \
-    static_assert(!(X), #X); \
-    EXPECT_FALSE(X);
 
 using namespace ::scl;
 
@@ -40,25 +32,25 @@ using W_double = fd::wrapper<double, feature::inplace::plain>;
 
 TEST(WrapperConstructorResolverStrategy1, ReturnType)
 {
-    TEST_EXPECT_TRUE((::std::is_same_v<W::executor_type &,
+    STATIC_EXPECT_TRUE((::std::is_same_v<W::executor_type &,
         decltype(::std::declval<fd::wrapper_constructor_resolver<W, W &>>().resolve())>));
 }
 
 TEST(WrapperConstructorResolverStrategy1, ConstReturnType)
 {
-    TEST_EXPECT_TRUE((::std::is_same_v<W::executor_type const &,
+    STATIC_EXPECT_TRUE((::std::is_same_v<W::executor_type const &,
         decltype(::std::declval<fd::wrapper_constructor_resolver<W, W const &>>().resolve())>));
 }
 
 TEST(WrapperConstructorResolverStrategy1, VolatileReturnType)
 {
-    TEST_EXPECT_TRUE((::std::is_same_v<W::executor_type volatile &,
+    STATIC_EXPECT_TRUE((::std::is_same_v<W::executor_type volatile &,
         decltype(::std::declval<fd::wrapper_constructor_resolver<W, W volatile &>>().resolve())>));
 }
 
 TEST(WrapperConstructorResolverStrategy1, ConstVolatileReturnType)
 {
-    TEST_EXPECT_TRUE((::std::is_same_v<W::executor_type const volatile &,
+    STATIC_EXPECT_TRUE((::std::is_same_v<W::executor_type const volatile &,
         decltype(::std::declval<fd::wrapper_constructor_resolver<W, W const volatile &>>().resolve())>));
 }
 
@@ -69,7 +61,7 @@ TEST(WrapperConstructorResolverStrategy1, Value)
         fd::wrapper_constructor_resolver<W, W &> r{src};
         return W::executor_type::value(r.resolve()) == 42;
     }();
-    TEST_EXPECT_TRUE(result);
+    STATIC_EXPECT_TRUE(result);
 }
 
 TEST(WrapperConstructorResolverStrategy1, SameObject)
@@ -80,7 +72,7 @@ TEST(WrapperConstructorResolverStrategy1, SameObject)
         W::executor_type::value(r.resolve()) = 99;
         return W::executor_type::value(fd::executor_access::get(src)) == 99;
     }();
-    TEST_EXPECT_TRUE(result);
+    STATIC_EXPECT_TRUE(result);
 }
 
 // ---------------------------------------------------------------------------
@@ -91,7 +83,7 @@ TEST(WrapperConstructorResolverStrategy1, SameObject)
 TEST(WrapperConstructorResolverStrategy2, ReturnType)
 {
     // WW wraps W, so W is compatible with the inner part of WW
-    TEST_EXPECT_TRUE((::std::is_same_v<W &,
+    STATIC_EXPECT_TRUE((::std::is_same_v<W &,
         decltype(::std::declval<fd::wrapper_constructor_resolver<WW, W &>>().resolve())>));
 }
 
@@ -102,7 +94,7 @@ TEST(WrapperConstructorResolverStrategy2, SameObject)
         fd::wrapper_constructor_resolver<WW, W &> r{src};
         return ::std::addressof(r.resolve()) == ::std::addressof(src);
     }();
-    TEST_EXPECT_TRUE(result);
+    STATIC_EXPECT_TRUE(result);
 }
 
 // ---------------------------------------------------------------------------
@@ -113,7 +105,7 @@ TEST(WrapperConstructorResolverStrategy2, SameObject)
 // left = W, right = WW (WW wraps W → strategy 3 peels WW → inner W → strategy 1)
 TEST(WrapperConstructorResolverStrategy3, ReturnType)
 {
-    TEST_EXPECT_TRUE((::std::is_same_v<W::executor_type &,
+    STATIC_EXPECT_TRUE((::std::is_same_v<W::executor_type &,
         decltype(::std::declval<fd::wrapper_constructor_resolver<W, WW &>>().resolve())>));
 }
 
@@ -124,13 +116,13 @@ TEST(WrapperConstructorResolverStrategy3, Value)
         fd::wrapper_constructor_resolver<W, WW &> r{src};
         return W::executor_type::value(r.resolve()) == 42;
     }();
-    TEST_EXPECT_TRUE(result);
+    STATIC_EXPECT_TRUE(result);
 }
 
 // Incompatible wrapper (W_double, W): strategy 3 peels W → inner plain<int>& → strategy 4 → int&
 TEST(WrapperConstructorResolverStrategy3, IncompatibleWrapperPeelsToInnerValue)
 {
-    TEST_EXPECT_TRUE((::std::is_same_v<int &,
+    STATIC_EXPECT_TRUE((::std::is_same_v<int &,
         decltype(::std::declval<fd::wrapper_constructor_resolver<W_double, W &>>().resolve())>));
 }
 
@@ -140,25 +132,25 @@ TEST(WrapperConstructorResolverStrategy3, IncompatibleWrapperPeelsToInnerValue)
 
 TEST(WrapperConstructorResolverStrategy4, ReturnType)
 {
-    TEST_EXPECT_TRUE((::std::is_same_v<int &,
+    STATIC_EXPECT_TRUE((::std::is_same_v<int &,
         decltype(::std::declval<fd::wrapper_constructor_resolver<W, int &>>().resolve())>));
 }
 
 TEST(WrapperConstructorResolverStrategy4, ConstReturnType)
 {
-    TEST_EXPECT_TRUE((::std::is_same_v<int const &,
+    STATIC_EXPECT_TRUE((::std::is_same_v<int const &,
         decltype(::std::declval<fd::wrapper_constructor_resolver<W, int const &>>().resolve())>));
 }
 
 TEST(WrapperConstructorResolverStrategy4, VolatileReturnType)
 {
-    TEST_EXPECT_TRUE((::std::is_same_v<int volatile &,
+    STATIC_EXPECT_TRUE((::std::is_same_v<int volatile &,
         decltype(::std::declval<fd::wrapper_constructor_resolver<W, int volatile &>>().resolve())>));
 }
 
 TEST(WrapperConstructorResolverStrategy4, ConstVolatileReturnType)
 {
-    TEST_EXPECT_TRUE((::std::is_same_v<int const volatile &,
+    STATIC_EXPECT_TRUE((::std::is_same_v<int const volatile &,
         decltype(::std::declval<fd::wrapper_constructor_resolver<W, int const volatile &>>().resolve())>));
 }
 
@@ -169,7 +161,7 @@ TEST(WrapperConstructorResolverStrategy4, SameObject)
         fd::wrapper_constructor_resolver<W, int &> r{x};
         return ::std::addressof(r.resolve()) == ::std::addressof(x);
     }();
-    TEST_EXPECT_TRUE(result);
+    STATIC_EXPECT_TRUE(result);
 }
 
 // ---------------------------------------------------------------------------
@@ -179,7 +171,7 @@ TEST(WrapperConstructorResolverStrategy4, SameObject)
 
 TEST(WrapperConstructorResolverDeepRecursion, ReturnType)
 {
-    TEST_EXPECT_TRUE((::std::is_same_v<W::executor_type &,
+    STATIC_EXPECT_TRUE((::std::is_same_v<W::executor_type &,
         decltype(::std::declval<fd::wrapper_constructor_resolver<W, WWW &>>().resolve())>));
 }
 
@@ -190,7 +182,7 @@ TEST(WrapperConstructorResolverDeepRecursion, Value)
         fd::wrapper_constructor_resolver<W, WWW &> r{src};
         return W::executor_type::value(r.resolve()) == 42;
     }();
-    TEST_EXPECT_TRUE(result);
+    STATIC_EXPECT_TRUE(result);
 }
 
 // ---------------------------------------------------------------------------
@@ -200,7 +192,7 @@ TEST(WrapperConstructorResolverDeepRecursion, Value)
 TEST(GuardedWrapperConstructorResolver, PeelsOneLayer)
 {
     // left = W, right = WW& → inner = W& → strategy 1 → plain<int>&
-    TEST_EXPECT_TRUE((::std::is_same_v<W::executor_type &,
+    STATIC_EXPECT_TRUE((::std::is_same_v<W::executor_type &,
         decltype(::std::declval<fd::guarded_wrapper_constructor_resolver<W, WW &>>().resolve())>));
 }
 
@@ -211,12 +203,12 @@ TEST(GuardedWrapperConstructorResolver, Value)
         fd::guarded_wrapper_constructor_resolver<W, WW &> r{src};
         return W::executor_type::value(r.resolve()) == 42;
     }();
-    TEST_EXPECT_TRUE(result);
+    STATIC_EXPECT_TRUE(result);
 }
 
 TEST(GuardedWrapperConstructorResolver, DeepRecursion)
 {
     // left = W, right = WWW& → peel two layers → plain<int>&
-    TEST_EXPECT_TRUE((::std::is_same_v<W::executor_type &,
+    STATIC_EXPECT_TRUE((::std::is_same_v<W::executor_type &,
         decltype(::std::declval<fd::guarded_wrapper_constructor_resolver<W, WWW &>>().resolve())>));
 }

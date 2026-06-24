@@ -1,6 +1,7 @@
 # Reserved path
 /bin
 /build
+/doc/doxygen
 
 # C++ objects and libs
 *.d

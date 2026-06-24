@@ -1,17 +1,9 @@
-#include <gtest/gtest.h>
+#include <gtest_utils.h>
 
 #include <scl/feature/wrapper.h>
 #include <scl/feature/wrapper_guard.h>
 
-#include <string>
-
-#define TEST_EXPECT_TRUE(X) \
-    static_assert(X, #X);   \
-    EXPECT_TRUE(X);
-
-#define TEST_EXPECT_FALSE(X) \
-    static_assert(!(X), #X); \
-    EXPECT_FALSE(X);
+#include <string_view>
 
 using namespace ::scl;
 
@@ -34,6 +26,12 @@ struct counting_executor
         : m_value{v}
         , m_counters{counters}
     {}
+
+    template <typename Self, typename Func, typename... Args>
+    static constexpr decltype(auto) execute(Self && self, Func && func, Args &&... args)
+    {
+        return ::std::invoke(::std::forward<Func>(func), ::std::forward<Args>(args)...);
+    }
 
     template <typename Self>
     static constexpr decltype(auto) value(Self && self)
@@ -66,42 +64,42 @@ struct counting_executor
 
 TEST(WrapperGuardValue, NotCopyable)
 {
-    TEST_EXPECT_FALSE(std::is_copy_constructible_v<feature::wrapper_guard<int &>>);
+    STATIC_EXPECT_FALSE(::std::is_copy_constructible_v<wrapper_guard<int &>>);
 }
 
 TEST(WrapperGuardValue, NotMovable)
 {
-    TEST_EXPECT_FALSE(std::is_move_constructible_v<feature::wrapper_guard<int &>>);
+    STATIC_EXPECT_FALSE(::std::is_move_constructible_v<wrapper_guard<int &>>);
 }
 
 TEST(WrapperGuardValue, HoldsIntRef)
 {
     constexpr auto result = [] {
         int x = 42;
-        feature::wrapper_guard<int &> g{x};
+        wrapper_guard<int &> g{x};
         return g.value() == 42;
     }();
-    TEST_EXPECT_TRUE(result);
+    STATIC_EXPECT_TRUE(result);
 }
 
 TEST(WrapperGuardValue, HoldsConstRef)
 {
     constexpr auto result = [] {
         int const x = 7;
-        feature::wrapper_guard<int const &> g{x};
+        wrapper_guard<int const &> g{x};
         return g.value() == 7;
     }();
-    TEST_EXPECT_TRUE(result);
+    STATIC_EXPECT_TRUE(result);
 }
 
 TEST(WrapperGuardValue, HoldsStringViewRef)
 {
     constexpr auto result = [] {
         std::string_view s = "hello";
-        feature::wrapper_guard<std::string_view &> g{s};
+        wrapper_guard<std::string_view &> g{s};
         return g.value() == "hello";
     }();
-    TEST_EXPECT_TRUE(result);
+    STATIC_EXPECT_TRUE(result);
 }
 
 // ---------------------------------------------------------------------------
@@ -111,33 +109,33 @@ TEST(WrapperGuardValue, HoldsStringViewRef)
 TEST(WrapperGuardWrapper, NotCopyable)
 {
     using W = wrapper<int, feature::inplace::plain>;
-    TEST_EXPECT_FALSE(std::is_copy_constructible_v<feature::wrapper_guard<W &>>);
+    STATIC_EXPECT_FALSE(::std::is_copy_constructible_v<wrapper_guard<W &>>);
 }
 
 TEST(WrapperGuardWrapper, NotMovable)
 {
     using W = wrapper<int, feature::inplace::plain>;
-    TEST_EXPECT_FALSE(std::is_move_constructible_v<feature::wrapper_guard<W &>>);
+    STATIC_EXPECT_FALSE(::std::is_move_constructible_v<wrapper_guard<W &>>);
 }
 
 TEST(WrapperGuardWrapper, PlainExecutorValue)
 {
     constexpr auto result = [] {
         wrapper<int, feature::inplace::plain> w{42};
-        feature::wrapper_guard<decltype(w) &> g{w};
+        wrapper_guard<decltype(w) &> g{w};
         return g.value() == 42;
     }();
-    TEST_EXPECT_TRUE(result);
+    STATIC_EXPECT_TRUE(result);
 }
 
 TEST(WrapperGuardWrapper, PlainExecutorConstValue)
 {
     constexpr auto result = [] {
         wrapper<int, feature::inplace::plain> const w{99};
-        feature::wrapper_guard<const decltype(w) &> g{w};
+        wrapper_guard<const decltype(w) &> g{w};
         return g.value() == 99;
     }();
-    TEST_EXPECT_TRUE(result);
+    STATIC_EXPECT_TRUE(result);
 }
 
 // ---------------------------------------------------------------------------
@@ -149,7 +147,7 @@ TEST(WrapperGuardWrapper, GuardCalledOnConstruction)
     guard_counters counters;
     wrapper<int, counting_executor> w{42, counters};
     {
-        feature::wrapper_guard<decltype(w) &> g{w};
+        wrapper_guard<decltype(w) &> g{w};
         EXPECT_EQ(counters.guard_count, 1);
         EXPECT_EQ(counters.unguard_count, 0);
     }
@@ -162,8 +160,8 @@ TEST(WrapperGuardWrapper, CountingExecutorValue)
     constexpr auto result = [] {
         guard_counters counters;
         wrapper<int, counting_executor> w{123, counters};
-        feature::wrapper_guard<decltype(w) &> g{w};
+        wrapper_guard<decltype(w) &> g{w};
         return g.value() == 123;
     }();
-    TEST_EXPECT_TRUE(result);
+    STATIC_EXPECT_TRUE(result);
 }

@@ -1,4 +1,4 @@
-#include <gtest/gtest.h>
+#include <gtest_utils.h>
 
 #include <scl/feature/reflection/method.h>
 #include <scl/feature/type_traits/executor.h>
@@ -15,18 +15,18 @@ struct Target
 {
     int value = 0;
 
-    short get() & { return convert<short>(); }
-    int get() const & { return convert<int>() + 50; }
-    float get() && { return convert<float>() + 100; }
-    double get() const && { return convert<double>() + 200; }
-
-    void set(short v) & { value = v; }
-
     template <typename T>
-    T convert() const &
+    constexpr T convert() const &
     {
         return static_cast<T>(value);
     }
+
+    constexpr short get() & { return convert<short>(); }
+    constexpr int get() const & { return convert<int>() + 50; }
+    constexpr float get() && { return convert<float>() + 100; }
+    constexpr double get() const && { return convert<double>() + 200; }
+
+    constexpr void set(short v) & { value = v; }
 };
 
 struct TestExecutor
@@ -64,9 +64,9 @@ struct ReflectedTarget
 {
     TestExecutor m_impl;
 
-    SCL_REFLECT_TYPE(ReflectedTarget, m_impl);
+    SCL_REFLECT_TYPE(ReflectedTarget, TestExecutor);
 
-    explicit ReflectedTarget(int v)
+    constexpr explicit ReflectedTarget(int v)
         : m_impl{v}
     {}
 
@@ -87,11 +87,22 @@ TEST(ReflectMethod, GetFromConstLValue)
     EXPECT_EQ(r.get(), 92);
 }
 
-TEST(ReflectMethod, GetFromRValue) { EXPECT_EQ(ReflectedTarget{42}.get(), 142); }
+TEST(ReflectMethod, GetFromConstexprValue)
+{
+    constexpr ReflectedTarget r{42};
+    STATIC_EXPECT_EQ(r.get(), 92);
+}
+
+TEST(ReflectMethod, GetFromRValue)
+{
+    // constexpr
+    STATIC_EXPECT_EQ(ReflectedTarget{42}.get(), 142);
+}
 
 TEST(ReflectMethod, GetFromConstRValue)
 {
-    EXPECT_EQ(std::move(static_cast<ReflectedTarget const &>(ReflectedTarget{42})).get(), 242);
+    // constexpr
+    STATIC_EXPECT_EQ(::std::move(static_cast<ReflectedTarget const &>(ReflectedTarget{42})).get(), 242);
 }
 
 TEST(ReflectMethod, SetThroughReflection)
@@ -102,19 +113,17 @@ TEST(ReflectMethod, SetThroughReflection)
 }
 
 template <typename T, typename... Args>
-constexpr bool can_call_set_v = requires { std::declval<T>().set(std::declval<Args>()...); };
+constexpr bool can_call_set_v = requires { ::std::declval<T>().set(::std::declval<Args>()...); };
 
 TEST(ReflectMethod, SetNotAvailableOnConst)
 {
     // set() is only available on mutable lvalue — const should not compile
-    static_assert(!can_call_set_v<ReflectedTarget const &, short>,
-        "set() must not be callable on const ReflectedTarget");
+    STATIC_EXPECT_FALSE((can_call_set_v<ReflectedTarget const &, short>));
 }
 
 TEST(ReflectMethod, SetNotAvailableOnRValue)
 {
-    static_assert(!can_call_set_v<ReflectedTarget &&, short>,
-        "set() must not be callable on rvalue ReflectedTarget");
+    STATIC_EXPECT_FALSE((can_call_set_v<ReflectedTarget &&, short>));
 }
 
 TEST(ReflectMethod, TemplateMethod)

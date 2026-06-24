@@ -2,30 +2,28 @@
 
 /// @file
 /// @brief Macro for declaring the wrapper type used by reflection macros.
+/// @ingroup scl_feature_reflection
 
 #include <type_traits>
 
-// clang-format off
-
-/// @brief Declares the wrapper type for use by @c SCL_REFLECT_METHOD.
+/// @brief Declares the wrapper and executor types for use by @c SCL_REFLECT_METHOD.
+/// @ingroup scl_feature_reflection
 ///
-/// Must appear inside the class body **after** the executor member declaration
-/// and **before** any @c SCL_REFLECT_METHOD invocations.
+/// Must appear inside the class body **before** any @c SCL_REFLECT_METHOD
+/// invocations.
 ///
 /// A specialization of @c scl::feature::executor_trait must also be provided
-/// for @p Type.
+/// for @p type.
 ///
 /// @par Example
 /// @code{.cpp}
-///     SCL_REFLECT_TYPE(MyWrapper, m_executor);
+///     SCL_REFLECT_TYPE(MyWrapper, MyExecutor);
 /// @endcode
 ///
-/// @param Type    The unqualified class name.
-/// @param Member  Executor data member name.
+/// @param type      The unqualified wrapper class name.
+/// @param executor  The unqualified executor type name.
 ///
 /// @sa scl::feature::executor_trait
-#define SCL_REFLECT_TYPE(Type, Member)                                                             \
-    using S_c_L_type_ = Type;                                                                      \
-    using S_c_L_executor_type_ = ::std::remove_cvref_t<decltype(Member)>
-
-// clang-format on
+#define SCL_REFLECT_TYPE(type, executor) \
+    using s_c_l_type = type;             \
+    using s_c_l_executor_type = executor;

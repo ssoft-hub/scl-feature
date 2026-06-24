@@ -1,18 +1,10 @@
-#include <gtest/gtest.h>
+#include <gtest_utils.h>
 
 #include <scl/feature/wrapper.h>
 
 #include <string>
 #include <string_view>
 #include <vector>
-
-#define TEST_EXPECT_TRUE(X) \
-    static_assert(X, #X);   \
-    EXPECT_TRUE(X);
-
-#define TEST_EXPECT_FALSE(X) \
-    static_assert(!(X), #X); \
-    EXPECT_FALSE(X);
 
 using namespace ::scl;
 
@@ -60,11 +52,11 @@ TEST(WrapperCreate, DefaultConstruct)
 
 TEST(WrapperType, DuplicateToolCollapsed)
 {
-    TEST_EXPECT_TRUE((::std::is_same_v<wrapper<int, feature::inplace::plain, feature::inplace::plain>,
+    STATIC_EXPECT_TRUE((::std::is_same_v<wrapper<int, feature::inplace::plain, feature::inplace::plain>,
         wrapper<int, feature::inplace::plain>>));
 }
 
 TEST(WrapperType, NoToolDefaultsToPlain)
 {
-    TEST_EXPECT_TRUE((::std::is_same_v<wrapper<int>, wrapper<int, feature::inplace::plain>>));
+    STATIC_EXPECT_TRUE((::std::is_same_v<wrapper<int>, wrapper<int, feature::inplace::plain>>));
 }
