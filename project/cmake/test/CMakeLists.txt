@@ -1,7 +1,11 @@
 # Generate tests for feature: one test target per subdirectory under module/feature/test/*
 # Supports GTest, doctest, and Catch2 depending on availability/toggles.
 
-include(${CMAKE_SOURCE_DIR}/project/cmake/SCLDependencies.cmake)
+# SCL_MAIN may be set by a worktree wrapper build; fall back to CMAKE_SOURCE_DIR.
+if (NOT DEFINED SCL_MAIN)
+    set(SCL_MAIN "${CMAKE_SOURCE_DIR}")
+endif()
+include(${SCL_MAIN}/project/cmake/SCLDependencies.cmake)
 
 get_filename_component(SCL_FEATURE_TEST_DIR "${CMAKE_CURRENT_LIST_DIR}/../../../test" ABSOLUTE)
 
