@@ -30,26 +30,26 @@ TEST(UninitializedAssignment, CopyAssign)
 {
     TrivialUninit a;
     TrivialUninit b;
-    TrivialUninit::value(a) = 42;
+    TrivialUninit::access(a) = 42;
     b = a;
-    EXPECT_EQ(TrivialUninit::value(b), 42);
+    EXPECT_EQ(TrivialUninit::access(b), 42);
 }
 
 TEST(UninitializedAssignment, MoveAssign)
 {
     TrivialUninit a;
     TrivialUninit b;
-    TrivialUninit::value(a) = 7;
+    TrivialUninit::access(a) = 7;
     b = ::std::move(a);
-    EXPECT_EQ(TrivialUninit::value(b), 7);
+    EXPECT_EQ(TrivialUninit::access(b), 7);
 }
 
 TEST(UninitializedAssignment, SelfAssignIsSafe)
 {
     TrivialUninit a;
-    TrivialUninit::value(a) = 99;
+    TrivialUninit::access(a) = 99;
     a = a; // NOLINT(clang-diagnostic-self-assign-overloaded)
-    EXPECT_EQ(TrivialUninit::value(a), 99);
+    EXPECT_EQ(TrivialUninit::access(a), 99);
 }
 
 TEST(UninitializedAssignment, ConstrainedToTriviallyCopyable)

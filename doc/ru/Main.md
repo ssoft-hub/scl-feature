@@ -63,7 +63,7 @@ target_link_libraries(your_target PRIVATE scl::feature)
 | Компонент | Заголовок | Описание |
 |-----------|-----------|----------|
 | [Wrapper traits](type_traits/wrapper.md) | `<scl/feature/type_traits/wrapper.h>` | `is_wrapper_v`, `is_compatible_with_v`, `is_convertible_from_v` и др. |
-| [Executor traits](type_traits/executor.md) | `<scl/feature/type_traits/executor.h>` | `is_executor_v`, `has_value_v`, `has_guard_v` и др. |
+| [Executor traits](type_traits/executor.md) | `<scl/feature/type_traits/executor.h>` | `is_executor_v`, `has_access_v`, `has_guard_v` и др. |
 
 ### Concepts — концепты
 

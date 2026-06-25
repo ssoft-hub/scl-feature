@@ -58,7 +58,7 @@ struct TargetExecutor
     }
 
     template <typename Self>
-    static constexpr decltype(auto) value(Self && self)
+    static constexpr decltype(auto) access(Self && self)
     {
         return ::scl::forward_like<Self>(self.m_value);
     }
@@ -131,7 +131,7 @@ struct OverridingOpExecutor
     }
 
     template <typename Self>
-    static constexpr decltype(auto) value(Self && self)
+    static constexpr decltype(auto) access(Self && self)
     {
         return ::scl::forward_like<Self>(self.m_value);
     }
@@ -192,7 +192,7 @@ struct NxExecutor
     }
 
     template <typename Self>
-    static constexpr decltype(auto) value(Self && self)
+    static constexpr decltype(auto) access(Self && self)
     {
         return ::scl::forward_like<Self>(self.m_value);
     }
@@ -466,7 +466,7 @@ struct SymExecutor
     }
 
     template <typename Self>
-    static constexpr decltype(auto) value(Self && self)
+    static constexpr decltype(auto) access(Self && self)
     {
         return ::scl::forward_like<Self>(self.m_value);
     }

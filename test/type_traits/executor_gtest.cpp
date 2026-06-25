@@ -9,7 +9,7 @@ using namespace ::scl::feature;
 
 // ── Executor fixtures ─────────────────────────────────────────────────────────
 
-// Minimal executor: has execute() and value(), no guard/unguard.
+// Minimal executor: has execute() and access(), no guard/unguard.
 template <typename T>
 struct MinimalExecutor
 {
@@ -25,22 +25,22 @@ struct MinimalExecutor
     }
 
     template <typename Self>
-    static constexpr decltype(auto) value(Self && self)
+    static constexpr decltype(auto) access(Self && self)
         requires ::std::same_as<::std::remove_cvref_t<Self>, MinimalExecutor>
     {
         return ::scl::forward_like<Self>(self.m_value);
     }
 };
 
-// No execute(), no value() — does not satisfy executor interface.
+// No execute(), no access() — does not satisfy executor interface.
 struct NoInterfaceExecutor
 {};
 
-// Has value() but no execute() — does not satisfy executor interface.
+// Has access() but no execute() — does not satisfy executor interface.
 struct NoExecuteExecutor
 {
     template <typename Self>
-    static constexpr int & value(Self &&) noexcept;
+    static constexpr int & access(Self &&) noexcept;
 };
 
 // Executor with noexcept guard and unguard.
@@ -71,7 +71,7 @@ struct NoGuardExecutor
     using value_type = int;
 
     template <typename Self>
-    static constexpr int & value(Self && self) noexcept;
+    static constexpr int & access(Self && self) noexcept;
 };
 
 // ── Fixtures for has_value / has_execute exact-match tests ────────────────────
@@ -80,14 +80,14 @@ struct NoGuardExecutor
 struct LvalueValueExecutor
 {
     int m_v{};
-    static int & value(LvalueValueExecutor & self) noexcept { return self.m_v; }
+    static int & access(LvalueValueExecutor & self) noexcept { return self.m_v; }
 };
 
 // Non-template value: accepts only const lvalue ref.
 struct ConstRefValueExecutor
 {
     int m_v{};
-    static int const & value(ConstRefValueExecutor const & self) noexcept { return self.m_v; }
+    static int const & access(ConstRefValueExecutor const & self) noexcept { return self.m_v; }
 };
 
 // Non-template first parameter, template Func: execute accepts only lvalue ref executor.
@@ -126,48 +126,48 @@ struct ConstRefGuardExecutor
     static void unguard(ConstRefGuardExecutor const &) noexcept {}
 };
 
-// ── has_value_v ───────────────────────────────────────────────────────────────
+// ── has_access_v ───────────────────────────────────────────────────────────────
 
 TEST(HasValue, TemplateValue)
 {
-    // Template value(Self&&): exact match for all three primary value categories.
-    STATIC_EXPECT_TRUE((has_value_v<MinimalExecutor<int>, MinimalExecutor<int> &>));
-    STATIC_EXPECT_TRUE((has_value_v<MinimalExecutor<int>, MinimalExecutor<int> &&>));
-    STATIC_EXPECT_TRUE((has_value_v<MinimalExecutor<int>, MinimalExecutor<int> const &>));
+    // Template access(Self&&): exact match for all three primary value categories.
+    STATIC_EXPECT_TRUE((has_access_v<MinimalExecutor<int>, MinimalExecutor<int> &>));
+    STATIC_EXPECT_TRUE((has_access_v<MinimalExecutor<int>, MinimalExecutor<int> &&>));
+    STATIC_EXPECT_TRUE((has_access_v<MinimalExecutor<int>, MinimalExecutor<int> const &>));
 
-    STATIC_EXPECT_TRUE((has_value_v<inplace::plain<int>, inplace::plain<int> &>));
-    STATIC_EXPECT_TRUE((has_value_v<inplace::plain<int>, inplace::plain<int> &&>));
-    STATIC_EXPECT_TRUE((has_value_v<inplace::plain<int>, inplace::plain<int> const &>));
+    STATIC_EXPECT_TRUE((has_access_v<inplace::plain<int>, inplace::plain<int> &>));
+    STATIC_EXPECT_TRUE((has_access_v<inplace::plain<int>, inplace::plain<int> &&>));
+    STATIC_EXPECT_TRUE((has_access_v<inplace::plain<int>, inplace::plain<int> const &>));
 }
 
 TEST(HasValue, NoValue)
 {
-    STATIC_EXPECT_FALSE((has_value_v<NoInterfaceExecutor, NoInterfaceExecutor &>));
-    STATIC_EXPECT_FALSE((has_value_v<NoInterfaceExecutor, NoInterfaceExecutor &&>));
-    STATIC_EXPECT_FALSE((has_value_v<NoInterfaceExecutor, NoInterfaceExecutor const &>));
+    STATIC_EXPECT_FALSE((has_access_v<NoInterfaceExecutor, NoInterfaceExecutor &>));
+    STATIC_EXPECT_FALSE((has_access_v<NoInterfaceExecutor, NoInterfaceExecutor &&>));
+    STATIC_EXPECT_FALSE((has_access_v<NoInterfaceExecutor, NoInterfaceExecutor const &>));
 }
 
 TEST(HasValue, ExactLvalueRef)
 {
-    // Non-template value(T&): exact for T& only.
-    STATIC_EXPECT_TRUE((has_value_v<LvalueValueExecutor, LvalueValueExecutor &>));
-    STATIC_EXPECT_FALSE((has_value_v<LvalueValueExecutor, LvalueValueExecutor &&>));
-    STATIC_EXPECT_FALSE((has_value_v<LvalueValueExecutor, LvalueValueExecutor const &>));
+    // Non-template access(T&): exact for T& only.
+    STATIC_EXPECT_TRUE((has_access_v<LvalueValueExecutor, LvalueValueExecutor &>));
+    STATIC_EXPECT_FALSE((has_access_v<LvalueValueExecutor, LvalueValueExecutor &&>));
+    STATIC_EXPECT_FALSE((has_access_v<LvalueValueExecutor, LvalueValueExecutor const &>));
 }
 
 TEST(HasValue, ExactConstRef)
 {
-    // Non-template value(T const&): exact for T const& only.
+    // Non-template access(T const&): exact for T const& only.
     // T& and T&& are rejected even though const& would bind them — exact match required.
-    STATIC_EXPECT_FALSE((has_value_v<ConstRefValueExecutor, ConstRefValueExecutor &>));
-    STATIC_EXPECT_FALSE((has_value_v<ConstRefValueExecutor, ConstRefValueExecutor &&>));
-    STATIC_EXPECT_TRUE((has_value_v<ConstRefValueExecutor, ConstRefValueExecutor const &>));
+    STATIC_EXPECT_FALSE((has_access_v<ConstRefValueExecutor, ConstRefValueExecutor &>));
+    STATIC_EXPECT_FALSE((has_access_v<ConstRefValueExecutor, ConstRefValueExecutor &&>));
+    STATIC_EXPECT_TRUE((has_access_v<ConstRefValueExecutor, ConstRefValueExecutor const &>));
 }
 
 TEST(HasValue, HasValueOnly)
 {
-    // NoExecuteExecutor has value() but not execute() — has_value_v is independent.
-    STATIC_EXPECT_TRUE((has_value_v<NoExecuteExecutor, NoExecuteExecutor &>));
+    // NoExecuteExecutor has access() but not execute() — has_access_v is independent.
+    STATIC_EXPECT_TRUE((has_access_v<NoExecuteExecutor, NoExecuteExecutor &>));
     STATIC_EXPECT_FALSE((has_execute_v<NoExecuteExecutor, NoExecuteExecutor &>));
 }
 

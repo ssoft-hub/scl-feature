@@ -25,7 +25,7 @@ TEST(WrapperConstructorSelf, FromLvalueRef)
     constexpr auto result = [] {
         W src{42};
         W dst{src};
-        return W::executor_type::value(fd::executor_access::get(dst)) == 42;
+        return W::executor_type::access(fd::executor_access::get(dst)) == 42;
     }();
     STATIC_EXPECT_TRUE(result);
 }
@@ -35,7 +35,7 @@ TEST(WrapperConstructorSelf, FromConstLvalueRef)
     constexpr auto result = [] {
         W const src{42};
         W dst{src};
-        return W::executor_type::value(fd::executor_access::get(dst)) == 42;
+        return W::executor_type::access(fd::executor_access::get(dst)) == 42;
     }();
     STATIC_EXPECT_TRUE(result);
 }
@@ -44,14 +44,14 @@ TEST(WrapperConstructorSelf, FromVolatileLvalueRef)
 {
     W volatile src{42};
     W dst{src};
-    EXPECT_EQ(W::executor_type::value(fd::executor_access::get(dst)), 42);
+    EXPECT_EQ(W::executor_type::access(fd::executor_access::get(dst)), 42);
 }
 
 TEST(WrapperConstructorSelf, FromConstVolatileLvalueRef)
 {
     W const volatile src{42};
     W dst{src};
-    EXPECT_EQ(W::executor_type::value(fd::executor_access::get(dst)), 42);
+    EXPECT_EQ(W::executor_type::access(fd::executor_access::get(dst)), 42);
 }
 
 TEST(WrapperConstructorSelf, FromRvalueRef)
@@ -59,7 +59,7 @@ TEST(WrapperConstructorSelf, FromRvalueRef)
     constexpr auto result = [] {
         W src{42};
         W dst{::std::move(src)};
-        return W::executor_type::value(fd::executor_access::get(dst)) == 42;
+        return W::executor_type::access(fd::executor_access::get(dst)) == 42;
     }();
     STATIC_EXPECT_TRUE(result);
 }
@@ -69,7 +69,7 @@ TEST(WrapperConstructorSelf, FromConstRvalueRef)
     constexpr auto result = [] {
         W const src{42};
         W dst{::std::move(src)};
-        return W::executor_type::value(fd::executor_access::get(dst)) == 42;
+        return W::executor_type::access(fd::executor_access::get(dst)) == 42;
     }();
     STATIC_EXPECT_TRUE(result);
 }
@@ -106,8 +106,8 @@ TEST(WrapperConstructorOther, ExplicitFromInnerWrapper)
     constexpr auto result = [] {
         W src{42};
         WW dst{src};
-        return W::executor_type::value(fd::executor_access::get(
-                   WW::executor_type::value(fd::executor_access::get(dst)))) == 42;
+        return W::executor_type::access(fd::executor_access::get(
+                   WW::executor_type::access(fd::executor_access::get(dst)))) == 42;
     }();
     STATIC_EXPECT_TRUE(result);
 }
@@ -118,8 +118,8 @@ TEST(WrapperConstructorOther, ImplicitFromInnerWrapper)
     constexpr auto result = [] {
         W src{42};
         WW dst = src; // implicit — only works via SCL_WRAPPER_CONSTRUCTOR_FOR_OTHER
-        return W::executor_type::value(fd::executor_access::get(
-                   WW::executor_type::value(fd::executor_access::get(dst)))) == 42;
+        return W::executor_type::access(fd::executor_access::get(
+                   WW::executor_type::access(fd::executor_access::get(dst)))) == 42;
     }();
     STATIC_EXPECT_TRUE(result);
 }
@@ -130,7 +130,7 @@ TEST(WrapperConstructorOther, FromOuterWrapper)
     constexpr auto result = [] {
         WW src{W{42}};
         W dst{src};
-        return W::executor_type::value(fd::executor_access::get(dst)) == 42;
+        return W::executor_type::access(fd::executor_access::get(dst)) == 42;
     }();
     STATIC_EXPECT_TRUE(result);
 }
@@ -141,7 +141,7 @@ TEST(WrapperConstructorOther, FromDeepOuterWrapper)
     constexpr auto result = [] {
         WWW src{WW{W{42}}};
         W dst{src};
-        return W::executor_type::value(fd::executor_access::get(dst)) == 42;
+        return W::executor_type::access(fd::executor_access::get(dst)) == 42;
     }();
     STATIC_EXPECT_TRUE(result);
 }
@@ -151,7 +151,7 @@ TEST(WrapperConstructorOther, FromRvalueOtherWrapper)
 {
     constexpr auto result = [] {
         W dst{WW{W{99}}};
-        return W::executor_type::value(fd::executor_access::get(dst)) == 99;
+        return W::executor_type::access(fd::executor_access::get(dst)) == 99;
     }();
     STATIC_EXPECT_TRUE(result);
 }

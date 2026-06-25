@@ -19,7 +19,7 @@
 ///    (after the executor member declaration).
 /// -# Specialize @c scl::feature::executor_trait for the wrapper type.
 /// -# The executor type must provide:
-///    - a static @c value(exec) method that returns a reference to the
+///    - a static @c access(exec) method that returns a reference to the
 ///      wrapped object; and
 ///    - a static @c execute(exec, callable, args...) method that invokes
 ///      @c callable(args...) in the executor's context and returns its result.
@@ -177,9 +177,9 @@
                                                       ScLArgs...> &&             \
         requires                                                                 \
         {                                                                        \
-            SCL_VALUE_DECLVAL(cv_ref).operator op(                               \
+            SCL_ACCESS_DECLVAL(cv_ref).operator op(                               \
                 ::scl::wrapper_cast(::std::declval<ScLArgs>())...);              \
-        } && operator_##name##_scl_quals<decltype(SCL_VALUE_DECLVAL(cv_ref)),    \
+        } && operator_##name##_scl_quals<decltype(SCL_ACCESS_DECLVAL(cv_ref)),    \
                  decltype(::scl::wrapper_cast(::std::declval<ScLArgs>()))...>)   \
     {                                                                            \
         return SCL_EXECUTE_OVERRIDED(SCL_FORWARD(operator op), cv_ref);          \
@@ -202,9 +202,9 @@
         requires                                                                  \
         {                                                                         \
             caller::template call<ScLParam, ScLParams...>(                        \
-                SCL_VALUE_DECLVAL(cv_ref), ::std::declval<ScLArgs>()...);         \
+                SCL_ACCESS_DECLVAL(cv_ref), ::std::declval<ScLArgs>()...);         \
         } && operator_##name##_scl_template_quals<ScLParam, ScLParams...>         \
-                 ::template value<decltype(SCL_VALUE_DECLVAL(cv_ref)),            \
+                 ::template value<decltype(SCL_ACCESS_DECLVAL(cv_ref)),            \
                      decltype(::scl::wrapper_cast(::std::declval<ScLArgs>()))...> \
     {                                                                             \
         return SCL_EXECUTE_TEMPLATE_OVERRIDED(caller, cv_ref);                    \
@@ -266,7 +266,7 @@
     requires                                                                            \
         (::std::is_same_v<ScLExec, s_c_l_executor_type cv_ref>                          \
             && (operator_##name##_scl_has_exec_override<ScLExec>                        \
-                || operator_##name##_scl_quals<decltype(SCL_VALUE_DECLVAL(cv_ref))>))   \
+                || operator_##name##_scl_quals<decltype(SCL_ACCESS_DECLVAL(cv_ref))>))   \
     {                                                                                   \
         if constexpr (operator_##name##_scl_has_exec_override<ScLExec>)                 \
         {                                                                               \
@@ -278,7 +278,7 @@
             return ::std::remove_cvref_t<ScLExec>::execute(SCL_EXECUTOR_ACCESS(cv_ref), \
                 [](auto && scl_v) -> decltype(auto)                                     \
                 { return ::std::forward<decltype(scl_v)>(scl_v).operator op(); },       \
-                ::std::remove_cvref_t<ScLExec>::value(SCL_EXECUTOR_ACCESS(cv_ref)));    \
+                ::std::remove_cvref_t<ScLExec>::access(SCL_EXECUTOR_ACCESS(cv_ref)));    \
         }                                                                               \
     }
 
@@ -300,7 +300,7 @@
     requires                                                                               \
         (::std::is_same_v<ScLExec, s_c_l_executor_type cv_ref>                             \
             && (operator_##name##_scl_has_exec_override<ScLExec>                           \
-                || operator_##name##_scl_quals<decltype(SCL_VALUE_DECLVAL(cv_ref)), int>)) \
+                || operator_##name##_scl_quals<decltype(SCL_ACCESS_DECLVAL(cv_ref)), int>)) \
     {                                                                                      \
         if constexpr (operator_##name##_scl_has_exec_override<ScLExec>)                    \
         {                                                                                  \
@@ -312,7 +312,7 @@
             return ::std::remove_cvref_t<ScLExec>::execute(SCL_EXECUTOR_ACCESS(cv_ref),    \
                 [](auto && scl_v) -> decltype(auto)                                        \
                 { return ::std::forward<decltype(scl_v)>(scl_v).operator op(int{}); },     \
-                ::std::remove_cvref_t<ScLExec>::value(SCL_EXECUTOR_ACCESS(cv_ref)));       \
+                ::std::remove_cvref_t<ScLExec>::access(SCL_EXECUTOR_ACCESS(cv_ref)));       \
         }                                                                                  \
     }
 
@@ -632,9 +632,9 @@
         (!operator_##name##_scl_has_exec_override<s_c_l_executor_type cv_ref, ScLArgs...> && \
         requires                                                                             \
         {                                                                                    \
-            SCL_VALUE_DECLVAL(cv_ref).operator op(                                           \
+            SCL_ACCESS_DECLVAL(cv_ref).operator op(                                           \
                 ::scl::wrapper_cast(::std::declval<ScLArgs>())...);                          \
-        } && operator_##name##_scl_quals<decltype(SCL_VALUE_DECLVAL(cv_ref)),                \
+        } && operator_##name##_scl_quals<decltype(SCL_ACCESS_DECLVAL(cv_ref)),                \
                  decltype(::scl::wrapper_cast(::std::declval<ScLArgs>()))...>)               \
     {                                                                                        \
         return SCL_FRIEND_EXECUTE_OVERRIDED(SCL_FORWARD(operator op), scl_self, cv_ref);     \
@@ -656,9 +656,9 @@
         requires                                                                  \
         {                                                                         \
             caller::template call<ScLParam, ScLParams...>(                        \
-                SCL_VALUE_DECLVAL(cv_ref), ::std::declval<ScLArgs>()...);         \
+                SCL_ACCESS_DECLVAL(cv_ref), ::std::declval<ScLArgs>()...);         \
         } && operator_##name##_scl_template_quals<ScLParam, ScLParams...>         \
-                 ::template value<decltype(SCL_VALUE_DECLVAL(cv_ref)),            \
+                 ::template value<decltype(SCL_ACCESS_DECLVAL(cv_ref)),            \
                      decltype(::scl::wrapper_cast(::std::declval<ScLArgs>()))...> \
     {                                                                             \
         return SCL_FRIEND_EXECUTE_TEMPLATE_OVERRIDED(caller, scl_self, cv_ref);   \
@@ -720,7 +720,7 @@
     requires                                                                          \
         (::std::is_same_v<ScLExec, s_c_l_executor_type cv_ref>                        \
             && (operator_##name##_scl_has_exec_override<ScLExec>                      \
-                || operator_##name##_scl_quals<decltype(SCL_VALUE_DECLVAL(cv_ref))>)) \
+                || operator_##name##_scl_quals<decltype(SCL_ACCESS_DECLVAL(cv_ref))>)) \
     {                                                                                 \
         if constexpr (operator_##name##_scl_has_exec_override<ScLExec>)               \
         {                                                                             \
@@ -733,7 +733,7 @@
                 SCL_FRIEND_EXECUTOR_ACCESS(scl_self, cv_ref),                         \
                 [](auto && scl_v) -> decltype(auto)                                   \
                 { return ::std::forward<decltype(scl_v)>(scl_v).operator op(); },     \
-                ::std::remove_cvref_t<ScLExec>::value(                                \
+                ::std::remove_cvref_t<ScLExec>::access(                                \
                     SCL_FRIEND_EXECUTOR_ACCESS(scl_self, cv_ref)));                   \
         }                                                                             \
     }
@@ -755,7 +755,7 @@
     requires                                                                               \
         (::std::is_same_v<ScLExec, s_c_l_executor_type cv_ref>                             \
             && (operator_##name##_scl_has_exec_override<ScLExec>                           \
-                || operator_##name##_scl_quals<decltype(SCL_VALUE_DECLVAL(cv_ref)), int>)) \
+                || operator_##name##_scl_quals<decltype(SCL_ACCESS_DECLVAL(cv_ref)), int>)) \
     {                                                                                      \
         if constexpr (operator_##name##_scl_has_exec_override<ScLExec>)                    \
         {                                                                                  \
@@ -768,7 +768,7 @@
                 SCL_FRIEND_EXECUTOR_ACCESS(scl_self, cv_ref),                              \
                 [](auto && scl_v) -> decltype(auto)                                        \
                 { return ::std::forward<decltype(scl_v)>(scl_v).operator op(int{}); },     \
-                ::std::remove_cvref_t<ScLExec>::value(                                     \
+                ::std::remove_cvref_t<ScLExec>::access(                                     \
                     SCL_FRIEND_EXECUTOR_ACCESS(scl_self, cv_ref)));                        \
         }                                                                                  \
     }
@@ -831,7 +831,7 @@
             && !::std::is_same_v<::std::remove_cvref_t<ScLLhs>,                            \
                    ::std::remove_cvref_t<s_c_l_type>>                                      \
             && operator_##name##_scl_reverse_viable<ScLLhs,                                \
-                   decltype(SCL_VALUE_DECLVAL(cv_ref))>())                                 \
+                   decltype(SCL_ACCESS_DECLVAL(cv_ref))>())                                 \
     {                                                                                     \
         return SCL_FRIEND_REVERSE_EXECUTE(SCL_FORWARD(op), scl_self, scl_lhs, cv_ref);     \
     }

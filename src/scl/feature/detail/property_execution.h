@@ -18,11 +18,11 @@
 /// - @c call_override(E&&) — invokes the override with the given executor
 ///   reference and returns its result.
 ///
-/// @par Dispatch in holder::value()
-/// When @c PropertyTag::has_override\<exec_refer\> is @c true, @c value()
+/// @par Dispatch in holder::access()
+/// When @c PropertyTag::has_override\<exec_refer\> is @c true, @c access()
 /// calls the override directly, bypassing @c execute() — analogous to the
 /// executor-override path of @c SCL_REFLECT_METHOD.
-/// Otherwise, @c value() routes through @c OuterExecutorType::execute(),
+/// Otherwise, @c access() routes through @c OuterExecutorType::execute(),
 /// analogous to the execute-path in @c SCL_REFLECT_METHOD.
 ///
 /// @par Copy / move safety
@@ -70,7 +70,7 @@ namespace scl::feature::detail
             /// @internal
             /// Non-reference type of the outer executor's held value.
             using outer_value_type = ::std::remove_reference_t<
-                decltype(OuterExecutorType::value(::std::declval<OuterExecutorType &>()))>;
+                decltype(OuterExecutorType::access(::std::declval<OuterExecutorType &>()))>;
 
             /// @internal
             /// Pointer-to-member type for the reflected field.
@@ -109,15 +109,15 @@ namespace scl::feature::detail
                 return reinterpret_cast<exec_obj *>(cursor); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
             }
 
-            // ── noexcept predicate for value() ────────────────────────────────
+            // ── noexcept predicate for access() ────────────────────────────────
 
             /// @internal
-            /// @c true iff @c value(Self&&) is @c noexcept for the given @p Self.
+            /// @c true iff @c access(Self&&) is @c noexcept for the given @p Self.
             ///
             /// Delegates to @c PropertyTag::override_noexcept, which already
             /// returns @c false when no override exists for the given cv-ref.
             template <typename Self>
-            static constexpr bool value_noexcept =
+            static constexpr bool access_noexcept =
                 PropertyTag::template override_noexcept<::scl::forward_like_t<Self, OuterExecutorType>>;
 
         public:
@@ -146,7 +146,7 @@ namespace scl::feature::detail
             ///    lambda applies the stored member pointer to @c outer_value.  This
             ///    allows locking or tracing executors to intercept every access.
             template <typename Self>
-            static decltype(auto) value(Self && self) noexcept(value_noexcept<Self>)
+            static decltype(auto) access(Self && self) noexcept(access_noexcept<Self>)
                 requires ::std::same_as<::std::remove_cvref_t<Self>, holder>
             {
                 using exec_refer = ::scl::forward_like_t<Self, OuterExecutorType>;
@@ -164,7 +164,7 @@ namespace scl::feature::detail
                         [property_pointer](auto && v) -> decltype(auto) {
                         using property_refer = ::scl::forward_like_t<decltype(v), PropertyType>;
                         return static_cast<property_refer>(::std::forward<decltype(v)>(v).*property_pointer);
-                    }, OuterExecutorType::value(::scl::forward_like<Self>(*exec)));
+                    }, OuterExecutorType::access(::scl::forward_like<Self>(*exec)));
                 }
             }
 
@@ -172,12 +172,12 @@ namespace scl::feature::detail
             /// Forwards @p func to the outer executor's @c execute() in its guard
             /// context.
             ///
-            /// @note Unlike @c value(), this overload performs no field projection:
+            /// @note Unlike @c access(), this overload performs no field projection:
             ///       it neither applies the stored member pointer nor passes the
             ///       wrapped value to @c func.  It is the generic executor-concept
             ///       @c execute used when arbitrary work must run under the outer
             ///       executor's guard; field access is handled exclusively by
-            ///       @c value().
+            ///       @c access().
             template <typename Self, typename Func>
             static decltype(auto) execute(Self && self, Func && func)
                 requires ::std::same_as<::std::remove_cvref_t<Self>, holder>

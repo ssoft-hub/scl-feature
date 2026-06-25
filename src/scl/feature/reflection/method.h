@@ -19,7 +19,7 @@
 ///    (after the executor member declaration).
 /// -# Specialize @c scl::feature::executor_trait for the wrapper type.
 /// -# The executor type must provide:
-///    - a static @c value(exec) method that returns a reference to the
+///    - a static @c access(exec) method that returns a reference to the
 ///      wrapped object; and
 ///    - a static @c execute(exec, callable, args...) method that invokes
 ///      @c callable(args...) in the executor's context and returns its result.
@@ -206,9 +206,9 @@
         (!method_##name##_scl_has_exec_override<s_c_l_executor_type cv_ref, ScLArgs...> && \
         requires                                                                           \
         {                                                                                  \
-            SCL_VALUE_DECLVAL(cv_ref).name(                                                \
+            SCL_ACCESS_DECLVAL(cv_ref).name(                                                \
                 ::scl::wrapper_cast(::std::declval<ScLArgs>())...);                        \
-        } && method_##name##_scl_quals<decltype(SCL_VALUE_DECLVAL(cv_ref)),                \
+        } && method_##name##_scl_quals<decltype(SCL_ACCESS_DECLVAL(cv_ref)),                \
             decltype(::scl::wrapper_cast(::std::declval<ScLArgs>()))...>)                  \
     {                                                                                      \
         return SCL_EXECUTE_OVERRIDED(SCL_FORWARD(name), cv_ref);                           \
@@ -245,9 +245,9 @@
         requires                                                                  \
         {                                                                         \
             caller::template call<ScLParam, ScLParams...>(                        \
-                SCL_VALUE_DECLVAL(cv_ref), ::std::declval<ScLArgs>()...);         \
+                SCL_ACCESS_DECLVAL(cv_ref), ::std::declval<ScLArgs>()...);         \
         } && method_##name##_scl_template_quals<ScLParam, ScLParams...>           \
-                 ::template value<decltype(SCL_VALUE_DECLVAL(cv_ref)),            \
+                 ::template value<decltype(SCL_ACCESS_DECLVAL(cv_ref)),            \
                      decltype(::scl::wrapper_cast(::std::declval<ScLArgs>()))...> \
     {                                                                             \
         return SCL_EXECUTE_TEMPLATE_OVERRIDED(caller, cv_ref);                    \
@@ -311,7 +311,7 @@
 /// type must provide an explicit specialization.
 ///
 /// The wrapped value is then obtained by calling
-/// @c Executor::value(executor_ref).
+/// @c Executor::access(executor_ref).
 ///
 /// @par Constraint — callability
 /// Each non-template overload has one @c requires clause with two conditions:

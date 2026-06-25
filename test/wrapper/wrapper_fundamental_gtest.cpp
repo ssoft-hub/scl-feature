@@ -17,7 +17,7 @@ template <::scl::feature::concepts::wrapper W>
 constexpr decltype(auto) value_of(W && w) noexcept
 {
     using RawW = ::std::remove_cvref_t<W>;
-    return RawW::executor_type::value(::scl::feature::executor_trait<RawW>::executor(::std::forward<W>(w)));
+    return RawW::executor_type::access(::scl::feature::executor_trait<RawW>::executor(::std::forward<W>(w)));
 }
 
 // ============================================================================

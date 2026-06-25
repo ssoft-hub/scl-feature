@@ -59,7 +59,7 @@ struct OverridingExecutor
     }
 
     template <typename Self>
-    static constexpr decltype(auto) value(Self && self)
+    static constexpr decltype(auto) access(Self && self)
     {
         return ::scl::forward_like<Self>(self.m_value);
     }
@@ -196,7 +196,7 @@ namespace
         }
 
         template <typename Self>
-        static constexpr decltype(auto) value(Self && self)
+        static constexpr decltype(auto) access(Self && self)
         {
             return ::scl::forward_like<Self>(self.m_value);
         }

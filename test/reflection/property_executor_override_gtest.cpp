@@ -58,7 +58,7 @@ struct OverridingExecutor
     }
 
     template <typename Self>
-    static constexpr decltype(auto) value(Self && self) noexcept
+    static constexpr decltype(auto) access(Self && self) noexcept
         requires ::std::same_as<::std::remove_cvref_t<Self>, OverridingExecutor>
     {
         return ::scl::forward_like<Self>(self.m_value);
@@ -192,7 +192,7 @@ namespace
         }
 
         template <typename Self>
-        static constexpr decltype(auto) value(Self && self) noexcept
+        static constexpr decltype(auto) access(Self && self) noexcept
             requires ::std::same_as<::std::remove_cvref_t<Self>, NoexceptOverrideExecutor>
         {
             return ::scl::forward_like<Self>(self.m_value);
@@ -228,34 +228,34 @@ struct NoexceptReflectedPoint
 
 // ── Tests — noexcept propagation ─────────────────────────────────────────────
 //
-// noexcept is tested at the holder::value() level, which is where the
+// noexcept is tested at the holder::access() level, which is where the
 // property_execution dispatch lives.  The wrapper_cast machinery sits on top
 // and has its own (unconditional) noexcept on wrapper_caster construction, so
 // testing through wrapper_cast would mask the underlying propagation.
 
 TEST(ReflectPropertyExecutorOverride, NoexceptOverrideIsNoexcept)
 {
-    // property_x(NoexceptOverrideExecutor &) is noexcept → holder::value(Holder&) noexcept.
+    // property_x(NoexceptOverrideExecutor &) is noexcept → holder::access(Holder&) noexcept.
     NoexceptReflectedPoint p{1, 2};
     using Holder = ::std::remove_reference_t<decltype(p.x)>::executor_type;
-    STATIC_EXPECT_TRUE(noexcept(Holder::value(::std::declval<Holder &>())));
+    STATIC_EXPECT_TRUE(noexcept(Holder::access(::std::declval<Holder &>())));
 }
 
 TEST(ReflectPropertyExecutorOverride, NonNoexceptOverrideIsNotNoexcept)
 {
-    // property_x(OverridingExecutor &) is NOT noexcept → holder::value(Holder&) not noexcept.
+    // property_x(OverridingExecutor &) is NOT noexcept → holder::access(Holder&) not noexcept.
     OverridingReflectedPoint p{0, 0};
     using Holder = ::std::remove_reference_t<decltype(p.x)>::executor_type;
-    STATIC_EXPECT_FALSE(noexcept(Holder::value(::std::declval<Holder &>())));
+    STATIC_EXPECT_FALSE(noexcept(Holder::access(::std::declval<Holder &>())));
 }
 
 TEST(ReflectPropertyExecutorOverride, ExecutePathIsNotNoexcept)
 {
     // No const& override for x → execute path; execute is not noexcept.
-    // Const propagates: const wrapper → Holder const& in value().
+    // Const propagates: const wrapper → Holder const& in access().
     NoexceptReflectedPoint const p{1, 2};
     using Holder = ::std::remove_reference_t<decltype(p.x)>::executor_type;
-    STATIC_EXPECT_FALSE(noexcept(Holder::value(::std::declval<Holder const &>())));
+    STATIC_EXPECT_FALSE(noexcept(Holder::access(::std::declval<Holder const &>())));
 }
 
 TEST(ReflectPropertyExecutorOverride, NoOverrideYIsNotNoexcept)
@@ -263,5 +263,5 @@ TEST(ReflectPropertyExecutorOverride, NoOverrideYIsNotNoexcept)
     // No property_y override at all → execute path for both qualifications.
     NoexceptReflectedPoint p{1, 2};
     using Holder = ::std::remove_reference_t<decltype(p.y)>::executor_type;
-    STATIC_EXPECT_FALSE(noexcept(Holder::value(::std::declval<Holder &>())));
+    STATIC_EXPECT_FALSE(noexcept(Holder::access(::std::declval<Holder &>())));
 }

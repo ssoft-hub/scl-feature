@@ -12,7 +12,7 @@
 
 `inplace::uninitialized<T>` резервирует память для объекта `T`, не конструируя его.
 Конструирование возлагается на пользователя — как правило через placement-new
-в `m_storage`. После этого `value()` предоставляет доступ к объекту через
+в `m_storage`. После этого `access()` предоставляет доступ к объекту через
 `reinterpret_cast` сырого хранилища.
 
 Исполнитель удобен для типов с дорогостоящим конструктором по умолчанию или
@@ -34,7 +34,7 @@ struct uninitialized
     // Возвращает ссылку на хранимый объект через reinterpret_cast.
     // Поведение не определено, если объект не был сконструирован.
     template <typename Self>
-    static constexpr decltype(auto) value(Self && self);
+    static constexpr decltype(auto) access(Self && self);
 
     // Немедленно вызывает func(args...) и возвращает результат.
     template <typename Self, typename Func, typename... Args>
@@ -60,7 +60,7 @@ scl::feature::inplace::uninitialized<std::string> e;
 // Конструируем объект вручную, когда готово:
 new (&e.m_storage) std::string{"hello"};
 
-std::string & s = scl::feature::inplace::uninitialized<std::string>::value(e);
+std::string & s = scl::feature::inplace::uninitialized<std::string>::access(e);
 // s == "hello"
 
 // Вручную уничтожаем, когда больше не нужно:

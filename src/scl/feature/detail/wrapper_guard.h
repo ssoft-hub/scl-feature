@@ -76,10 +76,10 @@ namespace scl::feature::detail
         [[nodiscard]]
         constexpr decltype(auto) value() const noexcept
             requires requires {
-                         executor_type::template value<executor_refer>(::std::declval<executor_refer>());
+                         executor_type::template access<executor_refer>(::std::declval<executor_refer>());
                      }
         {
-            return executor_type::template value<executor_refer>(::std::forward<executor_refer>(m_executor));
+            return executor_type::template access<executor_refer>(::std::forward<executor_refer>(m_executor));
         }
 
     private:

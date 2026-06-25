@@ -11,7 +11,7 @@
 ///
 /// | Method                              | Role                                         |
 /// |-------------------------------------|----------------------------------------------|
-/// | `static value(Self&&)`              | Returns a reference to the held value.       |
+/// | `static access(Self&&)`              | Returns a reference to the held value.       |
 /// | `static execute(Self&&, Func&&...)` | Invokes `func` in the executor's context.    |
 ///
 /// Optional methods recognized by the framework:
@@ -41,7 +41,7 @@ namespace scl::feature
     // -------------------------------------------------------------------------
 
     /// @ingroup scl_feature_type_traits
-    /// @brief @c true if @p ExecutorType has a @c value() method whose first (and
+    /// @brief @c true if @p ExecutorType has a @c access() method whose first (and
     ///        only) parameter type is exactly @p ExecutorRefer.
     ///
     /// Detection uses a function-pointer cast: the return type is deduced from a
@@ -52,10 +52,10 @@ namespace scl::feature
     /// @tparam ExecutorType   The executor class (cv-unqualified).
     /// @tparam ExecutorRefer  The cv-ref-qualified executor reference type.
     template <typename ExecutorType, typename ExecutorRefer>
-    inline constexpr bool has_value_v =
+    inline constexpr bool has_access_v =
         requires {
-            static_cast<decltype(ExecutorType::value(::std::declval<ExecutorRefer>())) (*)(ExecutorRefer)>(
-                &ExecutorType::value);
+            static_cast<decltype(ExecutorType::access(::std::declval<ExecutorRefer>())) (*)(
+                ExecutorRefer)>(&ExecutorType::access);
         };
 
     /// @ingroup scl_feature_type_traits
@@ -109,14 +109,14 @@ namespace scl::feature
 
     namespace detail
     {
-        /// @c true if @p Type is a class and has static @c value() and @c execute()
+        /// @c true if @p Type is a class and has static @c access() and @c execute()
         /// callable for the three primary value categories: @c Type&, @c Type&&,
         /// @c Type const&.  Non-class types (e.g. @c void, scalars) yield @c false.
         template <typename Type>
         inline constexpr bool has_executor_minimal_interface_v = []() constexpr -> bool {
             if constexpr (::std::is_class_v<Type>)
-                return has_value_v<Type, Type &> && has_value_v<Type, Type &&> &&
-                    has_value_v<Type, Type const &> && has_execute_v<Type, Type &> &&
+                return has_access_v<Type, Type &> && has_access_v<Type, Type &&> &&
+                    has_access_v<Type, Type const &> && has_execute_v<Type, Type &> &&
                     has_execute_v<Type, Type &&> && has_execute_v<Type, Type const &>;
             return false;
         }();
@@ -130,7 +130,7 @@ namespace scl::feature
     /// The check requires that the following static methods are callable for
     /// the three primary value categories (@c Type&, @c Type&&, @c Type const&):
     ///
-    /// - @c Type::value(Self&&) — returns a reference to the held value.
+    /// - @c Type::access(Self&&) — returns a reference to the held value.
     /// - @c Type::execute(Self&&, Func&&) — invokes a callable in the
     ///   executor's context; checked with a zero-argument @c void(*)().
     ///
@@ -155,7 +155,7 @@ namespace scl::feature
     ///       template <typename Self, typename Func>
     ///       static constexpr decltype(auto) execute(Self&&, Func&& f) { return f(); }
     ///       template <typename Self>
-    ///       static constexpr decltype(auto) value(Self&& self) { return forward_like<Self>(self.m_value); }
+    ///       static constexpr decltype(auto) access(Self&& self) { return forward_like<Self>(self.m_value); }
     ///   };
     ///   static_assert(is_executor_v<MyExecutor<int>>);
     /// @endcode

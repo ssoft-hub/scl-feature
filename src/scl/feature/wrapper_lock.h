@@ -97,7 +97,7 @@ namespace scl
         /**
          * @brief Returns the inner value through the executor.
          *
-         * For wrapper types delegates to @c executor_type::value().
+         * For wrapper types delegates to @c executor_type::access().
          * For non-wrapper types returns the held reference unchanged.
          *
          * @pre  For wrapper types @c lock() must have been called beforehand.

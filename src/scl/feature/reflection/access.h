@@ -37,8 +37,8 @@
 /// works during class definition when the wrapper type is still incomplete.
 ///
 /// @param cv_ref  cv-ref qualifiers applied to the executor.
-#define SCL_VALUE_DECLVAL(cv_ref) \
-    s_c_l_executor_type::value(::std::declval<s_c_l_executor_type cv_ref>())
+#define SCL_ACCESS_DECLVAL(cv_ref) \
+    s_c_l_executor_type::access(::std::declval<s_c_l_executor_type cv_ref>())
 
 /// @internal
 /// @ingroup scl_feature_reflection
@@ -49,7 +49,7 @@
 /// is complete.
 ///
 /// @param cv_ref  cv-ref qualifiers applied to the wrapper (@c *this).
-#define SCL_VALUE_ACCESS(cv_ref) s_c_l_executor_type::value(SCL_EXECUTOR_ACCESS(cv_ref))
+#define SCL_VALUE_ACCESS(cv_ref) s_c_l_executor_type::access(SCL_EXECUTOR_ACCESS(cv_ref))
 
 /// @internal
 /// @brief Dispatches a method call through @c Executor::execute.
@@ -108,7 +108,7 @@
 /// @param scl_self  The explicit wrapper parameter name.
 /// @param cv_ref    cv-ref qualifiers of @p scl_self.
 #define SCL_FRIEND_VALUE_ACCESS(scl_self, cv_ref) \
-    s_c_l_executor_type::value(SCL_FRIEND_EXECUTOR_ACCESS(scl_self, cv_ref))
+    s_c_l_executor_type::access(SCL_FRIEND_EXECUTOR_ACCESS(scl_self, cv_ref))
 
 /// @internal
 /// @brief Dispatches a non-template operator call through @c Executor::execute
@@ -162,7 +162,7 @@
         [](auto && scl_v, ScLArgs &&... values) -> decltype(auto) {            \
         return ::std::forward<decltype(scl_v)>(scl_v).op(                      \
             ::scl::wrapper_cast(::std::forward<ScLArgs>(values))...);          \
-    }, SCL_VALUE_DECLVAL(cv_ref), ::std::forward<ScLArgs>(scl_args)...)
+    }, SCL_ACCESS_DECLVAL(cv_ref), ::std::forward<ScLArgs>(scl_args)...)
 
 /// @internal
 /// @brief Noexcept-safe execute expression for friend template-operator noexcept specifiers.
@@ -178,7 +178,7 @@
         [](auto && scl_v, ScLArgs &&... values) -> decltype(auto) {                                  \
         return caller::template call<ScLParam, ScLParams...>(::std::forward<decltype(scl_v)>(scl_v), \
             ::std::forward<ScLArgs>(values)...);                                                     \
-    }, SCL_VALUE_DECLVAL(cv_ref), ::std::forward<ScLArgs>(scl_args)...)
+    }, SCL_ACCESS_DECLVAL(cv_ref), ::std::forward<ScLArgs>(scl_args)...)
 
 /// @internal
 /// @brief Dispatches a reverse-operand binary operator (@c lhs @c op @c value) through
@@ -215,4 +215,4 @@
     s_c_l_executor_type::execute(::std::declval<s_c_l_executor_type cv_ref>(),                   \
         [](auto && scl_v, auto && scl_l) -> decltype(auto) {                                     \
         return ::std::forward<decltype(scl_l)>(scl_l) op ::std::forward<decltype(scl_v)>(scl_v); \
-    }, SCL_VALUE_DECLVAL(cv_ref), ::std::declval<ScLLhs>())
+    }, SCL_ACCESS_DECLVAL(cv_ref), ::std::declval<ScLLhs>())

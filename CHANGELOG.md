@@ -32,7 +32,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `scl::wrapper_cast(w)` — returns a `wrapper_caster<Refer>` proxy that implicitly converts
   to any type reachable in the wrapper chain via `.to<T>()` or implicit conversion operators;
   pass-through for non-wrapper types
-- `is_executor_v<T>` — checks whether `T` satisfies the executor interface (`value()` and
+- `is_executor_v<T>` — checks whether `T` satisfies the executor interface (`access()` and
   `execute()` callable for all three primary value categories); cv-ref qualifiers are stripped
 - `concepts::executor<T>` — concept wrapping `is_executor_v`
 - `is_convertible_from_v<Target, Refer>` — checks whether `Target` is reachable from `Refer`
@@ -40,7 +40,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `concepts::convertible_from<Target, Refer>` — concept wrapping `is_convertible_from_v`
 - `concepts::compatible_with<Expected, T>`, `concepts::compatible_with_part_of<Expected, T>`,
   `concepts::part_compatible_with<Expected, T>` — three concepts for wrapper-chain compatibility
-- Executor method detection traits: `has_value_v`, `has_execute_v`, `has_guard_v`,
+- Executor method detection traits: `has_access_v`, `has_execute_v`, `has_guard_v`,
   `has_unguard_v`, `is_guard_noexcept_v`, `is_unguard_noexcept_v`
 - `scl::feature::reflect<Wrapper, Executor, Type>` — CRTP mixin base for the reflection chain;
   `detail::wrapper` inherits from it automatically; user-provided partial specialisations for
@@ -56,6 +56,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Executor headers relocated under `executor/`: `inplace/plain.h` and `inplace/uninitialized.h`
   now live at `executor/inplace/` and are included as `<scl/feature/executor/inplace/...>`; the
   `scl::feature::inplace` namespace is unchanged
+- Executor interface: the value accessor is renamed `value()` → `access()`, and the detection
+  trait `has_value_v` → `has_access_v`. Frees the name `value` for value-typed concepts and
+  removes the clash with `value_type` and the `value()` accessors on the lock handles. Breaking
+  change for any custom executor or `executor_trait` specialisation
 - `SCL_REFLECT_BINARY_OPERATOR` — now emits the 24 member overloads (wrapper-left) plus 8
   reverse-operand hidden-friend overloads (wrapper-right, `x op w`), making the reflected
   operator symmetric; the reverse friend is constrained out when the left operand is itself a
@@ -101,7 +105,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - `is_compatible_with_v`, `is_compatible_with_part_of_v`, `is_part_compatible_with_v`:
   cv-ref qualifiers were not stripped consistently from both sides before comparison
-- `inplace::uninitialized::value()` `const` overload: incorrect `const`-qualified
+- `inplace::uninitialized::access()` `const` overload: incorrect `const`-qualified
   `reinterpret_cast` prevented compilation in const contexts
 
 ## [0.0.1] - 2026-03-25

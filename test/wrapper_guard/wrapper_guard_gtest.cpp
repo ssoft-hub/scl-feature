@@ -34,7 +34,7 @@ struct counting_executor
     }
 
     template <typename Self>
-    static constexpr decltype(auto) value(Self && self)
+    static constexpr decltype(auto) access(Self && self)
         requires std::same_as<std::remove_cvref_t<Self>, counting_executor>
     {
         return ::scl::forward_like<Self>(self.m_value);

@@ -30,7 +30,7 @@ struct plain
 
     // Returns a reference to the held value, preserving cv-ref qualifiers.
     template <typename Self>
-    static constexpr decltype(auto) value(Self && self);
+    static constexpr decltype(auto) access(Self && self);
 
     // Invokes func(args...) immediately and returns the result.
     template <typename Self, typename Func, typename... Args>
@@ -52,7 +52,7 @@ struct plain
 
 scl::feature::inplace::plain<int> e{42};
 
-int & ref = scl::feature::inplace::plain<int>::value(e);        // ref == 42
+int & ref = scl::feature::inplace::plain<int>::access(e);        // ref == 42
 int   val = scl::feature::inplace::plain<int>::execute(e, [&]{ return e.m_value * 2; }); // 84
 ```
 

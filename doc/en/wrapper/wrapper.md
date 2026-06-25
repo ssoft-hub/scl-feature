@@ -18,7 +18,7 @@ cross-cutting behaviour such as thread safety, copy-on-write semantics, or
 deferred construction without modifying `Value`.
 
 The `Executor` template parameter must satisfy `concepts::executor`: it must
-provide static `value()` and `execute()` methods for all three primary value
+provide static `access()` and `execute()` methods for all three primary value
 categories (`E&`, `E&&`, `E const&`).
 
 `wrapper` inherits from `scl::feature::reflect<wrapper, Executor<Value>, wrapper>`
@@ -89,7 +89,7 @@ using IntWrapper = scl::wrapper<int, scl::feature::inplace::plain>;
 
 IntWrapper w{42};
 // Access the held value through the executor:
-int & v = scl::feature::inplace::plain<int>::value(
+int & v = scl::feature::inplace::plain<int>::access(
     scl::feature::detail::executor_access::get(w));
 ```
 
