@@ -56,7 +56,7 @@ public:
 ```cpp
 #include <scl/feature/wrapper_cast.h>
 #include <scl/feature/wrapper.h>
-#include <scl/feature/inplace/plain.h>
+#include <scl/feature/executor/inplace/plain.h>
 
 void increment(int & v) { ++v; }
 

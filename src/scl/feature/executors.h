@@ -28,7 +28,7 @@
  * @{
  */
 
-#include <scl/feature/inplace/plain.h>
-#include <scl/feature/inplace/uninitialized.h>
+#include <scl/feature/executor/inplace/plain.h>
+#include <scl/feature/executor/inplace/uninitialized.h>
 
 /** @} */ // end of group scl_feature_executors

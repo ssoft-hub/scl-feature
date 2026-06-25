@@ -1,8 +1,8 @@
 #include <gtest_utils.h>
 
 #include <scl/feature/concepts/executor.h>
-#include <scl/feature/inplace/plain.h>
-#include <scl/feature/inplace/uninitialized.h>
+#include <scl/feature/executor/inplace/plain.h>
+#include <scl/feature/executor/inplace/uninitialized.h>
 #include <scl/utility/type_traits/forward_like.h>
 
 using namespace ::scl::feature;

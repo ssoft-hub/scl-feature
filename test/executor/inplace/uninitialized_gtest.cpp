@@ -1,6 +1,6 @@
 #include <gtest_utils.h>
 
-#include <scl/feature/inplace/uninitialized.h>
+#include <scl/feature/executor/inplace/uninitialized.h>
 #include <scl/feature/wrapper.h>
 
 #include <string>

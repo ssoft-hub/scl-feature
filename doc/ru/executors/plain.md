@@ -2,7 +2,7 @@
 
 Исполнитель с прямым хранением значения в памяти, без каких-либо накладных расходов.
 
-- Заголовок: `#include <scl/feature/inplace/plain.h>`
+- Заголовок: `#include <scl/feature/executor/inplace/plain.h>`
 - Объявление: `template <typename T> struct plain;`
 - Пространство имён: `scl::feature::inplace`
 
@@ -48,7 +48,7 @@ struct plain
 ### Прямое использование
 
 ```cpp
-#include <scl/feature/inplace/plain.h>
+#include <scl/feature/executor/inplace/plain.h>
 
 scl::feature::inplace::plain<int> e{42};
 
@@ -60,7 +60,7 @@ int   val = scl::feature::inplace::plain<int>::execute(e, [&]{ return e.m_value 
 
 ```cpp
 #include <scl/feature/wrapper.h>
-#include <scl/feature/inplace/plain.h>
+#include <scl/feature/executor/inplace/plain.h>
 
 scl::wrapper<std::string, scl::feature::inplace::plain> w{"hello"};
 ```

@@ -53,6 +53,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- Executor headers relocated under `executor/`: `inplace/plain.h` and `inplace/uninitialized.h`
+  now live at `executor/inplace/` and are included as `<scl/feature/executor/inplace/...>`; the
+  `scl::feature::inplace` namespace is unchanged
 - `SCL_REFLECT_BINARY_OPERATOR` — now emits the 24 member overloads (wrapper-left) plus 8
   reverse-operand hidden-friend overloads (wrapper-right, `x op w`), making the reflected
   operator symmetric; the reverse friend is constrained out when the left operand is itself a

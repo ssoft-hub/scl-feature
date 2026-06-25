@@ -2,7 +2,7 @@
 
 Исполнитель с выровненным сырым хранилищем и отложенной конструкцией объекта.
 
-- Заголовок: `#include <scl/feature/inplace/uninitialized.h>`
+- Заголовок: `#include <scl/feature/executor/inplace/uninitialized.h>`
 - Объявление: `template <typename T> struct uninitialized;`
 - Пространство имён: `scl::feature::inplace`
 
@@ -52,7 +52,7 @@ struct uninitialized
 ### Отложенное конструирование
 
 ```cpp
-#include <scl/feature/inplace/uninitialized.h>
+#include <scl/feature/executor/inplace/uninitialized.h>
 #include <string>
 
 scl::feature::inplace::uninitialized<std::string> e;
@@ -71,7 +71,7 @@ s.~basic_string();
 
 ```cpp
 #include <scl/feature/wrapper.h>
-#include <scl/feature/inplace/uninitialized.h>
+#include <scl/feature/executor/inplace/uninitialized.h>
 
 scl::wrapper<std::string, scl::feature::inplace::uninitialized> w{"world"};
 ```

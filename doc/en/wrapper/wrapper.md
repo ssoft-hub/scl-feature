@@ -83,7 +83,7 @@ The executor member is private; access is provided through
 
 ```cpp
 #include <scl/feature/wrapper.h>
-#include <scl/feature/inplace/plain.h>
+#include <scl/feature/executor/inplace/plain.h>
 
 using IntWrapper = scl::wrapper<int, scl::feature::inplace::plain>;
 
@@ -98,7 +98,7 @@ int & v = scl::feature::inplace::plain<int>::value(
 ```cpp
 #include <scl/feature/wrapper.h>
 #include <scl/feature/reflection/method.h>
-#include <scl/feature/inplace/plain.h>
+#include <scl/feature/executor/inplace/plain.h>
 
 struct Counter {
     int value() const & { return m_value; }

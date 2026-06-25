@@ -41,8 +41,8 @@ Then include the umbrella header or individual component headers:
 
 | Component | Header | Description |
 |-----------|--------|-------------|
-| [inplace::plain](executors/plain.md) | `<scl/feature/inplace/plain.h>` | In-place storage with zero overhead |
-| [inplace::uninitialized](executors/uninitialized.md) | `<scl/feature/inplace/uninitialized.h>` | In-place raw storage with deferred construction |
+| [inplace::plain](executors/plain.md) | `<scl/feature/executor/inplace/plain.h>` | In-place storage with zero overhead |
+| [inplace::uninitialized](executors/uninitialized.md) | `<scl/feature/executor/inplace/uninitialized.h>` | In-place raw storage with deferred construction |
 
 ### Locking utilities
 
@@ -84,7 +84,7 @@ Then include the umbrella header or individual component headers:
 ```cpp
 #include <scl/feature/wrapper.h>
 #include <scl/feature/reflection/method.h>
-#include <scl/feature/inplace/plain.h>
+#include <scl/feature/executor/inplace/plain.h>
 
 struct Document {
     std::string title() const &;

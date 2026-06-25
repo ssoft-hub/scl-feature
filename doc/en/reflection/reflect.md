@@ -55,7 +55,7 @@ automatically exposes `my_method` and `another_method` as proxy members.
 ```cpp
 #include <scl/feature/wrapper.h>
 #include <scl/feature/reflection/method.h>
-#include <scl/feature/inplace/plain.h>
+#include <scl/feature/executor/inplace/plain.h>
 
 struct Temperature {
     double celsius() const &;

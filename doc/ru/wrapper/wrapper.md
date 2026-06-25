@@ -83,7 +83,7 @@ cv-ref квалификаций.
 
 ```cpp
 #include <scl/feature/wrapper.h>
-#include <scl/feature/inplace/plain.h>
+#include <scl/feature/executor/inplace/plain.h>
 
 using IntWrapper = scl::wrapper<int, scl::feature::inplace::plain>;
 
@@ -95,7 +95,7 @@ IntWrapper w{42};
 ```cpp
 #include <scl/feature/wrapper.h>
 #include <scl/feature/reflection/method.h>
-#include <scl/feature/inplace/plain.h>
+#include <scl/feature/executor/inplace/plain.h>
 
 struct Counter {
     int value() const & { return m_value; }

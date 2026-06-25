@@ -2,7 +2,7 @@
 
 In-place executor that stores the value directly with zero overhead.
 
-- Header: `#include <scl/feature/inplace/plain.h>`
+- Header: `#include <scl/feature/executor/inplace/plain.h>`
 - Declaration: `template <typename T> struct plain;`
 - Namespace: `scl::feature::inplace`
 
@@ -48,7 +48,7 @@ struct plain
 ### Direct use
 
 ```cpp
-#include <scl/feature/inplace/plain.h>
+#include <scl/feature/executor/inplace/plain.h>
 
 scl::feature::inplace::plain<int> e{42};
 
@@ -60,7 +60,7 @@ int   val = scl::feature::inplace::plain<int>::execute(e, [&]{ return e.m_value 
 
 ```cpp
 #include <scl/feature/wrapper.h>
-#include <scl/feature/inplace/plain.h>
+#include <scl/feature/executor/inplace/plain.h>
 
 scl::wrapper<std::string, scl::feature::inplace::plain> w{"hello"};
 ```

@@ -3,7 +3,7 @@
 #ifndef DOXYGEN
 
 #include <scl/feature/detail/wrapper.h>
-#include <scl/feature/inplace/plain.h>
+#include <scl/feature/executor/inplace/plain.h>
 
 #include <type_traits>
 

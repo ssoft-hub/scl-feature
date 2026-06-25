@@ -41,8 +41,8 @@ target_link_libraries(your_target PRIVATE scl::feature)
 
 | Компонент | Заголовок | Описание |
 |-----------|-----------|----------|
-| [inplace::plain](executors/plain.md) | `<scl/feature/inplace/plain.h>` | Хранение значения напрямую, без накладных расходов |
-| [inplace::uninitialized](executors/uninitialized.md) | `<scl/feature/inplace/uninitialized.h>` | Сырое выровненное хранилище с отложенной конструкцией |
+| [inplace::plain](executors/plain.md) | `<scl/feature/executor/inplace/plain.h>` | Хранение значения напрямую, без накладных расходов |
+| [inplace::uninitialized](executors/uninitialized.md) | `<scl/feature/executor/inplace/uninitialized.h>` | Сырое выровненное хранилище с отложенной конструкцией |
 
 ### Locking utilities — утилиты блокировки
 
@@ -84,7 +84,7 @@ target_link_libraries(your_target PRIVATE scl::feature)
 ```cpp
 #include <scl/feature/wrapper.h>
 #include <scl/feature/reflection/method.h>
-#include <scl/feature/inplace/plain.h>
+#include <scl/feature/executor/inplace/plain.h>
 
 struct Document {
     std::string title() const &;

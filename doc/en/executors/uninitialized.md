@@ -3,7 +3,7 @@
 In-place executor that holds the value in correctly sized and aligned raw storage,
 enabling deferred (lazy) construction.
 
-- Header: `#include <scl/feature/inplace/uninitialized.h>`
+- Header: `#include <scl/feature/executor/inplace/uninitialized.h>`
 - Declaration: `template <typename T> struct uninitialized;`
 - Namespace: `scl::feature::inplace`
 
@@ -53,7 +53,7 @@ struct uninitialized
 ### Deferred construction
 
 ```cpp
-#include <scl/feature/inplace/uninitialized.h>
+#include <scl/feature/executor/inplace/uninitialized.h>
 #include <string>
 
 scl::feature::inplace::uninitialized<std::string> e;
@@ -72,7 +72,7 @@ s.~basic_string();
 
 ```cpp
 #include <scl/feature/wrapper.h>
-#include <scl/feature/inplace/uninitialized.h>
+#include <scl/feature/executor/inplace/uninitialized.h>
 
 scl::wrapper<std::string, scl::feature::inplace::uninitialized> w{"world"};
 ```
