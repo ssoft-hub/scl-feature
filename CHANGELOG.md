@@ -103,6 +103,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- Reflected method, operator, and property dispatch resolved the wrapped value too early —
+  as an argument to `Executor::execute()`, evaluated before `execute()` ran. The executor is
+  now passed to the dispatch callable, which resolves the value from inside `execute()`, so
+  any work `execute()` performs happens before the value is read
 - `is_compatible_with_v`, `is_compatible_with_part_of_v`, `is_part_compatible_with_v`:
   cv-ref qualifiers were not stripped consistently from both sides before comparison
 - `inplace::uninitialized::access()` `const` overload: incorrect `const`-qualified

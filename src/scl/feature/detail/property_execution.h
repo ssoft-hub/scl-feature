@@ -142,9 +142,11 @@ namespace scl::feature::detail
             ///    is @c true, calls @c PropertyTag::call_override() directly,
             ///    bypassing @c execute().  @c noexcept is propagated from the override.
             /// -# **Execute path** — otherwise, routes through
-            ///    @c OuterExecutorType::execute(exec, lambda, outer_value) where the
-            ///    lambda applies the stored member pointer to @c outer_value.  This
-            ///    allows locking or tracing executors to intercept every access.
+            ///    @c OuterExecutorType::execute(exec, lambda, exec) where the lambda
+            ///    resolves @c OuterExecutorType::access() (inside @c execute(), after any
+            ///    @c guard()) and applies the stored member pointer to it.  This allows
+            ///    locking or copy-on-write executors to intercept every access and
+            ///    project the field from the post-guard value.
             template <typename Self>
             static decltype(auto) access(Self && self) noexcept(access_noexcept<Self>)
                 requires ::std::same_as<::std::remove_cvref_t<Self>, holder>
@@ -161,10 +163,14 @@ namespace scl::feature::detail
                     auto property_pointer = self.m_property_pointer;
                     auto * const exec = outer_exec_ptr(::std::forward<Self>(self));
                     return OuterExecutorType::execute(::scl::forward_like<Self>(*exec),
-                        [property_pointer](auto && v) -> decltype(auto) {
+                        [property_pointer](auto && scl_e) -> decltype(auto) {
+                        // access() is resolved here, inside execute() (after any guard()),
+                        // so guarding executors (e.g. copy-on-write) project the field
+                        // from the post-guard value rather than a pre-guard reference.
+                        decltype(auto) v = OuterExecutorType::access(::std::forward<decltype(scl_e)>(scl_e));
                         using property_refer = ::scl::forward_like_t<decltype(v), PropertyType>;
                         return static_cast<property_refer>(::std::forward<decltype(v)>(v).*property_pointer);
-                    }, OuterExecutorType::access(::scl::forward_like<Self>(*exec)));
+                    }, ::scl::forward_like<Self>(*exec));
                 }
             }
 
