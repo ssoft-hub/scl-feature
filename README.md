@@ -40,7 +40,7 @@ or deferred invocation without modifying the wrapped type. Licensed under [The U
   - `is_executor_v<T>` — checks whether `T` satisfies the executor interface (strips cv-ref qualifiers)
   - `is_convertible_from_v<Target, Refer>` — checks whether a reference `Refer` can be converted
     to `Target` by unwrapping through the wrapper chain
-  - `has_value_v<E, Self>`, `has_execute_v<E, Self>` — detects `value()` / `execute()` on executor `E`
+  - `has_access_v<E, Self>`, `has_execute_v<E, Self>` — detects `access()` / `execute()` on executor `E`
   - `has_guard_v<E, Self>`, `has_unguard_v<E, Self>` — detects `guard()` / `unguard()` on executor `E`
   - `is_guard_noexcept_v<E, Self>`, `is_unguard_noexcept_v<E, Self>` — checks `noexcept` on
     `guard()` / `unguard()` (true when the method is absent or marked `noexcept`)

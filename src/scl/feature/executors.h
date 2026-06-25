@@ -18,7 +18,7 @@
  *
  * - @c execute(self, func, args...) — runs @p func with @p args and returns
  *   its result; may add cross-cutting behaviour around the call.
- * - @c value(self) — returns a reference to the held value, propagating
+ * - @c access(self) — returns a reference to the held value, propagating
  *   the cv-ref qualifiers of @p self.
  *
  * | Executor | Storage | Overhead |
@@ -28,7 +28,7 @@
  * @{
  */
 
-#include <scl/feature/inplace/plain.h>
-#include <scl/feature/inplace/uninitialized.h>
+#include <scl/feature/executor/inplace/plain.h>
+#include <scl/feature/executor/inplace/uninitialized.h>
 
 /** @} */ // end of group scl_feature_executors

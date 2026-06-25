@@ -95,7 +95,7 @@ namespace scl::feature::inplace
         }
 
         template <typename Self>
-        static constexpr decltype(auto) value(Self && self)
+        static constexpr decltype(auto) access(Self && self)
             requires ::std::same_as<::std::remove_cvref_t<Self>, self_type>
         {
             // reinterpret_cast<value_type*> for raw storage access;

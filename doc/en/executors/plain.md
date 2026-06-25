@@ -2,7 +2,7 @@
 
 In-place executor that stores the value directly with zero overhead.
 
-- Header: `#include <scl/feature/inplace/plain.h>`
+- Header: `#include <scl/feature/executor/inplace/plain.h>`
 - Declaration: `template <typename T> struct plain;`
 - Namespace: `scl::feature::inplace`
 
@@ -30,7 +30,7 @@ struct plain
 
     // Returns a reference to the held value, preserving cv-ref qualifiers.
     template <typename Self>
-    static constexpr decltype(auto) value(Self && self);
+    static constexpr decltype(auto) access(Self && self);
 
     // Invokes func(args...) immediately and returns the result.
     template <typename Self, typename Func, typename... Args>
@@ -48,11 +48,11 @@ struct plain
 ### Direct use
 
 ```cpp
-#include <scl/feature/inplace/plain.h>
+#include <scl/feature/executor/inplace/plain.h>
 
 scl::feature::inplace::plain<int> e{42};
 
-int & ref = scl::feature::inplace::plain<int>::value(e);        // ref == 42
+int & ref = scl::feature::inplace::plain<int>::access(e);        // ref == 42
 int   val = scl::feature::inplace::plain<int>::execute(e, [&]{ return e.m_value * 2; }); // 84
 ```
 
@@ -60,7 +60,7 @@ int   val = scl::feature::inplace::plain<int>::execute(e, [&]{ return e.m_value 
 
 ```cpp
 #include <scl/feature/wrapper.h>
-#include <scl/feature/inplace/plain.h>
+#include <scl/feature/executor/inplace/plain.h>
 
 scl::wrapper<std::string, scl::feature::inplace::plain> w{"hello"};
 ```

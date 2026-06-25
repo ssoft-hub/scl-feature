@@ -83,11 +83,11 @@
 // clang-format off
 
 /// @internal
-/// @brief Helper: the (non-reference) type returned by @c s_c_l_executor_type::value(exec&).
+/// @brief Helper: the (non-reference) type returned by @c s_c_l_executor_type::access(exec&).
 ///
 /// Does not require @c value_type to be declared on the executor.
 #define SCL_EXECUTOR_VALUE_TYPE \
-    ::std::remove_reference_t<decltype(s_c_l_executor_type::value(::std::declval<s_c_l_executor_type &>()))>
+    ::std::remove_reference_t<decltype(s_c_l_executor_type::access(::std::declval<s_c_l_executor_type &>()))>
 
 /// @internal
 /// @brief Generates the executor-override tag struct for property @p prop.

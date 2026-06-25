@@ -3,7 +3,7 @@
 #ifndef DOXYGEN
 
 #include <scl/feature/detail/wrapper.h>
-#include <scl/feature/inplace/plain.h>
+#include <scl/feature/executor/inplace/plain.h>
 
 #include <type_traits>
 
@@ -48,7 +48,7 @@ namespace scl
      * @brief Composable proxy wrapper that delegates to @p Value through executors.
      *
      * Each executor is a class template @c E such that @c E<Value> must satisfy
-     * @c concepts::executor — it must provide static @c value(Self&&) and
+     * @c concepts::executor — it must provide static @c access(Self&&) and
      * @c execute(Self&&, Func&&) methods.  Executors are composed left-to-right;
      * adjacent duplicates in the list are collapsed.  Defaults to
      * @c feature::inplace::plain — a zero-overhead direct proxy — when no executor

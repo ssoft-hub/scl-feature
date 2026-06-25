@@ -15,7 +15,7 @@ namespace scl::feature::concepts
      *
      * | Method                           | Role                                      |
      * |----------------------------------|-------------------------------------------|
-     * | @c value(Self&&)                 | Returns a reference to the held value.    |
+     * | @c access(Self&&)                 | Returns a reference to the held value.    |
      * | @c execute(Self&&, Func&&)       | Invokes a callable in executor's context. |
      *
      * Optional methods (@c guard, @c unguard) may be provided to implement

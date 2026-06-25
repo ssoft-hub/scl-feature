@@ -1,7 +1,7 @@
 #include <gtest_utils.h>
 
 #include <scl/feature/detail/wrapper_constructor_resolver.h>
-#include <scl/feature/inplace/plain.h>
+#include <scl/feature/executor/inplace/plain.h>
 #include <scl/feature/wrapper.h>
 
 #include <memory>
@@ -59,7 +59,7 @@ TEST(WrapperConstructorResolverStrategy1, Value)
     constexpr auto result = [] {
         W src{42};
         fd::wrapper_constructor_resolver<W, W &> r{src};
-        return W::executor_type::value(r.resolve()) == 42;
+        return W::executor_type::access(r.resolve()) == 42;
     }();
     STATIC_EXPECT_TRUE(result);
 }
@@ -69,8 +69,8 @@ TEST(WrapperConstructorResolverStrategy1, SameObject)
     constexpr auto result = [] {
         W src{42};
         fd::wrapper_constructor_resolver<W, W &> r{src};
-        W::executor_type::value(r.resolve()) = 99;
-        return W::executor_type::value(fd::executor_access::get(src)) == 99;
+        W::executor_type::access(r.resolve()) = 99;
+        return W::executor_type::access(fd::executor_access::get(src)) == 99;
     }();
     STATIC_EXPECT_TRUE(result);
 }
@@ -114,7 +114,7 @@ TEST(WrapperConstructorResolverStrategy3, Value)
     constexpr auto result = [] {
         WW src{W{42}};
         fd::wrapper_constructor_resolver<W, WW &> r{src};
-        return W::executor_type::value(r.resolve()) == 42;
+        return W::executor_type::access(r.resolve()) == 42;
     }();
     STATIC_EXPECT_TRUE(result);
 }
@@ -180,7 +180,7 @@ TEST(WrapperConstructorResolverDeepRecursion, Value)
     constexpr auto result = [] {
         WWW src{WW{W{42}}};
         fd::wrapper_constructor_resolver<W, WWW &> r{src};
-        return W::executor_type::value(r.resolve()) == 42;
+        return W::executor_type::access(r.resolve()) == 42;
     }();
     STATIC_EXPECT_TRUE(result);
 }
@@ -201,7 +201,7 @@ TEST(GuardedWrapperConstructorResolver, Value)
     constexpr auto result = [] {
         WW src{W{42}};
         fd::guarded_wrapper_constructor_resolver<W, WW &> r{src};
-        return W::executor_type::value(r.resolve()) == 42;
+        return W::executor_type::access(r.resolve()) == 42;
     }();
     STATIC_EXPECT_TRUE(result);
 }

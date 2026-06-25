@@ -23,7 +23,7 @@ concept executor;
 ```
 
 Satisfied when `T` (after stripping cv-ref qualifiers) satisfies the executor
-interface: `value()` and `execute()` callable for all three primary value
+interface: `access()` and `execute()` callable for all three primary value
 categories. Wraps `is_executor_v<T>`.
 
 ```cpp

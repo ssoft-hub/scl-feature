@@ -1,15 +1,15 @@
 #include <gtest_utils.h>
 
 #include <scl/feature/concepts/executor.h>
-#include <scl/feature/inplace/plain.h>
-#include <scl/feature/inplace/uninitialized.h>
+#include <scl/feature/executor/inplace/plain.h>
+#include <scl/feature/executor/inplace/uninitialized.h>
 #include <scl/utility/type_traits/forward_like.h>
 
 using namespace ::scl::feature;
 
 // ── Executor fixtures ─────────────────────────────────────────────────────────
 
-// Minimal executor: has execute() and value(), no guard/unguard.
+// Minimal executor: has execute() and access(), no guard/unguard.
 template <typename T>
 struct MinimalExecutor
 {
@@ -25,22 +25,22 @@ struct MinimalExecutor
     }
 
     template <typename Self>
-    static constexpr decltype(auto) value(Self && self)
+    static constexpr decltype(auto) access(Self && self)
         requires ::std::same_as<::std::remove_cvref_t<Self>, MinimalExecutor>
     {
         return ::scl::forward_like<Self>(self.m_value);
     }
 };
 
-// No execute(), no value() — does not satisfy executor interface.
+// No execute(), no access() — does not satisfy executor interface.
 struct NoInterfaceExecutor
 {};
 
-// Has value() but no execute() — does not satisfy executor interface.
+// Has access() but no execute() — does not satisfy executor interface.
 struct NoExecuteExecutor
 {
     template <typename Self>
-    static constexpr int & value(Self &&) noexcept;
+    static constexpr int & access(Self &&) noexcept;
 };
 
 // ── concepts::executor ───────────────────────────────────────────────────────

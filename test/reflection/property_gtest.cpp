@@ -36,7 +36,7 @@ struct PointExecutor
     }
 
     template <typename Self>
-    static constexpr decltype(auto) value(Self && self) noexcept
+    static constexpr decltype(auto) access(Self && self) noexcept
         requires ::std::same_as<::std::remove_cvref_t<Self>, PointExecutor>
     {
         return ::scl::forward_like<Self>(self.m_value);
@@ -141,7 +141,7 @@ TEST(ReflectProperty, MovePreservesCorrectness)
 // ── Rvalue access ───────────────────────────────────────────────────────────
 //
 // Reading through an rvalue wrapper exercises the rvalue cv-ref branch of
-// holder::value(): exec_refer becomes OuterExecutor&&, so outer_executor() must
+// holder::access(): exec_refer becomes OuterExecutor&&, so outer_executor() must
 // re-seat the offset and propagate the rvalue qualification correctly.
 
 TEST(ReflectProperty, ReadXFromRValue)
@@ -182,7 +182,7 @@ namespace
         }
 
         template <typename Self>
-        static constexpr decltype(auto) value(Self && self) noexcept
+        static constexpr decltype(auto) access(Self && self) noexcept
             requires ::std::same_as<::std::remove_cvref_t<Self>, BagExecutor>
         {
             return ::scl::forward_like<Self>(self.m_value);
@@ -261,7 +261,7 @@ namespace
         }
 
         template <typename Self>
-        static constexpr decltype(auto) value(Self && self) noexcept
+        static constexpr decltype(auto) access(Self && self) noexcept
             requires ::std::same_as<::std::remove_cvref_t<Self>, GuardingExecutor>
         {
             return ::scl::forward_like<Self>(self.m_value);

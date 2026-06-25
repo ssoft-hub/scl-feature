@@ -43,7 +43,7 @@ struct FriendTargetExecutor
     }
 
     template <typename Self>
-    static constexpr decltype(auto) value(Self && self)
+    static constexpr decltype(auto) access(Self && self)
     {
         return ::scl::forward_like<Self>(self.m_value);
     }
@@ -99,7 +99,7 @@ struct OverridingFriendExecutor
     }
 
     template <typename Self>
-    static constexpr decltype(auto) value(Self && self)
+    static constexpr decltype(auto) access(Self && self)
     {
         return ::scl::forward_like<Self>(self.m_value);
     }
@@ -160,7 +160,7 @@ struct FriendNxExecutor
     }
 
     template <typename Self>
-    static constexpr decltype(auto) value(Self && self)
+    static constexpr decltype(auto) access(Self && self)
     {
         return ::scl::forward_like<Self>(self.m_value);
     }
@@ -195,8 +195,7 @@ struct FriendWrappedNx
 // ============================================================================
 
 template <typename T, typename Arg>
-constexpr bool can_friend_add_v =
-    requires { ::std::declval<T>() + ::std::declval<Arg>(); };
+constexpr bool can_friend_add_v = requires { ::std::declval<T>() + ::std::declval<Arg>(); };
 
 template <typename T, typename Arg>
 constexpr bool has_member_op_plus_v =

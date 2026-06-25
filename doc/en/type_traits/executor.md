@@ -7,7 +7,7 @@ Compile-time predicates for executor interface detection and noexcept inspection
 
 Contents:
 - [`is_executor_v<T>`](#is_executor_v)
-- [`has_value_v<E, Self>`](#has_value_v)
+- [`has_access_v<E, Self>`](#has_access_v)
 - [`has_execute_v<E, Self>`](#has_execute_v)
 - [`has_guard_v<E, Self>`](#has_guard_v)
 - [`has_unguard_v<E, Self>`](#has_unguard_v)
@@ -25,7 +25,7 @@ inline constexpr bool is_executor_v;
 ```
 
 `true` if `T` (after stripping cv-ref qualifiers) satisfies the executor
-interface: `T::value(Self&&)` and `T::execute(Self&&, Func&&)` must be callable
+interface: `T::access(Self&&)` and `T::execute(Self&&, Func&&)` must be callable
 for all three primary value categories (`T&`, `T&&`, `T const&`). Non-class
 types always yield `false`.
 
@@ -38,14 +38,14 @@ static_assert(!is_executor_v<void>);
 
 ---
 
-## has_value_v
+## has_access_v
 
 ```cpp
 template <typename ExecutorType, typename ExecutorRefer>
-inline constexpr bool has_value_v;
+inline constexpr bool has_access_v;
 ```
 
-`true` if `ExecutorType` has a static `value()` method whose first (and only)
+`true` if `ExecutorType` has a static `access()` method whose first (and only)
 parameter type is exactly `ExecutorRefer`. Detection uses a function-pointer cast
 that rejects implicit conversions.
 

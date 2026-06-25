@@ -41,8 +41,8 @@ target_link_libraries(your_target PRIVATE scl::feature)
 
 | Компонент | Заголовок | Описание |
 |-----------|-----------|----------|
-| [inplace::plain](executors/plain.md) | `<scl/feature/inplace/plain.h>` | Хранение значения напрямую, без накладных расходов |
-| [inplace::uninitialized](executors/uninitialized.md) | `<scl/feature/inplace/uninitialized.h>` | Сырое выровненное хранилище с отложенной конструкцией |
+| [inplace::plain](executors/plain.md) | `<scl/feature/executor/inplace/plain.h>` | Хранение значения напрямую, без накладных расходов |
+| [inplace::uninitialized](executors/uninitialized.md) | `<scl/feature/executor/inplace/uninitialized.h>` | Сырое выровненное хранилище с отложенной конструкцией |
 
 ### Locking utilities — утилиты блокировки
 
@@ -63,7 +63,7 @@ target_link_libraries(your_target PRIVATE scl::feature)
 | Компонент | Заголовок | Описание |
 |-----------|-----------|----------|
 | [Wrapper traits](type_traits/wrapper.md) | `<scl/feature/type_traits/wrapper.h>` | `is_wrapper_v`, `is_compatible_with_v`, `is_convertible_from_v` и др. |
-| [Executor traits](type_traits/executor.md) | `<scl/feature/type_traits/executor.h>` | `is_executor_v`, `has_value_v`, `has_guard_v` и др. |
+| [Executor traits](type_traits/executor.md) | `<scl/feature/type_traits/executor.h>` | `is_executor_v`, `has_access_v`, `has_guard_v` и др. |
 
 ### Concepts — концепты
 
@@ -84,7 +84,7 @@ target_link_libraries(your_target PRIVATE scl::feature)
 ```cpp
 #include <scl/feature/wrapper.h>
 #include <scl/feature/reflection/method.h>
-#include <scl/feature/inplace/plain.h>
+#include <scl/feature/executor/inplace/plain.h>
 
 struct Document {
     std::string title() const &;

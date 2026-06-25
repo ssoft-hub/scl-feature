@@ -123,7 +123,7 @@ struct SpecialExecutor {
     { return f(::std::forward<Args>(args)...); }
 
     template <typename Self>
-    static decltype(auto) value(Self && self) noexcept
+    static decltype(auto) access(Self && self) noexcept
     { return ::scl::forward_like<Self>(self.m_value); }
 };
 ```

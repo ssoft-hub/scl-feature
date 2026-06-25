@@ -8,7 +8,7 @@
 
 Содержание:
 - [`is_executor_v<T>`](#is_executor_v)
-- [`has_value_v<E, Self>`](#has_value_v)
+- [`has_access_v<E, Self>`](#has_access_v)
 - [`has_execute_v<E, Self>`](#has_execute_v)
 - [`has_guard_v<E, Self>`](#has_guard_v)
 - [`has_unguard_v<E, Self>`](#has_unguard_v)
@@ -26,7 +26,7 @@ inline constexpr bool is_executor_v;
 ```
 
 `true`, если `T` (без cv-ref-квалификаторов) удовлетворяет интерфейсу исполнителя:
-`T::value(Self&&)` и `T::execute(Self&&, Func&&)` должны быть вызываемы для всех
+`T::access(Self&&)` и `T::execute(Self&&, Func&&)` должны быть вызываемы для всех
 трёх основных категорий значения (`T&`, `T&&`, `T const&`).
 Для не-классовых типов всегда `false`.
 
@@ -39,14 +39,14 @@ static_assert(!is_executor_v<void>);
 
 ---
 
-## has_value_v
+## has_access_v
 
 ```cpp
 template <typename ExecutorType, typename ExecutorRefer>
-inline constexpr bool has_value_v;
+inline constexpr bool has_access_v;
 ```
 
-`true`, если `ExecutorType` имеет статический метод `value()`, первый (и единственный)
+`true`, если `ExecutorType` имеет статический метод `access()`, первый (и единственный)
 параметр которого — в точности `ExecutorRefer`. Для обнаружения используется
 приведение к указателю на функцию, что исключает неявные преобразования.
 

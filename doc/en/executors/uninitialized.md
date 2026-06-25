@@ -3,7 +3,7 @@
 In-place executor that holds the value in correctly sized and aligned raw storage,
 enabling deferred (lazy) construction.
 
-- Header: `#include <scl/feature/inplace/uninitialized.h>`
+- Header: `#include <scl/feature/executor/inplace/uninitialized.h>`
 - Declaration: `template <typename T> struct uninitialized;`
 - Namespace: `scl::feature::inplace`
 
@@ -13,7 +13,7 @@ enabling deferred (lazy) construction.
 
 `inplace::uninitialized<T>` reserves the storage for a `T` without constructing it.
 Construction is the responsibility of the user — typically performed via
-placement-new into `m_storage`. Once constructed, `value()` provides access through
+placement-new into `m_storage`. Once constructed, `access()` provides access through
 a `reinterpret_cast` on the raw storage.
 
 This executor is useful for types that are expensive to default-construct or that
@@ -35,7 +35,7 @@ struct uninitialized
     // Returns a reference to the stored object via reinterpret_cast.
     // Behaviour is undefined if the object has not been constructed.
     template <typename Self>
-    static constexpr decltype(auto) value(Self && self);
+    static constexpr decltype(auto) access(Self && self);
 
     // Invokes func(args...) immediately and returns the result.
     template <typename Self, typename Func, typename... Args>
@@ -53,7 +53,7 @@ struct uninitialized
 ### Deferred construction
 
 ```cpp
-#include <scl/feature/inplace/uninitialized.h>
+#include <scl/feature/executor/inplace/uninitialized.h>
 #include <string>
 
 scl::feature::inplace::uninitialized<std::string> e;
@@ -61,7 +61,7 @@ scl::feature::inplace::uninitialized<std::string> e;
 // Construct the object manually when ready:
 new (&e.m_storage) std::string{"hello"};
 
-std::string & s = scl::feature::inplace::uninitialized<std::string>::value(e);
+std::string & s = scl::feature::inplace::uninitialized<std::string>::access(e);
 // s == "hello"
 
 // Destroy manually when done:
@@ -72,7 +72,7 @@ s.~basic_string();
 
 ```cpp
 #include <scl/feature/wrapper.h>
-#include <scl/feature/inplace/uninitialized.h>
+#include <scl/feature/executor/inplace/uninitialized.h>
 
 scl::wrapper<std::string, scl::feature::inplace::uninitialized> w{"world"};
 ```

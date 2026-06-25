@@ -164,7 +164,7 @@ namespace scl::feature::detail
                     if constexpr (::scl::feature::has_guard_v<right_executor, right_executor_refer>)
                         right_executor::guard(::std::forward<right_executor_refer>(executor));
 
-                    decltype(auto) inner = right_executor::template value<right_executor_refer>(
+                    decltype(auto) inner = right_executor::template access<right_executor_refer>(
                         ::std::forward<decltype(executor)>(executor));
 
                     return wrapper_constructor_resolver<left_type, decltype(inner)>{

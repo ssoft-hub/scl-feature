@@ -109,12 +109,12 @@ namespace scl::feature::detail
         /// Returns the inner value through the executor (lock should be held by the caller).
         [[nodiscard]]
         constexpr value_refer value() const /**/
-            noexcept(noexcept(executor_type::template value<executor_refer>(::std::declval<executor_refer>())))
+            noexcept(noexcept(executor_type::template access<executor_refer>(::std::declval<executor_refer>())))
             requires requires {
-                         executor_type::template value<executor_refer>(::std::declval<executor_refer>());
+                         executor_type::template access<executor_refer>(::std::declval<executor_refer>());
                      }
         {
-            return executor_type::template value<executor_refer>(executor());
+            return executor_type::template access<executor_refer>(executor());
         }
 
     private:

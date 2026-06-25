@@ -67,7 +67,7 @@ namespace scl
         /**
          * @brief Returns the stored value with the same cv- and ref-qualifiers as @p Refer.
          *
-         * For wrapper types delegates to @c executor_type::value().
+         * For wrapper types delegates to @c executor_type::access().
          * For non-wrapper types returns the held reference unchanged.
          *
          * @pre  For wrapper types the guard is held (guaranteed by the constructor).
