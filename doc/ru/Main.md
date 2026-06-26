@@ -43,6 +43,7 @@ target_link_libraries(your_target PRIVATE scl::feature)
 |-----------|-----------|----------|
 | [inplace::plain](executors/plain.md) | `<scl/feature/executor/inplace/plain.h>` | Хранение значения напрямую, без накладных расходов |
 | [inplace::uninitialized](executors/uninitialized.md) | `<scl/feature/executor/inplace/uninitialized.h>` | Сырое выровненное хранилище с отложенной конструкцией |
+| [implicit::indirect](executors/implicit_indirect.md) | `<scl/feature/executor/implicit/indirect.h>` | Хранение в куче с копированием при записи; интрузивный блок в один указатель, поддержка аллокатора |
 
 ### Locking utilities — утилиты блокировки
 

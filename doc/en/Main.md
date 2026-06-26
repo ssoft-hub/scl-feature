@@ -43,6 +43,7 @@ Then include the umbrella header or individual component headers:
 |-----------|--------|-------------|
 | [inplace::plain](executors/plain.md) | `<scl/feature/executor/inplace/plain.h>` | In-place storage with zero overhead |
 | [inplace::uninitialized](executors/uninitialized.md) | `<scl/feature/executor/inplace/uninitialized.h>` | In-place raw storage with deferred construction |
+| [implicit::indirect](executors/implicit_indirect.md) | `<scl/feature/executor/implicit/indirect.h>` | Heap storage with copy-on-write; one-pointer intrusive control block, allocator-aware |
 
 ### Locking utilities
 
