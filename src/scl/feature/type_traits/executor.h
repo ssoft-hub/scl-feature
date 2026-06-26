@@ -105,6 +105,38 @@ namespace scl::feature
     inline constexpr bool has_unguard_v =
         requires { static_cast<void (*)(ExecutorRefer)>(&ExecutorType::unguard); };
 
+    /// @ingroup scl_feature_type_traits
+    /// @brief @c true if @p ExecutorType has a static @c operator_assign() callable as
+    ///        @c operator_assign(SelfRefer, SourceRefer).
+    ///
+    /// @tparam ExecutorType  The executor class (cv-unqualified).
+    /// @tparam SelfRefer     cv-ref-qualified reference to the target executor.
+    /// @tparam SourceRefer   cv-ref-qualified reference to the source executor.
+    template <typename ExecutorType, typename SelfRefer, typename SourceRefer>
+    inline constexpr bool has_operator_assign_v =
+        requires { static_cast<void (*)(SelfRefer, SourceRefer)>(&ExecutorType::operator_assign); };
+
+    /// @ingroup scl_feature_type_traits
+    /// @brief Noexcept value for executor assignment dispatch.
+    ///
+    /// @c true if assigning from @p SourceRefer into @p SelfRefer is @c noexcept —
+    /// checking @c operator_assign when it exists, falling back to @c operator=.
+    template <typename ExecutorType, typename SelfRefer, typename SourceRefer>
+    inline constexpr bool is_executor_assign_noexcept_v = []() constexpr -> bool {
+        if constexpr (has_operator_assign_v<ExecutorType, SelfRefer, SourceRefer>)
+            return noexcept(ExecutorType::operator_assign(::std::declval<SelfRefer>(),
+                ::std::declval<SourceRefer>()));
+        else
+            return ::std::is_nothrow_assignable_v<SelfRefer, SourceRefer>;
+    }();
+
+    /// @ingroup scl_feature_type_traits
+    /// @brief @c true if executor assignment from @p SourceRefer to @p SelfRefer is possible
+    ///        via @c operator_assign or @c operator=.
+    template <typename ExecutorType, typename SelfRefer, typename SourceRefer>
+    inline constexpr bool executor_assign_possible_v = has_operator_assign_v<ExecutorType, SelfRefer, SourceRefer> ||
+        ::std::assignable_from<SelfRefer, SourceRefer>;
+
     // -------------------------------------------------------------------------
 
     namespace detail

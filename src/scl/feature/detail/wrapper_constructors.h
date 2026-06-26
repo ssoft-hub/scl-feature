@@ -1,5 +1,7 @@
 #pragma once
 
+#include <scl/feature/type_traits/executor.h>
+
 #include <concepts>
 #include <type_traits>
 
@@ -51,13 +53,20 @@
 
 /// @internal
 /// @brief Generates one assignment operator for `self_type cv_ref` source.
-#define SCL_WRAPPER_ASSIGNMENT_FOR_SELF_PROTOTYPE(cv_ref)                               \
-    constexpr wrapper & operator=(self_type cv_ref other) /**/                          \
-        noexcept(::std::is_nothrow_assignable_v<executor_type &, executor_type cv_ref>) \
-        requires(::std::assignable_from<executor_type &, executor_type cv_ref>)         \
-    {                                                                                   \
-        m_executor = ::scl::forward_like<self_type cv_ref>(other.m_executor);           \
-        return *this;                                                                   \
+///
+/// Dispatches through @c executor_type::operator_assign when it exists (e.g.
+/// @c implicit::indirect), otherwise falls back to the executor's @c operator=.
+#define SCL_WRAPPER_ASSIGNMENT_FOR_SELF_PROTOTYPE(cv_ref)                                                             \
+    constexpr wrapper & operator=(self_type cv_ref other) /**/                                                        \
+        noexcept(::scl::feature::is_executor_assign_noexcept_v<executor_type, executor_type &, executor_type cv_ref>) \
+        requires(::scl::feature::executor_assign_possible_v<executor_type, executor_type &, executor_type cv_ref>)    \
+    {                                                                                                                 \
+        if constexpr (::scl::feature::has_operator_assign_v<executor_type, executor_type &, executor_type cv_ref>)    \
+            executor_type::operator_assign(m_executor,                                                                \
+                ::scl::forward_like<self_type cv_ref>(other.m_executor));                                             \
+        else                                                                                                          \
+            m_executor = ::scl::forward_like<self_type cv_ref>(other.m_executor);                                     \
+        return *this;                                                                                                 \
     }
 
 /// @internal
