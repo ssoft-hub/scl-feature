@@ -8,6 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- `scl::feature::implicit::indirect<Value, Allocator, Counter>` — copy-on-write executor that
+  stores the value on the heap in a single intrusive control block; copies share one allocation
+  and a shared value is cloned lazily on the first access through a non-const wrapper, while const
+  access never clones. Keeps the executor one pointer wide (with an empty allocator), allows a
+  custom allocator (rebound internally; a stateful instance via the `std::allocator_arg` overload),
+  and lets the reference counter type be chosen — `std::atomic` (default) for a thread-safe count
+  or a plain integer for single-threaded use
 - `SCL_REFLECT_MEMBER_BINARY_OPERATOR(op, name)`, `SCL_REFLECT_MEMBER_PREFIX_UNARY_OPERATOR`,
   `SCL_REFLECT_MEMBER_POSTFIX_UNARY_OPERATOR` — member-only operator reflection; required for
   operators C++ mandates as non-static member functions (`=`, `->`, compound assigns)
