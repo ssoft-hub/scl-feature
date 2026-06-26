@@ -25,9 +25,11 @@
  * |----------|---------|----------|
  * | @c scl::feature::inplace::plain | in-place, direct | none |
  * | @c scl::feature::inplace::uninitialized | in-place, raw aligned storage | none |
+ * | @c scl::feature::implicit::indirect | heap, copy-on-write | intrusive counter (1 pointer) |
  * @{
  */
 
+#include <scl/feature/executor/implicit/indirect.h>
 #include <scl/feature/executor/inplace/plain.h>
 #include <scl/feature/executor/inplace/uninitialized.h>
 
