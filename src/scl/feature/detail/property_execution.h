@@ -29,8 +29,10 @@
 /// The executor stores a @c ptrdiff_t byte-offset from @c &this to the outer
 /// executor, not a raw pointer.  Because the distance between two members of
 /// the same class is invariant across all instances, memberwise copy and move
-/// of the outer wrapper automatically fix up the pointer — no custom
-/// constructors are required.
+/// of the outer wrapper automatically fix up the pointer.  Copy and move
+/// construction stay defaulted (memberwise); they are declared explicitly only
+/// because deleting the assignment operators — required for the executor
+/// concept — would otherwise delete the implicit copy constructor.
 ///
 /// @par Thread safety
 /// @c guard() / @c unguard() are forwarded to the outer executor when it
@@ -130,6 +132,17 @@ namespace scl::feature::detail
                 : m_offset{reinterpret_cast<::std::byte const *>(this) - reinterpret_cast<::std::byte const *>(exec)}
                 , m_property_pointer{property_pointer}
             {}
+
+            /// @internal
+            /// An executor carries no assignment operator of its own.  Copy/move
+            /// construction stays available (memberwise copy fixes up the offset);
+            /// only assignment is removed so the holder satisfies the executor
+            /// concept's no-assignment requirement.
+            holder(holder const &) = default;
+            holder(holder &&) = default;
+            holder & operator=(holder const &) = delete;
+            holder & operator=(holder &&) = delete;
+            ~holder() = default;
 
             // ── executor interface ────────────────────────────────────────────
 

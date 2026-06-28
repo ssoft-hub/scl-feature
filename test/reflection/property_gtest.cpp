@@ -27,6 +27,10 @@ struct PointExecutor
 {
     Point m_value;
 
+    // An executor carries no assignment operator of its own (deleting copy
+    // assignment also blocks move assignment, leaving construction intact).
+    PointExecutor & operator=(PointExecutor const &) = delete;
+
     template <typename Self, typename Func, typename... Args>
     static constexpr decltype(auto) execute(Self && self, Func && func, Args &&... args)
         noexcept(::std::is_nothrow_invocable_v<Func &&, Args &&...>)
@@ -173,6 +177,10 @@ namespace
     {
         Bag m_value;
 
+        // An executor carries no assignment operator of its own (deleting copy
+        // assignment also blocks move assignment, leaving construction intact).
+        BagExecutor & operator=(BagExecutor const &) = delete;
+
         template <typename Self, typename Func, typename... Args>
         static constexpr decltype(auto) execute(Self && self, Func && func, Args &&... args)
             noexcept(::std::is_nothrow_invocable_v<Func &&, Args &&...>)
@@ -242,6 +250,10 @@ namespace
     struct GuardingExecutor
     {
         Point m_value;
+
+        // An executor carries no assignment operator of its own (deleting copy
+        // assignment also blocks move assignment, leaving construction intact).
+        GuardingExecutor & operator=(GuardingExecutor const &) = delete;
 
         template <typename Self>
         static void guard(Self && self) noexcept
