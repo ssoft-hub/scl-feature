@@ -31,25 +31,6 @@
     SCL_EXECUTOR_CONSTRUCTOR_FOR_SELF_PROTOTYPE(volatile &&)      \
     SCL_EXECUTOR_CONSTRUCTOR_FOR_SELF_PROTOTYPE(const volatile &&)
 
-#define SCL_EXECUTOR_ASSIGNMENT_FOR_SELF_PROTOTYPE(cv_ref)                                                              \
-    constexpr uninitialized & operator=(self_type cv_ref other) /**/                                                    \
-        noexcept                                                                                                        \
-        requires(::std::is_trivially_copyable_v<value_type> && ::std::assignable_from<value_type &, value_type cv_ref>) \
-    {                                                                                                                   \
-        ::std::ranges::copy(other.m_storage, m_storage);                                                                \
-        return *this;                                                                                                   \
-    }
-
-#define SCL_EXECUTOR_ASSIGNMENT_FOR_SELF                         \
-    SCL_EXECUTOR_ASSIGNMENT_FOR_SELF_PROTOTYPE(&)                \
-    SCL_EXECUTOR_ASSIGNMENT_FOR_SELF_PROTOTYPE(const &)          \
-    SCL_EXECUTOR_ASSIGNMENT_FOR_SELF_PROTOTYPE(volatile &)       \
-    SCL_EXECUTOR_ASSIGNMENT_FOR_SELF_PROTOTYPE(const volatile &) \
-    SCL_EXECUTOR_ASSIGNMENT_FOR_SELF_PROTOTYPE(&&)               \
-    SCL_EXECUTOR_ASSIGNMENT_FOR_SELF_PROTOTYPE(const &&)         \
-    SCL_EXECUTOR_ASSIGNMENT_FOR_SELF_PROTOTYPE(volatile &&)      \
-    SCL_EXECUTOR_ASSIGNMENT_FOR_SELF_PROTOTYPE(const volatile &&)
-
 namespace scl::feature::inplace
 {
     /**
@@ -84,7 +65,11 @@ namespace scl::feature::inplace
         constexpr uninitialized() noexcept = default;
 
         SCL_EXECUTOR_CONSTRUCTOR_FOR_SELF
-        SCL_EXECUTOR_ASSIGNMENT_FOR_SELF
+
+        // An executor carries no assignment operator of its own; assignment is
+        // performed value-semantically by the wrapper through execute().
+        uninitialized & operator=(uninitialized const &) = delete;
+        uninitialized & operator=(uninitialized &&) = delete;
 
     public:
         template <typename Self, typename Func, typename... Args>
@@ -111,5 +96,3 @@ namespace scl::feature::inplace
 
 #undef SCL_EXECUTOR_CONSTRUCTOR_FOR_SELF
 #undef SCL_EXECUTOR_CONSTRUCTOR_FOR_SELF_PROTOTYPE
-#undef SCL_EXECUTOR_ASSIGNMENT_FOR_SELF
-#undef SCL_EXECUTOR_ASSIGNMENT_FOR_SELF_PROTOTYPE

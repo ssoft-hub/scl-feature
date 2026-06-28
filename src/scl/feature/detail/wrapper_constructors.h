@@ -1,5 +1,9 @@
 #pragma once
 
+#include <scl/feature/detail/executor_access.h>
+#include <scl/feature/type_traits/wrapper.h>
+#include <scl/utility/type_traits/forward_like.h>
+
 #include <concepts>
 #include <type_traits>
 
@@ -51,13 +55,25 @@
 
 /// @internal
 /// @brief Generates one assignment operator for `self_type cv_ref` source.
-#define SCL_WRAPPER_ASSIGNMENT_FOR_SELF_PROTOTYPE(cv_ref)                               \
-    constexpr wrapper & operator=(self_type cv_ref other) /**/                          \
-        noexcept(::std::is_nothrow_assignable_v<executor_type &, executor_type cv_ref>) \
-        requires(::std::assignable_from<executor_type &, executor_type cv_ref>)         \
-    {                                                                                   \
-        m_executor = ::scl::forward_like<self_type cv_ref>(other.m_executor);           \
-        return *this;                                                                   \
+///
+/// Interim value-level implementation: the executor has no operator= of its own,
+/// so the wrapped value is assigned through execute() (access(self) =
+/// access(source)).  The final assignment strategy is introduced in a follow-up.
+#define SCL_WRAPPER_ASSIGNMENT_FOR_SELF_PROTOTYPE(cv_ref)                                               \
+    constexpr wrapper & operator=(self_type cv_ref other) /**/                                          \
+        noexcept(noexcept(                                                                              \
+            executor_type::access(::std::declval<executor_type &>()) =                                  \
+                executor_type::access(::std::declval<executor_type cv_ref>())))                         \
+        requires requires {                                                                             \
+                     executor_type::access(::std::declval<executor_type &>()) =                         \
+                         executor_type::access(::std::declval<executor_type cv_ref>());                 \
+                 }                                                                                      \
+    {                                                                                                   \
+        executor_type::execute(m_executor, [](auto && scl_self, auto && scl_source) -> decltype(auto) { \
+            return executor_type::access(::std::forward<decltype(scl_self)>(scl_self)) =                \
+                       executor_type::access(::std::forward<decltype(scl_source)>(scl_source));         \
+        }, m_executor, ::scl::forward_like<self_type cv_ref>(other.m_executor));                        \
+        return *this;                                                                                   \
     }
 
 /// @internal
@@ -73,15 +89,28 @@
     SCL_WRAPPER_ASSIGNMENT_FOR_SELF_PROTOTYPE(const volatile &&)
 
 /// @internal
-/// @brief Single forwarding-reference assignment for any other wrapper type.
-#define SCL_WRAPPER_ASSIGNMENT_FOR_OTHER                                                                            \
-    template <typename Other>                                                                                       \
-    constexpr wrapper & operator=(Other && other) /**/                                                              \
-        noexcept(noexcept(::std::declval<wrapper_constructor_resolver<self_type, Other &&>>().resolve()))           \
-        requires(::scl::feature::is_wrapper_v<Other> && !::std::same_as<::std::remove_cvref_t<Other>, self_type> && \
-            ::std::assignable_from<executor_type &,                                                                 \
-                decltype(::std::declval<wrapper_constructor_resolver<self_type, Other &&>>().resolve())>)           \
-    {                                                                                                               \
-        m_executor = wrapper_constructor_resolver<self_type, Other &&>{::std::forward<Other>(other)}.resolve();     \
-        return *this;                                                                                               \
+/// @brief Single forwarding-reference assignment for another wrapper type.
+///
+/// Interim value-level implementation: assigns the source wrapper's value to this
+/// wrapper's value through execute() (access(self) = access(source)), using each
+/// wrapper's own executor.  The final assignment strategy is introduced in a
+/// follow-up.
+#define SCL_WRAPPER_ASSIGNMENT_FOR_OTHER                                                                                    \
+    template <typename Other>                                                                                               \
+    constexpr wrapper & operator=(Other && other) /**/                                                                      \
+        noexcept(noexcept(                                                                                                  \
+            executor_type::access(::std::declval<executor_type &>()) = ::std::remove_cvref_t<Other>::executor_type::access( \
+                ::std::declval<::scl::forward_like_t<Other, typename ::std::remove_cvref_t<Other>::executor_type>>())))     \
+        requires(::scl::feature::is_wrapper_v<Other> && !::std::same_as<::std::remove_cvref_t<Other>, self_type> &&         \
+            requires {                                                                                                      \
+                executor_type::access(::std::declval<executor_type &>()) = ::std::remove_cvref_t<                           \
+                    Other>::executor_type::access(::std::declval<::scl::forward_like_t<Other,                               \
+                        typename ::std::remove_cvref_t<Other>::executor_type>>());                                          \
+            })                                                                                                              \
+    {                                                                                                                       \
+        executor_type::execute(m_executor, [](auto && scl_self, auto && scl_source) -> decltype(auto) {                     \
+            return executor_type::access(::std::forward<decltype(scl_self)>(scl_self)) = ::std::remove_cvref_t<             \
+                       Other>::executor_type::access(::std::forward<decltype(scl_source)>(scl_source));                     \
+        }, m_executor, ::scl::feature::detail::executor_access::get(::std::forward<Other>(other)));                         \
+        return *this;                                                                                                       \
     }

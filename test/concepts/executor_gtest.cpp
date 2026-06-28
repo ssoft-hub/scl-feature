@@ -17,6 +17,11 @@ struct MinimalExecutor
 
     T m_value{};
 
+    // An executor carries no assignment operator of its own.  Deleting copy
+    // assignment also blocks move assignment (an rvalue binds the deleted
+    // copy-assignment) while leaving copy/move construction intact.
+    MinimalExecutor & operator=(MinimalExecutor const &) = delete;
+
     template <typename Self, typename Func>
     static constexpr decltype(auto) execute(Self &&, Func && func)
         requires ::std::same_as<::std::remove_cvref_t<Self>, MinimalExecutor>

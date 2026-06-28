@@ -1,9 +1,11 @@
 #include <gtest_utils.h>
 
 #include <scl/feature/wrapper.h>
+#include <scl/feature/wrapper_cast.h>
 
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 using namespace ::scl;
@@ -59,4 +61,26 @@ TEST(WrapperType, DuplicateToolCollapsed)
 TEST(WrapperType, NoToolDefaultsToPlain)
 {
     STATIC_EXPECT_TRUE((::std::is_same_v<wrapper<int>, wrapper<int, feature::inplace::plain>>));
+}
+
+// ── Assignment ────────────────────────────────────────────────────────────────
+// The executor has no assignment operator of its own; wrapper-to-wrapper
+// assignment is performed value-semantically through the executor's execute().
+
+TEST(WrapperAssign, SelfTypeCopyAssign)
+{
+    wrapper<int> a{42};
+    wrapper<int> b{0};
+    b = a;
+    int const result = wrapper_cast(b);
+    EXPECT_EQ(result, 42);
+}
+
+TEST(WrapperAssign, SelfTypeMoveAssign)
+{
+    wrapper<int> a{7};
+    wrapper<int> b{0};
+    b = ::std::move(a);
+    int const result = wrapper_cast(b);
+    EXPECT_EQ(result, 7);
 }

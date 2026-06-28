@@ -26,9 +26,13 @@
 /// analogous to the execute-path in @c SCL_REFLECT_METHOD.
 ///
 /// @par Copy / move safety
-/// The executor stores a byte offset from @c &this to the outer executor, not a
-/// raw pointer, so memberwise copy/move of the **whole** enclosing wrapper keeps
-/// it valid (both ends translate together) — no custom constructors are required.
+/// The executor stores a @c ptrdiff_t byte offset from @c &this to the outer
+/// executor, not a raw pointer.  Because the distance between two members of the
+/// same class is invariant across all instances, memberwise copy/move of the
+/// **whole** enclosing wrapper keeps it valid (both ends translate together).
+/// Copy and move construction stay defaulted (memberwise); they are declared
+/// explicitly only because deleting the assignment operators — required for the
+/// executor concept — would otherwise delete the implicit copy constructor.
 /// The property member is a view, however: copying, moving, or returning it on its
 /// own re-bases the offset against an unrelated address and corrupts the
 /// back-pointer.  Do not detach it from its wrapper.
@@ -131,6 +135,17 @@ namespace scl::feature::detail
                 : m_offset{reinterpret_cast<::std::byte const *>(this) - reinterpret_cast<::std::byte const *>(exec)}
                 , m_property_pointer{property_pointer}
             {}
+
+            /// @internal
+            /// An executor carries no assignment operator of its own.  Copy/move
+            /// construction stays available (memberwise copy fixes up the offset);
+            /// only assignment is removed so the holder satisfies the executor
+            /// concept's no-assignment requirement.
+            holder(holder const &) = default;
+            holder(holder &&) = default;
+            holder & operator=(holder const &) = delete;
+            holder & operator=(holder &&) = delete;
+            ~holder() = default;
 
             // ── executor interface ────────────────────────────────────────────
 
