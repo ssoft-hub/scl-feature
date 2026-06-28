@@ -92,22 +92,53 @@ duplicate member definitions.
 
 ---
 
-## Dispatch (all families)
+## Selection and return type
 
-Each generated overload participates in the same two-path dispatch:
+A call resolves in two steps: it first picks a **direction** (which generated
+overload is viable), then a **path** (how that overload reaches the value).
 
-| Path | Active when | Action |
-|------|-------------|--------|
-| *executor-override* | `Executor::operator_<name>(exec, args...)` exists | calls that static member directly |
-| *execute-path* | no executor override | calls `Executor::execute(exec, callable, value, args...)` |
+### Direction (binary operators)
+
+| Expression | Overload chosen | Reflects |
+|------------|-----------------|----------|
+| `w op x` (wrapper on the left) | member | `value op x` |
+| `x op w` (wrapper on the right, `x` not a wrapper) | reverse-operand friend | `x op value` |
+| `w1 op w2` (both wrappers) | member — the reverse friend is constrained out via `is_wrapper_v` | `value1 op w2` |
+
+A member (wrapper-left) overload is viable **only when the wrapped value actually
+has a matching `operator op`** for that cv-ref qualifier; otherwise it is
+constrained out. Fundamental value types (`int`, `double`, …) have no member
+operators, so for them the wrapper-left forms — including `w op x` and every
+compound assignment `w op= x` — are **not** generated; only the reverse friends
+(`x op w`) apply, because `x op value` is valid built-in syntax.
+
+> `scl::wrapper`'s own copy/move assignment `=` is the one exception to the
+> fundamental-type rule: `w = value` assigns the wrapped value for fundamental and
+> class value types alike, because it is not a reflected member operator but a
+> dedicated wrapper operator using expression assignment. See
+> [wrapper](../wrapper/wrapper.md).
+
+### Path (within the chosen overload)
+
+| Path | Active when | Calls | Returns |
+|------|-------------|-------|---------|
+| *executor-override* | `Executor::operator_<name>(exec, args...)` exists | that static member directly, with the **raw** operands | the override's return type |
+| *execute-path* | no executor override | `Executor::execute(exec, callable, exec, args...)`; the callable applies `scl::wrapper_cast` to wrapper arguments and resolves the value inside `execute()` | the reflected call's return type |
+
+Every overload is declared `decltype(auto)`: the wrapper returns the override's
+result (override path) or the wrapped value's operator result (execute path)
+verbatim — it never rewraps the result. There is no executor-override path for the
+reverse-operand friends; the `operator_<name>` convention applies to the
+wrapper-left member overloads only.
 
 ---
 
 ## Constraint: distinct return types
 
-All operator families share the same constraint as `SCL_REFLECT_METHOD`: overloads
-for different cv-ref qualifiers must return distinct types so that
-`SCL_HAS_QUALIFIED_METHOD` can distinguish them.
+All operator families share the same constraint as `SCL_REFLECT_METHOD`: the
+value type's `operator op` overloads for different cv-ref qualifiers must return
+distinct types, so that `SCL_HAS_QUALIFIED_METHOD` can tell them apart by return
+type when selecting the qualifier-matching overload.
 
 ---
 
@@ -131,23 +162,31 @@ bool r2 = (a == Length{});   // member overload (wrapper on left)
 bool r3 = (Length{} == a);   // reverse-operand hidden friend (wrapper on right)
 ```
 
-### Mandatory-member assignment
+### Mandatory-member compound assignment
 
 ```cpp
 struct Counter {
-    Counter & operator=(int) &;
+    Counter & operator+=(int) &;
 };
 
 template <typename W, typename E>
 class scl::feature::reflect<W, E, Counter>
 {
     SCL_REFLECT_TYPE(W, E)
-    SCL_REFLECT_MEMBER_BINARY_OPERATOR(=, assign)
+    SCL_REFLECT_MEMBER_BINARY_OPERATOR(+=, plus_assign)
 };
 
 scl::wrapper<Counter> c;
-c = 42;   // OK — member operator=
+c += 42;   // OK — reflects Counter::operator+=
 ```
+
+> Plain `=` is different. On `scl::wrapper` the copy/move/converting assignment is
+> the wrapper's **own** operator (it must suppress the implicitly-deleted copy/move
+> assignment; see [wrapper](../wrapper/wrapper.md)), which hides any reflected
+> `operator=`. `SCL_REFLECT_MEMBER_BINARY_OPERATOR(=, assign)` therefore governs
+> assignment only for a custom proxy type that inherits the reflected operators
+> without declaring its own `operator=`, not for `scl::wrapper`. The compound
+> assignments (`+=`, `*=`, …) and `->` are reflected normally on every wrapper.
 
 ---
 

@@ -45,8 +45,9 @@ namespace scl::feature::detail
         SCL_WRAPPER_CONSTRUCTOR_FOR_SELF // NOLINT(performance-noexcept-move-constructor)
         // cppcheck-suppress noExplicitConstructor
         SCL_WRAPPER_CONSTRUCTOR_FOR_OTHER
+        SCL_WRAPPER_ASSIGNMENT_DISPATCH
         SCL_WRAPPER_ASSIGNMENT_FOR_SELF
-        SCL_WRAPPER_ASSIGNMENT_FOR_OTHER
+        SCL_WRAPPER_ASSIGNMENT_FOR_OPERAND
         // clang-format on
     };
     // NOLINTEND(cppcoreguidelines-special-member-functions, cppcoreguidelines-c-copy-assignment-signature)

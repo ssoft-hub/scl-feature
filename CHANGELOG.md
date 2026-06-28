@@ -14,16 +14,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `SCL_REFLECT_FRIEND_BINARY_OPERATOR(op, name)`, `SCL_REFLECT_FRIEND_PREFIX_UNARY_OPERATOR`,
   `SCL_REFLECT_FRIEND_POSTFIX_UNARY_OPERATOR` — hidden-friend (ADL-only) operator reflection
   with no member counterpart; the wrapper is the explicit first parameter
-- Assignment operators for `inplace::plain` — eight cv-ref overloads via
-  `SCL_EXECUTOR_ASSIGNMENT_FOR_SELF`; constrained on `assignable_from<value_type>`, `noexcept`-propagating,
-  value forwarded with `scl::forward_like`
-- Assignment operators for `inplace::uninitialized` — eight cv-ref overloads via
-  `SCL_EXECUTOR_ASSIGNMENT_FOR_SELF`; copies raw storage bytes via `std::ranges::copy`,
-  constrained (together with the copy/move constructor) to `std::is_trivially_copyable_v`
-  value types — byte-copying a non-trivially-copyable object is undefined behaviour
-- Assignment operators for `scl::wrapper` — eight self-type cv-ref overloads
-  (`SCL_WRAPPER_ASSIGNMENT_FOR_SELF`) plus a forwarding-reference overload for compatible
-  wrapper types (`SCL_WRAPPER_ASSIGNMENT_FOR_OTHER`)
+- Assignment for `scl::wrapper` — `wrapper = x` assigns the wrapped value for any
+  right-hand operand: a plain value, another wrapper (read through its own executor,
+  so value types may differ), or the same wrapper type. Assignment reflects through
+  the executor with the same dispatch as every other reflected operator: an executor
+  `operator_assign(self, rhs)` override is used when present (receiving the raw
+  operand, the same convention as `operator_<name>` overrides), otherwise the value
+  is assigned through `execute()`. Executors themselves carry no assignment operator
 - `scl::wrapper_lock<Refer>` — lazy RAII lock for a single wrapper layer; `lock()`/`unlock()`
   call `guard()`/`unguard()` on the executor; non-copyable and non-movable
 - `scl::value_lock<Refer>` — recursive lazy lock through the entire wrapper chain; captures
@@ -33,7 +30,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   to any type reachable in the wrapper chain via `.to<T>()` or implicit conversion operators;
   pass-through for non-wrapper types
 - `is_executor_v<T>` — checks whether `T` satisfies the executor interface (`access()` and
-  `execute()` callable for all three primary value categories); cv-ref qualifiers are stripped
+  `execute()` callable for all three primary value categories, and no assignment operator of
+  its own — an executor is neither copy- nor move-assignable); cv-ref qualifiers are stripped
 - `concepts::executor<T>` — concept wrapping `is_executor_v`
 - `is_convertible_from_v<Target, Refer>` — checks whether `Target` is reachable from `Refer`
   directly or by traversing any number of wrapper layers
