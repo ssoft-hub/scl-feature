@@ -45,6 +45,7 @@ namespace scl::feature::detail
         SCL_WRAPPER_CONSTRUCTOR_FOR_SELF // NOLINT(performance-noexcept-move-constructor)
         // cppcheck-suppress noExplicitConstructor
         SCL_WRAPPER_CONSTRUCTOR_FOR_OTHER
+        SCL_WRAPPER_ASSIGNMENT_PERFORMER
         SCL_WRAPPER_ASSIGNMENT_FOR_SELF
         SCL_WRAPPER_ASSIGNMENT_FOR_OTHER
         // clang-format on
