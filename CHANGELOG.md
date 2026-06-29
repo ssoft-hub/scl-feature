@@ -103,6 +103,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- Reflection test suite no longer aborts compilation under MSVC: the `can_call_set_v`
+  call-site checks tripped a fatal internal compiler error (C1001) on the non-Clang MSVC
+  frontend. The checks now route through `is_invocable` on a SFINAE-friendly lambda,
+  restoring the full test build on MSVC alongside GCC and Clang
 - Reflected method, operator, and property dispatch resolved the wrapped value too early —
   as an argument to `Executor::execute()`, evaluated before `execute()` ran. The executor is
   now passed to the dispatch callable, which resolves the value from inside `execute()`, so

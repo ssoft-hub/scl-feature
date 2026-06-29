@@ -154,8 +154,15 @@ struct PlainReflected
 // Helper: call-site concept check
 // ============================================================================
 
+// NOTE: a bare requires-expression here — `requires { declval<T>().set(...); }` —
+// makes MSVC's non-Clang frontend ICE (C1001) when T's set() is a reflected method.
+// Routing the same check through is_invocable on a SFINAE-friendly lambda avoids it
+// while staying equivalent on every compiler.
+inline constexpr auto can_call_set_fn = [](auto && t, auto &&... a)
+    -> decltype(static_cast<decltype(t)>(t).set(static_cast<decltype(a)>(a)...)) {};
+
 template <typename T, typename... Args>
-constexpr bool can_call_set_v = requires { ::std::declval<T>().set(::std::declval<Args>()...); };
+constexpr bool can_call_set_v = ::std::is_invocable_v<decltype(can_call_set_fn), T, Args...>;
 
 // ============================================================================
 // Tests — reflected method returns execute()'s result, not the wrapped type
@@ -253,11 +260,6 @@ TEST(ReflectMethodExecuteResult, SetWithConstWrapperLValueGoesToExecute)
 // Tests — reflected interface accepts scl::wrapper<T> in place of raw T
 // ============================================================================
 
-// MSVC (non-Clang frontend) triggers fatal error C1001 (internal compiler error)
-// when evaluating can_call_set_v inside a requires-expression that involves the
-// reflected set() signature.
-#if !defined(_MSC_VER) || defined(__clang__)
-
 TEST(ReflectMethodWrapperArg, IsCallableWithWrapperRValue)
 {
     STATIC_EXPECT_TRUE((can_call_set_v<PlainReflected &, ::scl::wrapper<short>>));
@@ -272,8 +274,6 @@ TEST(ReflectMethodWrapperArg, IsCallableWithConstWrapperLValue)
 {
     STATIC_EXPECT_TRUE((can_call_set_v<PlainReflected &, ::scl::wrapper<short> const &>));
 }
-
-#endif // !_MSC_VER
 
 TEST(ReflectMethodWrapperArg, SetWithWrapperRValueSetsValue)
 {
