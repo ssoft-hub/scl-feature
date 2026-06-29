@@ -2,6 +2,9 @@
 
 #include <scl/feature/wrapper.h>
 
+#include <type_traits>
+#include <utility>
+
 // ============================================================================
 // Tests for reflect<Wrapper, Executor, Target> specialization.
 //
@@ -165,8 +168,15 @@ TEST(ReflectSetMethod, SetWithWrapperArgument)
     EXPECT_EQ(r.get(), short{77});
 }
 
+// NOTE: a bare requires-expression here — `requires { declval<T>().set(...); }` —
+// makes MSVC's non-Clang frontend ICE (C1001) when T's set() is a reflected method.
+// Routing the same check through is_invocable on a SFINAE-friendly lambda avoids it
+// while staying equivalent on every compiler.
+inline constexpr auto can_call_set_fn = [](auto && t, auto &&... a)
+    -> decltype(static_cast<decltype(t)>(t).set(static_cast<decltype(a)>(a)...)) {};
+
 template <typename T, typename... Args>
-constexpr bool can_call_set_v = requires { ::std::declval<T>().set(::std::declval<Args>()...); };
+constexpr bool can_call_set_v = ::std::is_invocable_v<decltype(can_call_set_fn), T, Args...>;
 
 TEST(ReflectSetMethod, AvailableOnLValue)
 {
