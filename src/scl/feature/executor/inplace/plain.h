@@ -57,8 +57,11 @@ namespace scl::feature::inplace
         using value_type = Value;
 
     public:
+        // Constrained on the member initialisation: unconstrained, this ctor is selected for any
+        // argument, so `is_constructible` reports true even when `value_type{args...}` won't compile.
         template <typename... Args>
         constexpr explicit plain(Args &&... args)
+            requires requires { value_type{::std::declval<Args>()...}; }
             : m_value{::std::forward<Args>(args)...}
         {}
 

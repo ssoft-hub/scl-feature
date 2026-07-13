@@ -91,7 +91,7 @@ struct WrappedTarget
     SCL_REFLECT_BINARY_OPERATOR(+, op_add)
 
     // Friend-inline: unary prefix -
-    SCL_REFLECT_BINARY_OPERATOR(-, op_neg)
+    SCL_REFLECT_PREFIX_UNARY_OPERATOR(-, op_neg)
 
     // Friend-inline: prefix ++
     SCL_REFLECT_PREFIX_UNARY_OPERATOR(++, op_preinc)
@@ -533,3 +533,100 @@ TEST(ReflectReverseOperator, WrapperLhsUsesMemberNotReverseFriend)
     // i.e. the reverse friend does not silently hijack wrapper-on-the-left calls.
     STATIC_EXPECT_FALSE((sym_can_add_v<SymWrapped &, SymWrapped &>));
 }
+
+// ============================================================================
+// Reverse-operand guard: the wrapped value is an operand of a free operator, so
+// it must be reached through the executor guard (guard()/unguard() must fire),
+// not raw access.  A guard-counting executor proves the reflected reverse friend
+// brackets the operation with guard/unguard.
+// ============================================================================
+
+namespace
+{
+    int g_rev_guard_count = 0;
+    int g_rev_unguard_count = 0;
+
+    struct RevGuardTarget
+    {
+        int value = 0;
+
+        // Member operators keep the member-overload machinery well-formed (distinct
+        // return types per cv-ref for SCL_HAS_QUALIFIED_*); `w + x` uses these.
+        constexpr short operator+(int rhs) & { return static_cast<short>(value + rhs); }
+        constexpr int operator+(int rhs) const & { return value + rhs + 50; }
+
+        // Free (non-member) operator — reflected via the reverse friend for `x + w`.
+        friend constexpr long operator+(int lhs, RevGuardTarget const & self)
+        {
+            return static_cast<long>(lhs + self.value);
+        }
+    };
+
+    struct RevGuardExecutor
+    {
+        RevGuardTarget m_value;
+
+        template <typename Self>
+        static void guard(Self &&) noexcept
+        {
+            ++g_rev_guard_count;
+        }
+
+        template <typename Self>
+        static void unguard(Self &&) noexcept
+        {
+            ++g_rev_unguard_count;
+        }
+
+        template <typename Self, typename Func, typename... Args>
+        static constexpr decltype(auto) execute(Self &&, Func && func, Args &&... args)
+        {
+            return ::std::forward<Func>(func)(::std::forward<Args>(args)...);
+        }
+
+        template <typename Self>
+        static constexpr decltype(auto) access(Self && self)
+        {
+            return ::scl::forward_like<Self>(self.m_value);
+        }
+    };
+} // namespace
+
+struct RevGuardWrapped;
+
+template <>
+struct scl::feature::executor_trait<RevGuardWrapped>
+{
+    template <typename Self>
+    static constexpr decltype(auto) executor(Self && self)
+    {
+        return ::scl::forward_like<Self>(self.m_exec);
+    }
+};
+
+struct RevGuardWrapped
+{
+    RevGuardExecutor m_exec;
+
+    SCL_REFLECT_TYPE(RevGuardWrapped, RevGuardExecutor);
+
+    explicit RevGuardWrapped(int v)
+        : m_exec{RevGuardTarget{v}}
+    {}
+
+    SCL_REFLECT_BINARY_OPERATOR(+, op_add)
+};
+
+TEST(ReflectReverseOperator, ReverseFriendGuardsWrappedValue)
+{
+    g_rev_guard_count = 0;
+    g_rev_unguard_count = 0;
+
+    RevGuardWrapped w{10};
+    auto result = 5 + w; // reverse friend → 5 + value, bracketed by guard/unguard
+
+    EXPECT_EQ(result, 15L);
+    EXPECT_EQ(g_rev_guard_count, 1);
+    EXPECT_EQ(g_rev_unguard_count, 1);
+}
+

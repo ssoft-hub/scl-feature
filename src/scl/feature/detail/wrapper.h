@@ -45,7 +45,10 @@ namespace scl::feature::detail
         SCL_WRAPPER_CONSTRUCTOR_FOR_SELF // NOLINT(performance-noexcept-move-constructor)
         // cppcheck-suppress noExplicitConstructor
         SCL_WRAPPER_CONSTRUCTOR_FOR_OTHER
-        SCL_WRAPPER_ASSIGNMENT_DISPATCH
+
+        // Assignment forwards to the reflected operator= in reflect_operators: the operand overload
+        // for any non-self source, plus explicit self-type overloads that suppress the deleted
+        // implicit copy/move assignment.
         SCL_WRAPPER_ASSIGNMENT_FOR_SELF
         SCL_WRAPPER_ASSIGNMENT_FOR_OPERAND
         // clang-format on

@@ -4,6 +4,8 @@
 /// @brief Internal accessor macros for executor and value access in reflected methods.
 /// @ingroup scl_feature_reflection
 
+#include <scl/feature/detail/executor_guard.h>
+#include <scl/feature/detail/wrapper_guard.h>
 #include <scl/feature/type_traits/executor.h>
 
 #include <type_traits>
@@ -75,6 +77,85 @@
         [](auto && scl_e, ScLArgs &&... values) -> decltype(auto) {              \
         return caller::template call<ScLParam, ScLParams...>(                    \
             s_c_l_executor_type::access(::std::forward<decltype(scl_e)>(scl_e)), \
+            ::std::forward<ScLArgs>(values)...);                                 \
+    }, SCL_EXECUTOR_ACCESS(cv_ref), ::std::forward<ScLArgs>(scl_args)...)
+
+/// @internal
+/// @brief Dispatches a binary/compound infix operator through @c Executor::execute,
+///        preferring the wrapped value's member operator and falling back to the
+///        free (non-member / built-in) expression form.
+///
+/// Selects between two forms with @c if @c constexpr:
+/// -# **member call** — @c access(self).operator op(wrapper_cast(args)...) — chosen
+///    when the wrapped value exposes a matching member operator
+///    (@c operator_##name##_scl_member_ok).  Unchanged from @c SCL_EXECUTE_OVERRIDED,
+///    so member-typed values keep their exact behaviour.
+/// -# **free expression** — @c guarded(value) op guarded(arg) — chosen otherwise, so
+///    fundamental and free-operator value types are reflected.  Both operands are
+///    reached single-level under a guard (@c executor_guard for @c self, @c wrapper_guard
+///    for the argument, which unwraps one level for a wrapper operand and is the
+///    identity for a plain one) so that guard()/unguard() fire once per wrapped operand
+///    and overload selection stays deterministic (a full @c wrapper_cast would expose an
+///    implicit conversion per nesting level and make the operator ambiguous).
+///
+/// @param op      The C++ binary operator token (e.g. @c +, @c ==, @c +=).
+/// @param name    Short unique name identifying the operator (plain identifier).
+/// @param cv_ref  cv-ref qualifiers applied to the wrapper.
+#define SCL_EXECUTE_INFIX_FREE(op, name, cv_ref)                             \
+    s_c_l_executor_type::execute(SCL_EXECUTOR_ACCESS(cv_ref),                \
+        [](auto && scl_e, ScLArgs &&... values) -> decltype(auto) {          \
+        ::scl::feature::detail::executor_guard<decltype(scl_e)> scl_guard{   \
+            ::std::forward<decltype(scl_e)>(scl_e)};                         \
+        return operator_##name##_scl_infix_applier::apply(scl_guard.value(), \
+            ::std::forward<ScLArgs>(values)...);                             \
+    }, SCL_EXECUTOR_ACCESS(cv_ref), ::std::forward<ScLArgs>(scl_args)...)
+
+/// @internal
+/// @brief Dispatches a free (member-or-built-in) **prefix** unary operator @c op value through
+///        @c Executor::execute — the guarded value is combined with the operator as an
+///        expression, so a member unary operator is found by overload resolution.
+///
+/// @param op     The C++ prefix-unary operator token.
+/// @param cv_ref cv-ref qualifiers applied to the wrapper.
+#define SCL_EXECUTE_PREFIX_UNARY_FREE(op, cv_ref)                                                   \
+    s_c_l_executor_type::execute(SCL_EXECUTOR_ACCESS(cv_ref), [](auto && scl_e) -> decltype(auto) { \
+        ::scl::feature::detail::executor_guard<decltype(scl_e)> scl_guard{                          \
+            ::std::forward<decltype(scl_e)>(scl_e)};                                                \
+        return op scl_guard.value();                                                                \
+    }, SCL_EXECUTOR_ACCESS(cv_ref))
+
+/// @internal
+/// @brief Dispatches a free (member-or-built-in) **postfix** unary operator @c value op through
+///        @c Executor::execute.
+///
+/// @param op     The C++ postfix-unary operator token (@c ++ or @c --).
+/// @param cv_ref cv-ref qualifiers applied to the wrapper.
+#define SCL_EXECUTE_POSTFIX_UNARY_FREE(op, cv_ref)                                                  \
+    s_c_l_executor_type::execute(SCL_EXECUTOR_ACCESS(cv_ref), [](auto && scl_e) -> decltype(auto) { \
+        ::scl::feature::detail::executor_guard<decltype(scl_e)> scl_guard{                          \
+            ::std::forward<decltype(scl_e)>(scl_e)};                                                \
+        return scl_guard.value() op;                                                                \
+    }, SCL_EXECUTOR_ACCESS(cv_ref))
+
+/// @internal
+/// @brief Dispatches @c operator[] through @c Executor::execute, preferring the
+///        wrapped value's member @c operator[] and falling back to the built-in /
+///        free subscript expression @c guarded(value)[guarded(arg)].
+///
+/// Free-subscript counterpart of @c SCL_EXECUTE_INFIX_FREE (bracket syntax rather than an
+/// infix token).  Reflects a pointer/built-in value's subscript.  A separate constrained
+/// overload (not an @c if @c constexpr inside this lambda) handles the member @c operator[]
+/// case — MSVC internal-compiler-errors on @c if @c constexpr with @c decltype(auto) inside a
+/// lambda, so the member/free split is expressed as two overloads instead.
+///
+/// @param name    Short unique name identifying the operator (plain identifier).
+/// @param cv_ref  cv-ref qualifiers applied to the wrapper.
+#define SCL_EXECUTE_SUBSCRIPT_FREE(name, cv_ref)                                 \
+    s_c_l_executor_type::execute(SCL_EXECUTOR_ACCESS(cv_ref),                    \
+        [](auto && scl_e, ScLArgs &&... values) -> decltype(auto) {              \
+        ::scl::feature::detail::executor_guard<decltype(scl_e)> scl_guard{       \
+            ::std::forward<decltype(scl_e)>(scl_e)};                             \
+        return operator_##name##_scl_subscript_applier::apply(scl_guard.value(), \
             ::std::forward<ScLArgs>(values)...);                                 \
     }, SCL_EXECUTOR_ACCESS(cv_ref), ::std::forward<ScLArgs>(scl_args)...)
 
@@ -166,6 +247,45 @@
     }, ::std::declval<s_c_l_executor_type cv_ref>(), ::std::forward<ScLArgs>(scl_args)...)
 
 /// @internal
+/// @brief Dispatches a **free** (non-member) forward operator @c value op arg through
+///        @c Executor::execute from a hidden-friend function body.
+///
+/// Reflects the wrapped value's free/built-in operator rather than a member call: the value is
+/// reached one level down under @c executor_guard and combined with the argument through the
+/// operator's @c infix_applier (which guards a wrapper argument single-level).  Used by the
+/// standalone @c SCL_REFLECT_FRIEND_BINARY_OPERATOR overloads.
+///
+/// @param name      Short unique name identifying the operator (plain identifier).
+/// @param scl_self  The explicit wrapper parameter name.
+/// @param cv_ref    cv-ref qualifiers of @p scl_self.
+#define SCL_FRIEND_EXECUTE_INFIX_FREE(name, scl_self, cv_ref)                  \
+    s_c_l_executor_type::execute(SCL_FRIEND_EXECUTOR_ACCESS(scl_self, cv_ref), \
+        [](auto && scl_e, ScLArgs &&... values) -> decltype(auto) {            \
+        ::scl::feature::detail::executor_guard<decltype(scl_e)> scl_guard{     \
+            ::std::forward<decltype(scl_e)>(scl_e)};                           \
+        return operator_##name##_scl_infix_applier::apply(scl_guard.value(),   \
+            ::std::forward<ScLArgs>(values)...);                               \
+    }, SCL_FRIEND_EXECUTOR_ACCESS(scl_self, cv_ref), ::std::forward<ScLArgs>(scl_args)...)
+
+/// @internal
+/// @brief Noexcept-safe free forward-operator execute expression for friend noexcept specifiers.
+///
+/// Equivalent to @c SCL_FRIEND_EXECUTE_INFIX_FREE but uses
+/// @c std::declval\<s_c_l_executor_type cv_ref\>() so it is safe to evaluate while the wrapper
+/// class is still incomplete (GCC evaluates friend noexcept specifiers eagerly).
+///
+/// @param name   Short unique name identifying the operator (plain identifier).
+/// @param cv_ref cv-ref qualifiers of the wrapper parameter.
+#define SCL_FRIEND_EXECUTE_INFIX_FREE_NX(name, cv_ref)                         \
+    s_c_l_executor_type::execute(::std::declval<s_c_l_executor_type cv_ref>(), \
+        [](auto && scl_e, ScLArgs &&... values) -> decltype(auto) {            \
+        ::scl::feature::detail::executor_guard<decltype(scl_e)> scl_guard{     \
+            ::std::forward<decltype(scl_e)>(scl_e)};                           \
+        return operator_##name##_scl_infix_applier::apply(scl_guard.value(),   \
+            ::std::forward<ScLArgs>(values)...);                               \
+    }, ::std::declval<s_c_l_executor_type cv_ref>(), ::std::declval<ScLArgs>()...)
+
+/// @internal
 /// @brief Dispatches a reverse-operand binary operator (@c lhs @c op @c value) through
 ///        @c Executor::execute from a friend function body.
 ///
@@ -179,11 +299,12 @@
 /// @param scl_self  The explicit wrapper parameter name.
 /// @param scl_lhs   The external left-operand parameter name.
 /// @param cv_ref    cv-ref qualifiers of @p scl_self.
-#define SCL_FRIEND_REVERSE_EXECUTE(op, scl_self, scl_lhs, cv_ref)                   \
-    s_c_l_executor_type::execute(SCL_FRIEND_EXECUTOR_ACCESS(scl_self, cv_ref),      \
-        [](auto && scl_e, auto && scl_l) -> decltype(auto) {                        \
-        return ::std::forward<decltype(scl_l)>(scl_l)                               \
-            op s_c_l_executor_type::access(::std::forward<decltype(scl_e)>(scl_e)); \
+#define SCL_FRIEND_REVERSE_EXECUTE(op, scl_self, scl_lhs, cv_ref)              \
+    s_c_l_executor_type::execute(SCL_FRIEND_EXECUTOR_ACCESS(scl_self, cv_ref), \
+        [](auto && scl_e, auto && scl_l) -> decltype(auto) {                   \
+        ::scl::feature::detail::executor_guard<decltype(scl_e)> scl_guard{     \
+            ::std::forward<decltype(scl_e)>(scl_e)};                           \
+        return ::std::forward<decltype(scl_l)>(scl_l) op scl_guard.value();    \
     }, SCL_FRIEND_EXECUTOR_ACCESS(scl_self, cv_ref), ::std::forward<ScLLhs>(scl_lhs))
 
 /// @internal
@@ -197,9 +318,10 @@
 ///
 /// @param op     The C++ binary operator token.
 /// @param cv_ref cv-ref qualifiers of @p scl_self.
-#define SCL_FRIEND_REVERSE_EXECUTE_NX(op, cv_ref)                                   \
-    s_c_l_executor_type::execute(::std::declval<s_c_l_executor_type cv_ref>(),      \
-        [](auto && scl_e, auto && scl_l) -> decltype(auto) {                        \
-        return ::std::forward<decltype(scl_l)>(scl_l)                               \
-            op s_c_l_executor_type::access(::std::forward<decltype(scl_e)>(scl_e)); \
+#define SCL_FRIEND_REVERSE_EXECUTE_NX(op, cv_ref)                              \
+    s_c_l_executor_type::execute(::std::declval<s_c_l_executor_type cv_ref>(), \
+        [](auto && scl_e, auto && scl_l) -> decltype(auto) {                   \
+        ::scl::feature::detail::executor_guard<decltype(scl_e)> scl_guard{     \
+            ::std::forward<decltype(scl_e)>(scl_e)};                           \
+        return ::std::forward<decltype(scl_l)>(scl_l) op scl_guard.value();    \
     }, ::std::declval<s_c_l_executor_type cv_ref>(), ::std::declval<ScLLhs>())

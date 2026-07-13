@@ -7,25 +7,49 @@
 #include <utility>
 
 // ============================================================================
-// FriendTarget — wrapped type with qualified operators for friend reflection
+// FR12 — standalone friend declaration reflects the value's FREE operator.
+//
+// The wrapped types below define their operators as FREE (hidden-friend, i.e.
+// non-member) functions — NO member operators.  The wrapper reflects them via
+// SCL_REFLECT_FRIEND_* as hidden friends of the wrapper:
+//   * `w op x` is found only by ADL — `w.operator op(...)` (member lookup) FAILS;
+//   * the standalone declaration adds NO member path and does not obey member
+//     precedence (there is no member to prefer).
+//
+// cv-ref discrimination uses the free operator's first (self) parameter:
+//   operator+(FreeTarget &, int)       -> short
+//   operator+(FreeTarget const &, int) -> int
+// ============================================================================
+
+// ============================================================================
+// FriendTarget — FREE (hidden-friend) operators only, no members
 // ============================================================================
 
 struct FriendTarget
 {
     int value = 0;
 
-    // Binary +: distinguishable return types per cv-ref (required by SCL_HAS_QUALIFIED_*)
-    constexpr short operator+(int rhs) & { return static_cast<short>(value + rhs); }
-    constexpr int operator+(int rhs) const & { return value + rhs + 50; }
+    // Binary +: FREE, distinguishable return types per cv-ref (via self param)
+    friend constexpr short operator+(FriendTarget & self, int rhs)
+    {
+        return static_cast<short>(self.value + rhs);
+    }
+    friend constexpr int operator+(FriendTarget const & self, int rhs)
+    {
+        return self.value + rhs + 50;
+    }
 
-    // Unary prefix - (const& only)
-    constexpr int operator-() const & { return -value; }
+    // Unary prefix - (const& only), FREE
+    friend constexpr int operator-(FriendTarget const & self) { return -self.value; }
 
-    // Prefix ++ (mutable& only)
-    constexpr long operator++() & { return ++value; }
+    // Prefix ++ (mutable& only), FREE
+    friend constexpr long operator++(FriendTarget & self) { return ++self.value; }
 
-    // Postfix ++(int) (mutable& only)
-    constexpr short operator++(int) & { return static_cast<short>(value++); }
+    // Postfix ++(int) (mutable& only), FREE
+    friend constexpr short operator++(FriendTarget & self, int)
+    {
+        return static_cast<short>(self.value++);
+    }
 };
 
 // ============================================================================
@@ -72,25 +96,26 @@ struct FriendWrapped
     {}
 
     SCL_REFLECT_FRIEND_BINARY_OPERATOR(+, op_add)
-    SCL_REFLECT_FRIEND_BINARY_OPERATOR(-, op_neg)
+    SCL_REFLECT_FRIEND_PREFIX_UNARY_OPERATOR(-, op_neg)
     SCL_REFLECT_FRIEND_PREFIX_UNARY_OPERATOR(++, op_preinc)
     SCL_REFLECT_FRIEND_POSTFIX_UNARY_OPERATOR(++, op_postinc)
 };
 
 // ============================================================================
-// Executor override test types
+// Executor override test types — override still wins over the free path (FR8)
 // ============================================================================
 
 struct OverridingFriendExecutor
 {
     FriendTarget m_value;
 
-    // Override for mutable lvalue: returns long (distinct from FriendTarget::operator+(int)& → short)
+    // Override for mutable lvalue: returns long (distinct from the free
+    // operator+(FriendTarget&, int) -> short)
     static constexpr long operator_op_add(OverridingFriendExecutor & self, int v)
     {
         return static_cast<long>(self.m_value.value + v) * 100;
     }
-    // No const& override → falls through to execute path → int (value + rhs + 50)
+    // No const& override → falls through to the free path → int (value + rhs + 50)
 
     template <typename Self, typename Func, typename... Args>
     static constexpr decltype(auto) execute(Self &&, Func && func, Args &&... args)
@@ -138,8 +163,15 @@ struct FriendNxTarget
 {
     int value = 0;
 
-    constexpr int operator+(int rhs) const & noexcept { return value + rhs; }
-    constexpr int operator-(int rhs) const & { return value - rhs; }
+    // FREE noexcept / non-noexcept operators
+    friend constexpr int operator+(FriendNxTarget const & self, int rhs) noexcept
+    {
+        return self.value + rhs;
+    }
+    friend constexpr int operator-(FriendNxTarget const & self, int rhs)
+    {
+        return self.value - rhs;
+    }
 };
 
 struct FriendNxExecutor
@@ -151,7 +183,7 @@ struct FriendNxExecutor
     {
         return self.m_value.value + v;
     }
-    // No override for nx_sub → execute path; execute is not noexcept → noexcept(false)
+    // No override for nx_sub → free path; execute is not noexcept → noexcept(false)
 
     template <typename Self, typename Func, typename... Args>
     static constexpr decltype(auto) execute(Self &&, Func && func, Args &&... args)
@@ -191,6 +223,65 @@ struct FriendWrappedNx
 };
 
 // ============================================================================
+// Guard-counting target — the free-path operand must be reached under guard
+// ============================================================================
+
+namespace
+{
+    int g_friend_guard = 0;
+    int g_friend_unguard = 0;
+
+    struct GuardFriendExecutor
+    {
+        FriendTarget m_value;
+
+        template <typename Self>
+        static void guard(Self &&) noexcept
+        {
+            ++g_friend_guard;
+        }
+        template <typename Self>
+        static void unguard(Self &&) noexcept
+        {
+            ++g_friend_unguard;
+        }
+        template <typename Self, typename Func, typename... Args>
+        static constexpr decltype(auto) execute(Self &&, Func && func, Args &&... args)
+        {
+            return ::std::forward<Func>(func)(::std::forward<Args>(args)...);
+        }
+        template <typename Self>
+        static constexpr decltype(auto) access(Self && self)
+        {
+            return ::scl::forward_like<Self>(self.m_value);
+        }
+    };
+} // namespace
+
+struct GuardFriendWrapped;
+
+template <>
+struct scl::feature::executor_trait<GuardFriendWrapped>
+{
+    template <typename Self>
+    static constexpr decltype(auto) executor(Self && self)
+    {
+        return ::scl::forward_like<Self>(self.m_exec);
+    }
+};
+
+struct GuardFriendWrapped
+{
+    GuardFriendExecutor m_exec;
+    SCL_REFLECT_TYPE(GuardFriendWrapped, GuardFriendExecutor);
+    explicit GuardFriendWrapped(int v)
+        : m_exec{FriendTarget{v}}
+    {}
+
+    SCL_REFLECT_FRIEND_BINARY_OPERATOR(+, op_add)
+};
+
+// ============================================================================
 // Helper predicates
 // ============================================================================
 
@@ -208,64 +299,55 @@ template <typename T>
 constexpr bool can_postfix_inc_v = requires { ::std::declval<T>()++; };
 
 // ============================================================================
-// Tests — SCL_REFLECT_FRIEND_BINARY_OPERATOR
+// Tests — SCL_REFLECT_FRIEND_BINARY_OPERATOR reflects the FREE operator
 // ============================================================================
 
-TEST(ReflectFriendOperator, BinaryAddMutableLvalue)
+TEST(ReflectFriendOperator, FreeBinaryAddMutableLvalue)
 {
     FriendWrapped w{10};
     auto result = w + 5;
-    EXPECT_EQ(result, static_cast<short>(15));
+    EXPECT_EQ(result, static_cast<short>(15)); // free operator+(FriendTarget&, int) -> short
 }
 
-TEST(ReflectFriendOperator, BinaryAddConstLvalue)
+TEST(ReflectFriendOperator, FreeBinaryAddConstLvalue)
 {
     FriendWrapped const w{10};
     auto result = w + 5;
-    EXPECT_EQ(result, 65); // 10 + 5 + 50
+    EXPECT_EQ(result, 65); // free operator+(FriendTarget const&, int) -> int (10 + 5 + 50)
 }
 
-TEST(ReflectFriendOperator, BinaryAddConstLvalueConstexpr)
+TEST(ReflectFriendOperator, FreeBinaryAddConstLvalueConstexpr)
 {
     constexpr FriendWrapped w{10};
     STATIC_EXPECT_EQ(w + 5, 65);
 }
 
-TEST(ReflectFriendOperator, PrefixNeg)
+TEST(ReflectFriendOperator, FreeUnaryNeg)
 {
     FriendWrapped const w{7};
     EXPECT_EQ(-w, -7);
 }
 
-TEST(ReflectFriendOperator, PrefixNegConstexpr)
+TEST(ReflectFriendOperator, FreeUnaryNegConstexpr)
 {
     constexpr FriendWrapped w{7};
     STATIC_EXPECT_EQ(-w, -7);
 }
 
-// ============================================================================
-// Tests — SCL_REFLECT_FRIEND_PREFIX_UNARY_OPERATOR
-// ============================================================================
-
-TEST(ReflectFriendOperator, PrefixIncrement)
+TEST(ReflectFriendOperator, FreePrefixIncrement)
 {
     FriendWrapped w{5};
     auto result = ++w;
     EXPECT_EQ(result, 6L);
-    // Underlying value changed — verify via operator+
     EXPECT_EQ(w + 0, static_cast<short>(6));
 }
 
-TEST(ReflectFriendOperator, PrefixIncNotAvailableOnConst)
+TEST(ReflectFriendOperator, FreePrefixIncNotAvailableOnConst)
 {
     STATIC_EXPECT_FALSE(can_prefix_inc_v<FriendWrapped const &>);
 }
 
-// ============================================================================
-// Tests — SCL_REFLECT_FRIEND_POSTFIX_UNARY_OPERATOR
-// ============================================================================
-
-TEST(ReflectFriendOperator, PostfixIncrement)
+TEST(ReflectFriendOperator, FreePostfixIncrement)
 {
     FriendWrapped w{5};
     auto old_val = w++;
@@ -273,18 +355,18 @@ TEST(ReflectFriendOperator, PostfixIncrement)
     EXPECT_EQ(w + 0, static_cast<short>(6));
 }
 
-TEST(ReflectFriendOperator, PostfixIncNotAvailableOnConst)
+TEST(ReflectFriendOperator, FreePostfixIncNotAvailableOnConst)
 {
     STATIC_EXPECT_FALSE(can_postfix_inc_v<FriendWrapped const &>);
 }
 
 // ============================================================================
-// Tests — ADL-only: member lookup must NOT work
+// Tests — FR12: ADL-only, member lookup must NOT work
 // ============================================================================
 
 TEST(ReflectFriendOperator, MemberLookupNotAvailable)
 {
-    // Friend (hidden-friend) operator: not a member function, so .operator+(...) fails.
+    // Standalone friend: a hidden-friend, not a member — `.operator+(...)` fails.
     STATIC_EXPECT_FALSE((has_member_op_plus_v<FriendWrapped &, int>));
 }
 
@@ -294,15 +376,15 @@ TEST(ReflectFriendOperator, AdlLookupAvailable)
     STATIC_EXPECT_TRUE((can_friend_add_v<FriendWrapped &, int>));
 }
 
-TEST(ReflectFriendOperator, BinaryAddRvalueCallsConstLvalueOverload)
+TEST(ReflectFriendOperator, RvalueBindsToConstLvalueFreeOverload)
 {
-    // FriendTarget has operator+(int) const & — rvalue wrapper binds to const&
+    // The free operator+(FriendTarget const&, int) accepts an rvalue wrapper's value.
     STATIC_EXPECT_TRUE((can_friend_add_v<FriendWrapped &&, int>));
     STATIC_EXPECT_TRUE((::std::same_as<decltype(::std::declval<FriendWrapped &&>() + 5), int>));
 }
 
 // ============================================================================
-// Tests — executor override for friend operator
+// Tests — executor override still wins over the free path (FR8)
 // ============================================================================
 
 TEST(ReflectFriendOperatorExecutorOverride, MutableLValueCallsOverride)
@@ -316,13 +398,13 @@ TEST(ReflectFriendOperatorExecutorOverride, MutableLValueCallsOverride)
     EXPECT_EQ(result, (5 + 3) * 100L);
 }
 
-TEST(ReflectFriendOperatorExecutorOverride, ConstLValueFallsToExecutePath)
+TEST(ReflectFriendOperatorExecutorOverride, ConstLValueFallsToFreePath)
 {
     OverridingFriendWrapped const w{5};
     auto result = w + 3;
 
     static_assert(::std::same_as<decltype(result), int>,
-        "const-lvalue operator+ must return int — execute path, FriendTarget::operator+(int) const&");
+        "const-lvalue operator+ must return int — free path, operator+(FriendTarget const&, int)");
 
     EXPECT_EQ(result, 58); // 5 + 3 + 50
 }
@@ -337,7 +419,7 @@ TEST(ReflectFriendOperatorExecutorOverride, ReturnTypeIsOverrideNotTarget)
 TEST(ReflectFriendOperatorExecutorOverride, ConstUnaffectedByMutableOverride)
 {
     OverridingFriendWrapped const cw{0};
-    // const& has no override → execute path → int
+    // const& has no override → free path → int
     STATIC_EXPECT_TRUE((::std::same_as<decltype(cw + 1), int>));
 }
 
@@ -354,7 +436,24 @@ TEST(ReflectFriendOperator, NoexceptPropagatesFromExecutorOverride)
 
 TEST(ReflectFriendOperator, NoexceptNotPropagatedWhenNoExecutorOverride)
 {
-    // No executor override for nx_sub → execute path; execute is not noexcept
+    // No executor override for nx_sub → free path; execute is not noexcept
     FriendWrappedNx const w{1};
     STATIC_EXPECT_FALSE(noexcept(w - 1));
+}
+
+// ============================================================================
+// Tests — FR7: the free-path operand is reached under guard
+// ============================================================================
+
+TEST(ReflectFriendOperator, FreePathGuardsWrappedValueOnce)
+{
+    g_friend_guard = 0;
+    g_friend_unguard = 0;
+
+    GuardFriendWrapped w{10};
+    auto result = w + 5; // free operator+ over the guarded value
+
+    EXPECT_EQ(result, static_cast<short>(15));
+    EXPECT_EQ(g_friend_guard, 1);
+    EXPECT_EQ(g_friend_unguard, 1);
 }

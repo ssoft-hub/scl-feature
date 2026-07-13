@@ -9,142 +9,116 @@ object through the executor.
 
 ## Macro families
 
-| Macro | Overloads generated | Use case |
-|-------|---------------------|----------|
-| `SCL_REFLECT_BINARY_OPERATOR(op, name)` | 24 member + 8 reverse-operand friend | symmetric binary operators (`+`, `==`, `<`, …) |
-| `SCL_REFLECT_PREFIX_UNARY_OPERATOR(op, name)` | 8 member only | prefix unary operators (`-`, `++`, `&`, …) |
-| `SCL_REFLECT_POSTFIX_UNARY_OPERATOR(op, name)` | 8 member only | postfix unary operators (`++`, `--`) |
-| `SCL_REFLECT_MEMBER_BINARY_OPERATOR(op, name)` | 24 member only | mandatory-member operators (`=`, `*=`, … ) |
-| `SCL_REFLECT_MEMBER_PREFIX_UNARY_OPERATOR(op, name)` | 8 member only | mandatory-member prefix unary (`->`) |
-| `SCL_REFLECT_MEMBER_POSTFIX_UNARY_OPERATOR(op, name)` | 8 member only | mandatory-member postfix unary |
-| `SCL_REFLECT_FRIEND_BINARY_OPERATOR(op, name)` | 24 friend only | ADL-only binary operators |
-| `SCL_REFLECT_FRIEND_PREFIX_UNARY_OPERATOR(op, name)` | 8 friend only | ADL-only prefix unary |
-| `SCL_REFLECT_FRIEND_POSTFIX_UNARY_OPERATOR(op, name)` | 8 friend only | ADL-only postfix unary |
-| `SCL_REFLECT_OPERATOR_WITH_ARGUMENTS(op, name)` | 24 member only | `[]`, `()` (must be members in C++20) |
+| Macro | Reflects | Use case |
+|-------|----------|----------|
+| `SCL_REFLECT_BINARY_OPERATOR(op, name)` | `w op x`, `x op w`, `w1 op w2` | symmetric binary operators (`+`, `<`, …) |
+| `SCL_REFLECT_EQUALITY_OPERATOR(op, name)` | `w op x`, `x op w` returning `bool` | `==`, `!=` |
+| `SCL_REFLECT_PREFIX_UNARY_OPERATOR(op, name)` | `op w` | prefix unary operators (`-`, `~`, `++`, …) |
+| `SCL_REFLECT_POSTFIX_UNARY_OPERATOR(op, name)` | `w op` | postfix unary operators (`++`, `--`) |
+| `SCL_REFLECT_SUBSCRIPT_OPERATOR(op, name)` | `w[i]` | `operator[]`, including a pointer value |
+| `SCL_REFLECT_MEMBER_BINARY_OPERATOR(op, name)` | `w op x` | mandatory-member operators (`=`, `*=`, …) |
+| `SCL_REFLECT_MEMBER_PREFIX_UNARY_OPERATOR(op, name)` | `op w` | mandatory-member prefix unary (`->`, `&`, `*`) |
+| `SCL_REFLECT_MEMBER_POSTFIX_UNARY_OPERATOR(op, name)` | `w op` | mandatory-member postfix unary |
+| `SCL_REFLECT_FRIEND_BINARY_OPERATOR(op, name)` | `w op x` via ADL only | ADL-only binary operators |
+| `SCL_REFLECT_FRIEND_PREFIX_UNARY_OPERATOR(op, name)` | `op w` via ADL only | ADL-only prefix unary |
+| `SCL_REFLECT_FRIEND_POSTFIX_UNARY_OPERATOR(op, name)` | `w op` via ADL only | ADL-only postfix unary |
+| `SCL_REFLECT_OPERATOR_WITH_ARGUMENTS(op, name)` | `w(...)` | `()`, `->*` (member-only value side) |
 
 `SCL_REFLECT_TYPE` must be declared in the same class body before any operator macro.
 
 ---
 
-## Symmetric binary operators (`SCL_REFLECT_BINARY_OPERATOR`)
+## What is reflected
 
-`SCL_REFLECT_BINARY_OPERATOR` generates:
+A reflected operator applies the operator to the **wrapped value** as an expression —
+`value op arg`, `op value`, `value[index]` — rather than calling a specific member.
+Ordinary overload resolution on that expression then selects the value's own operator:
 
-1. **Member overloads** (24) — selected when the wrapper is the **left** operand
-   (`w op x`); they reflect `value.operator op(x)`.
-2. **Reverse-operand hidden-friend overloads** (8, one per cv-ref qualifier) — found via
-   ADL when the wrapper is the **right** operand (`x op w`); they reflect `x op value`.
+- a **member** operator of the value, when it has one (so a member operator takes
+  precedence over a free one); or
+- a **free or built-in** operator otherwise.
+
+Because the built-in operators of fundamental and pointer types are reached through this
+same expression, they are reflected too: `wrapper<int>{} + 5`, `-w`, `w1 * w2`, and
+`wrapper<int*>{arr}[2]` all work. The cv-ref qualifier of the wrapper flows to the value,
+so the value's `&` / `const &` / … overloads are picked per the wrapper's qualification.
+
+The argument of a binary/subscript operator is reached one level down under the executor's
+guard, so a wrapper argument (`w1 op w2`) is unwrapped once and `guard()`/`unguard()` fire
+around the read; a plain argument passes through unchanged.
+
+---
+
+## Direction (binary operators)
+
+| Expression | Overload | Reflects |
+|------------|----------|----------|
+| `w op x` (wrapper on the left) | member of the wrapper | `value op x` |
+| `x op w` (wrapper on the right, `x` not a wrapper) | reverse-operand hidden friend | `x op value` |
+| `w1 op w2` (both wrappers) | member of the left wrapper | `value1 op value2` |
 
 The reverse friend is constrained out when the left operand is itself a wrapper
-(`is_wrapper_v`), so `w1 op w2` resolves to the member overload without ambiguity. A
-non-wrapper left operand cannot bind the wrapper parameter of the member overload, so each
-direction has exactly one viable candidate.
+(`is_wrapper_v`), so `w1 op w2` resolves to the left wrapper's overload without ambiguity.
 
 ```cpp
 template <typename Wrapper, typename Executor>
 class scl::feature::reflect<Wrapper, Executor, MyValue>
 {
     SCL_REFLECT_TYPE(Wrapper, Executor)
-    SCL_REFLECT_BINARY_OPERATOR(+, plus)        // w + x  (member)  AND  x + w  (reverse friend)
-    SCL_REFLECT_BINARY_OPERATOR(==, equal_to)   // x == w (reverse friend); w == x may also work
-                                                // via C++20 reversed candidates (compiler-dependent)
+    SCL_REFLECT_BINARY_OPERATOR(+, plus)        // w + x, x + w, w1 + w2
+    SCL_REFLECT_EQUALITY_OPERATOR(==, equal_to) // w == x, x == w (bool)
 };
 ```
 
-> Note: there is no reverse executor-override path — the `operator_<name>(exec, …)` override
-> convention applies to the wrapper-left member overloads only. The reverse direction still
-> routes through `Executor::execute`, so cross-cutting behaviour applies on both sides.
->
-> Unary operators (`SCL_REFLECT_PREFIX_UNARY_OPERATOR` /
-> `SCL_REFLECT_POSTFIX_UNARY_OPERATOR`) have a single operand and therefore no reverse case;
-> they generate member overloads only. Use `SCL_REFLECT_FRIEND_*` for an ADL-only unary
-> operator.
+Unary operators have a single operand and therefore no reverse case. `SCL_REFLECT_EQUALITY_OPERATOR`
+returns `bool` so the C++20 reversed comparison `x == w` is formed from the wrapper's member.
+
+---
+
+## Path (executor override vs execute)
+
+| Path | Active when | Calls | Returns |
+|------|-------------|-------|---------|
+| *executor-override* | `Executor::operator_<name>(exec, args...)` exists | that static member directly, with the **raw** operands | the override's return type |
+| *execute-path* | no executor override | `Executor::execute(exec, callable, exec, args...)`; the callable applies the operator to the value resolved inside `execute()` | the reflected expression's type |
+
+The override convention applies to the wrapper-left / unary form only; the reverse-operand
+friend has no override path but still routes through `Executor::execute`, so cross-cutting
+behaviour applies on both sides. Every overload is declared `decltype(auto)` and returns the
+result verbatim — it never rewraps.
 
 ---
 
 ## Member-only variants (`SCL_REFLECT_MEMBER_*`)
 
-The C++ standard ([over.oper]) requires `operator=`, `operator->`, and all
-compound-assignment operators to be non-static member functions.  Generating
-hidden-friend free-function overloads for them would be ill-formed.
-
-Use `SCL_REFLECT_MEMBER_*` macros for these operators:
+The C++ standard ([over.oper]) requires `operator=`, `operator->`, `operator()`, `operator[]`,
+and the compound-assignment operators to be non-static member functions **on the wrapper**;
+the *value* side may still be a free or built-in operator. `operator&` and `operator*` are kept
+member-only as well — a free fallback for `&` would make `&wrapper` reflect `&value` and hijack
+the pointer-to-wrapper syntax.
 
 ```cpp
-SCL_REFLECT_MEMBER_BINARY_OPERATOR(=,   assign)
-SCL_REFLECT_MEMBER_BINARY_OPERATOR(+=,  plus_assign)
+SCL_REFLECT_MEMBER_BINARY_OPERATOR(+=, plus_assign)
 SCL_REFLECT_MEMBER_PREFIX_UNARY_OPERATOR(->, arrow)
 ```
 
-`reflect_operators` (the default base class of `scl::wrapper`) uses `SCL_REFLECT_MEMBER_*`
-for `=`, `*=`, `/=`, `%=`, `+=`, `-=`, `<<=`, `>>=`, `&=`, `|=`, `^=`, and `->`.
+`reflect_operators` (the default base class of `scl::wrapper`) uses these for `*=`, `/=`, `%=`,
+`+=`, `-=`, `<<=`, `>>=`, `&=`, `|=`, `^=`, `->`, `&`, `*`.
 
 ---
 
 ## Friend-only variants (`SCL_REFLECT_FRIEND_*`)
 
-Generates only hidden-friend free functions, with no member counterpart.
-
-Use when the operator must be ADL-findable but must NOT be callable via
-`w.operator op(...)` member syntax. Do not combine with a `SCL_REFLECT_*_OPERATOR`
-macro for the same `name` — both emit the same class-level helpers, causing
-duplicate member definitions.
-
----
-
-## Selection and return type
-
-A call resolves in two steps: it first picks a **direction** (which generated
-overload is viable), then a **path** (how that overload reaches the value).
-
-### Direction (binary operators)
-
-| Expression | Overload chosen | Reflects |
-|------------|-----------------|----------|
-| `w op x` (wrapper on the left) | member | `value op x` |
-| `x op w` (wrapper on the right, `x` not a wrapper) | reverse-operand friend | `x op value` |
-| `w1 op w2` (both wrappers) | member — the reverse friend is constrained out via `is_wrapper_v` | `value1 op w2` |
-
-A member (wrapper-left) overload is viable **only when the wrapped value actually
-has a matching `operator op`** for that cv-ref qualifier; otherwise it is
-constrained out. Fundamental value types (`int`, `double`, …) have no member
-operators, so for them the wrapper-left forms — including `w op x` and every
-compound assignment `w op= x` — are **not** generated; only the reverse friends
-(`x op w`) apply, because `x op value` is valid built-in syntax.
-
-> `scl::wrapper`'s own copy/move assignment `=` is the one exception to the
-> fundamental-type rule: `w = value` assigns the wrapped value for fundamental and
-> class value types alike, because it is not a reflected member operator but a
-> dedicated wrapper operator using expression assignment. See
-> [wrapper](../wrapper/wrapper.md).
-
-### Path (within the chosen overload)
-
-| Path | Active when | Calls | Returns |
-|------|-------------|-------|---------|
-| *executor-override* | `Executor::operator_<name>(exec, args...)` exists | that static member directly, with the **raw** operands | the override's return type |
-| *execute-path* | no executor override | `Executor::execute(exec, callable, exec, args...)`; the callable applies `scl::wrapper_cast` to wrapper arguments and resolves the value inside `execute()` | the reflected call's return type |
-
-Every overload is declared `decltype(auto)`: the wrapper returns the override's
-result (override path) or the wrapped value's operator result (execute path)
-verbatim — it never rewraps the result. There is no executor-override path for the
-reverse-operand friends; the `operator_<name>` convention applies to the
-wrapper-left member overloads only.
-
----
-
-## Constraint: distinct return types
-
-All operator families share the same constraint as `SCL_REFLECT_METHOD`: the
-value type's `operator op` overloads for different cv-ref qualifiers must return
-distinct types, so that `SCL_HAS_QUALIFIED_METHOD` can tell them apart by return
-type when selecting the qualifier-matching overload.
+Reflect the value's **free** operator as a hidden friend of the wrapper: findable via ADL
+(`w op x`), never via `w.operator op(...)` member syntax. Do not combine with a
+`SCL_REFLECT_*_OPERATOR` macro for the same `name` — both emit the same class-level helpers,
+causing duplicate definitions.
 
 ---
 
 ## Examples
 
-### Symmetric equality via combined macro
+### Symmetric equality
 
 ```cpp
 struct Length { bool operator==(Length) const &; };
@@ -153,40 +127,37 @@ template <typename W, typename E>
 class scl::feature::reflect<W, E, Length>
 {
     SCL_REFLECT_TYPE(W, E)
-    SCL_REFLECT_BINARY_OPERATOR(==, equal_to)
+    SCL_REFLECT_EQUALITY_OPERATOR(==, equal_to)
 };
 
 scl::wrapper<Length> a, b;
-bool r1 = (a == b);          // member overload (both wrappers)
-bool r2 = (a == Length{});   // member overload (wrapper on left)
-bool r3 = (Length{} == a);   // reverse-operand hidden friend (wrapper on right)
+bool r1 = (a == b);          // value == value (both wrappers)
+bool r2 = (a == Length{});   // value == x     (wrapper on left)
+bool r3 = (Length{} == a);   // x == value     (reverse friend)
+```
+
+### Fundamental value type
+
+```cpp
+scl::wrapper<int> n{40};
+int  s = n + 2;   // 42 — built-in int + int, reflected
+bool c = n < 50;  // built-in comparison
+int  m = -n;      // built-in negation
+
+scl::wrapper<int *> p{arr};
+int e = p[2];     // built-in pointer subscript
 ```
 
 ### Mandatory-member compound assignment
 
 ```cpp
-struct Counter {
-    Counter & operator+=(int) &;
-};
-
-template <typename W, typename E>
-class scl::feature::reflect<W, E, Counter>
-{
-    SCL_REFLECT_TYPE(W, E)
-    SCL_REFLECT_MEMBER_BINARY_OPERATOR(+=, plus_assign)
-};
-
-scl::wrapper<Counter> c;
-c += 42;   // OK — reflects Counter::operator+=
+scl::wrapper<int> c{0};
+c += 42;   // reflects int += int through the wrapper's own operator+=
 ```
 
-> Plain `=` is different. On `scl::wrapper` the copy/move/converting assignment is
-> the wrapper's **own** operator (it must suppress the implicitly-deleted copy/move
-> assignment; see [wrapper](../wrapper/wrapper.md)), which hides any reflected
-> `operator=`. `SCL_REFLECT_MEMBER_BINARY_OPERATOR(=, assign)` therefore governs
-> assignment only for a custom proxy type that inherits the reflected operators
-> without declaring its own `operator=`, not for `scl::wrapper`. The compound
-> assignments (`+=`, `*=`, …) and `->` are reflected normally on every wrapper.
+> Plain `=` is different. On `scl::wrapper` the copy/move/converting assignment is the wrapper's
+> **own** operator (it must suppress the implicitly-deleted copy/move assignment; see
+> [wrapper](../wrapper/wrapper.md)), which hides any reflected `operator=`.
 
 ---
 

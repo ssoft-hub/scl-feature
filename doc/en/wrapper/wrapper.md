@@ -80,9 +80,7 @@ constexpr decltype(auto) operator=(Other && other);
   operator.
 - **Fundamental and class value types alike** — the value path uses the expression
   `access(self) = source` (not `.operator=()`), so it assigns `int`, `double`, and
-  classes with a member `operator=` equally. (Unlike the compound assignments
-  `+=`, `*=`, …, which are reflected via the value's member operator and are
-  therefore unavailable for fundamental value types.)
+  classes with a member `operator=` equally, like the reflected compound assignments.
 - **Return type** — `decltype(auto)`, like every reflected operator: the executor
   override's return type on the override path, or the result of `access(self) = source`
   (typically `value_type &`) on the value path. Not necessarily `*this`.

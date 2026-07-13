@@ -90,13 +90,15 @@ namespace scl::feature
     public:
         SCL_REFLECT_TYPE(Wrapper, Executor)
 
-        SCL_REFLECT_PREFIX_UNARY_OPERATOR(&, address_of)
-        SCL_REFLECT_PREFIX_UNARY_OPERATOR(*, indirection)
+        // `&`/`*` stay member-only: a free fallback would make `&wrapper` reflect `&value`
+        // (built-in address-of is universal), hijacking the pointer-to-wrapper syntax.
+        SCL_REFLECT_MEMBER_PREFIX_UNARY_OPERATOR(&, address_of)
+        SCL_REFLECT_MEMBER_PREFIX_UNARY_OPERATOR(*, indirection)
         SCL_REFLECT_OPERATOR_WITH_ARGUMENTS(->*, arrow_to_pointer)
         SCL_REFLECT_MEMBER_PREFIX_UNARY_OPERATOR(->, arrow)
 
         SCL_REFLECT_BINARY_OPERATOR(SCL_FORWARD(, ), comma)
-        SCL_REFLECT_OPERATOR_WITH_ARGUMENTS([], subscript)
+        SCL_REFLECT_SUBSCRIPT_OPERATOR([], subscript)
         SCL_REFLECT_OPERATOR_WITH_ARGUMENTS((), call)
 
         SCL_REFLECT_PREFIX_UNARY_OPERATOR(+, unary_plus)
@@ -109,8 +111,10 @@ namespace scl::feature
         SCL_REFLECT_POSTFIX_UNARY_OPERATOR(++, postfix_increment)
         SCL_REFLECT_POSTFIX_UNARY_OPERATOR(--, postfix_decrement)
 
-        SCL_REFLECT_BINARY_OPERATOR(==, equal_to)
-        SCL_REFLECT_BINARY_OPERATOR(!=, not_equal_to)
+        // Equality reflects `==`/`!=` returning bool (not decltype(auto)): a C++20 reversed-`==`
+        // rewrite candidate must return bool.  Relational operators below are not rewrite targets.
+        SCL_REFLECT_EQUALITY_OPERATOR(==, equal_to)
+        SCL_REFLECT_EQUALITY_OPERATOR(!=, not_equal_to)
         SCL_REFLECT_BINARY_OPERATOR(<, less)
         SCL_REFLECT_BINARY_OPERATOR(<=, less_equal)
         SCL_REFLECT_BINARY_OPERATOR(>, greater)
