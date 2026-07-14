@@ -104,6 +104,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- `SCL_REFLECT_EQUALITY_OPERATOR`: a reflected `==` / `!=` whose underlying result is not
+  `static_cast`-ible to `bool` is now SFINAE-absent instead of a hard error at the `static_cast`
+  in the overload body. All three equality paths — free/execute, reverse friend, and the
+  executor `operator_equal_to` override (previously `decltype(auto)`, which could yield a
+  non-`bool` type and break the C++20 rewrite of `w == x`) — gate on `static_cast<bool>`
+  viability. `static_cast` (not `std::convertible_to`) is used so a proxy with an explicit
+  `operator bool` is still accepted
 - Reflection test suite no longer aborts compilation under MSVC: the `can_call_set_v`
   call-site checks tripped a fatal internal compiler error (C1001) on the non-Clang MSVC
   frontend. The checks now route through `is_invocable` on a SFINAE-friendly lambda,

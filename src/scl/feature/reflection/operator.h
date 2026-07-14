@@ -1082,6 +1082,56 @@
     }
 
 /// @internal
+/// @brief Generates the @c operator_##name##_scl_free_bool_ok predicate for an **equality**
+///        operator — viability of the free expression **and** its @c static_cast to @c bool.
+/// @ingroup scl_feature_reflection
+///
+/// Like @c SCL_REFLECT_OPERATOR_INFIX_FREE_OK, but the requirement also demands that the free
+/// result be @c static_cast-ible to @c bool — the operation the overload body performs.  The
+/// wrapper's @c operator== always returns @c bool (a C++20 rewritten @c operator== candidate must);
+/// the inner result need only be contextually convertible, so a non-convertible result leaves the
+/// operator undeclared.  @c static_cast (not @c std::convertible_to) accepts a proxy with an
+/// @b explicit @c operator @c bool.
+///
+/// @param name  Short unique name identifying the operator (plain identifier).
+#define SCL_REFLECT_EQUALITY_FREE_BOOL_OK(name)                                     \
+    template <typename ScLValRef, typename... ScLArgs>                              \
+    static constexpr bool operator_##name##_scl_free_bool_ok() noexcept             \
+    {                                                                               \
+        return requires {                                                           \
+                   static_cast<bool>(operator_##name##_scl_infix_applier::apply(    \
+                       ::std::declval<ScLValRef>(), ::std::declval<ScLArgs>()...)); \
+               };                                                                   \
+    }
+
+/// @internal
+/// @brief Executor-override **equality** overload for one cv-ref qualifier, returning @c bool.
+/// @ingroup scl_feature_reflection
+///
+/// Like @c SCL_REFLECT_OPERATOR_EXECUTOR_OVERRIDE_BASE, but returns @c bool (via @c static_cast)
+/// and is constrained on the override result being @c static_cast-ible to @c bool.  Equality forces
+/// @c bool — the generic base's @c decltype(auto) return would not satisfy the C++20 @c operator==
+/// rewrite — and the override is absent when its result is not @c bool-convertible.
+///
+/// @param op     The C++ equality operator token (@c == or @c !=).
+/// @param name   Short unique name identifying the operator (plain identifier).
+/// @param cv_ref cv-ref qualifiers applied to the wrapper.
+#define SCL_REFLECT_EQUALITY_EXECUTOR_OVERRIDE_BASE(op, name, cv_ref)              \
+    template <typename ScLExec = s_c_l_executor_type cv_ref, typename... ScLArgs>  \
+    constexpr bool operator op(ScLArgs &&... scl_args) cv_ref /**/                 \
+        noexcept(operator_##name##_scl_exec_noexcept<ScLExec, ScLArgs...>)         \
+        requires(::std::is_same_v<ScLExec, s_c_l_executor_type cv_ref> &&          \
+            operator_##name##_scl_has_exec_override<ScLExec, ScLArgs...> &&        \
+            requires {                                                             \
+                static_cast<bool>(::std::remove_cvref_t<ScLExec>::operator_##name( \
+                    ::std::declval<ScLExec>(), ::std::declval<ScLArgs>()...));     \
+            })                                                                     \
+    {                                                                              \
+        return static_cast<bool>(::std::remove_cvref_t<ScLExec>::operator_##name(  \
+            SCL_EXECUTOR_ACCESS(cv_ref), ::std::forward<ScLArgs>(scl_args)...));   \
+    }
+
+/// @internal
 /// @brief requires-clause + body for a non-template **equality** operator overload: the free
 ///        infix dispatch (@c SCL_EXECUTE_INFIX_FREE) @c static_cast to @c bool.
 /// @ingroup scl_feature_reflection
@@ -1096,7 +1146,7 @@
 #define SCL_REFLECT_EQUALITY_OPERATOR_BASE(op, name, cv_ref)                                         \
     noexcept(noexcept(SCL_EXECUTE_INFIX_FREE(SCL_FORWARD(op), name, cv_ref)))                        \
         requires(!operator_##name##_scl_has_exec_override<s_c_l_executor_type cv_ref, ScLArgs...> && \
-            operator_##name##_scl_free_ok<decltype(SCL_ACCESS_DECLVAL(cv_ref)), ScLArgs...>())       \
+            operator_##name##_scl_free_bool_ok<decltype(SCL_ACCESS_DECLVAL(cv_ref)), ScLArgs...>())  \
     {                                                                                                \
         return static_cast<bool>(SCL_EXECUTE_INFIX_FREE(SCL_FORWARD(op), name, cv_ref));             \
     }
@@ -1107,7 +1157,7 @@
 ///        never called with explicit template arguments).
 /// @ingroup scl_feature_reflection
 #define SCL_REFLECT_EQUALITY_OPERATOR_HELPER(op, name, cv_ref)                 \
-    SCL_REFLECT_OPERATOR_EXECUTOR_OVERRIDE_BASE(SCL_FORWARD(op), name, cv_ref) \
+    SCL_REFLECT_EQUALITY_EXECUTOR_OVERRIDE_BASE(SCL_FORWARD(op), name, cv_ref) \
     template <typename... ScLArgs>                                             \
     constexpr bool operator op(ScLArgs &&... scl_args)                         \
         cv_ref SCL_REFLECT_EQUALITY_OPERATOR_BASE(SCL_FORWARD(op), name, cv_ref)
@@ -1119,7 +1169,7 @@
 #define SCL_REFLECT_EQUALITY_OPERATOR_IMPL(op, name)                              \
     SCL_REFLECT_OPERATOR_EXEC_HELPERS(name)                                       \
     SCL_REFLECT_OPERATOR_INFIX_APPLIER(SCL_FORWARD(op), name)                     \
-    SCL_REFLECT_OPERATOR_INFIX_FREE_OK(name)                                      \
+    SCL_REFLECT_EQUALITY_FREE_BOOL_OK(name)                                       \
     SCL_REFLECT_EQUALITY_OPERATOR_HELPER(SCL_FORWARD(op), name, &)                \
     SCL_REFLECT_EQUALITY_OPERATOR_HELPER(SCL_FORWARD(op), name, &&)               \
     SCL_REFLECT_EQUALITY_OPERATOR_HELPER(SCL_FORWARD(op), name, const &)          \
@@ -1136,7 +1186,8 @@
 /// Like @c SCL_REFLECT_REVERSE_FRIEND_OPERATOR_BASE but returns @c bool, required for a C++20
 /// @c operator== candidate.  Serves both @c x @c == @c w (this friend, primary candidate) and
 /// the reversed rewrite of @c w @c == @c x (this friend as reversed candidate — @c bool return
-/// keeps the rewrite well-formed).
+/// keeps the rewrite well-formed).  Constrained on the reverse result being @c static_cast-ible to
+/// @c bool, so a non-convertible result leaves the friend undeclared.
 ///
 /// @param op     The C++ equality operator token (@c == or @c !=).
 /// @param name   Short unique name identifying the operator (plain identifier).
@@ -1147,7 +1198,8 @@
         noexcept(noexcept(SCL_FRIEND_REVERSE_EXECUTE_NX(SCL_FORWARD(op), cv_ref)))                        \
         requires(!::scl::feature::is_wrapper_v<::std::remove_cvref_t<ScLLhs>> &&                          \
             !::std::is_same_v<::std::remove_cvref_t<ScLLhs>, ::std::remove_cvref_t<s_c_l_type>> &&        \
-            operator_##name##_scl_reverse_viable<ScLLhs, decltype(SCL_ACCESS_DECLVAL(cv_ref))>())         \
+            operator_##name##_scl_reverse_viable<ScLLhs, decltype(SCL_ACCESS_DECLVAL(cv_ref))>() &&       \
+            requires { static_cast<bool>(SCL_FRIEND_REVERSE_EXECUTE_NX(SCL_FORWARD(op), cv_ref)); })      \
     {                                                                                                     \
         return static_cast<bool>(SCL_FRIEND_REVERSE_EXECUTE(SCL_FORWARD(op), scl_self, scl_lhs, cv_ref)); \
     }
