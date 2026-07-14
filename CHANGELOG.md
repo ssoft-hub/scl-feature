@@ -104,6 +104,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- `scl::wrapper` same-type assignment is SFINAE-clean when the value's assignment is ill-formed.
+  Instantiating a wrapper over a value type whose assignment (or its volatile qualification) does
+  not compile — e.g. a non-assignable value, or a class whose copy-assignment binds `const &` —
+  no longer hard-errors on the volatile-qualified self-assignment overloads; the same-type
+  assignment is simply absent. The self-assignment viability check now probes `execute()` arity
+  with a trivial callable and checks the performer's own viability, instead of deducing the
+  performer through `execute()`'s return type
 - `SCL_REFLECT_EQUALITY_OPERATOR`: a reflected `==` / `!=` whose underlying result is not
   `static_cast`-ible to `bool` is now SFINAE-absent instead of a hard error at the `static_cast`
   in the overload body. All three equality paths — free/execute, reverse friend, and the

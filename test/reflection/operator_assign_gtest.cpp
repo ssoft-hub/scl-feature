@@ -8,14 +8,14 @@
 #include <utility>
 
 // ============================================================================
-// Acceptance suite for reflected ASSIGNMENT (FR13) on real `scl::wrapper`.
-//   AC16  `w = x`            reflects `v = x`
-//   AC17  `w = w2` same type -> the wrapper's own copy-assign (NOT reflection)
-//   AC18  `w = w2` other val -> reflects `v = v2`
-//   AC19  incompatible value -> ill-formed, SFINAE-friendly
-//   AC20  compound `w += x`  reflects `v += x`
-//   AC21  guard()/unguard() fire once per wrapper operand
-//   + executor override `operator_assign` takes priority (FR8)
+// Reflected assignment on real `scl::wrapper`:
+//   `w = x`              reflects `v = x`
+//   `w = w2` same type   uses the wrapper's own copy-assign (NOT reflection)
+//   `w = w2` other value reflects `v = v2`
+//   incompatible value   ill-formed, SFINAE-friendly
+//   compound `w += x`    reflects `v += x`
+//   guard()/unguard()    fire once per wrapper operand
+//   executor `operator_assign` override takes priority over the reflected path
 // ============================================================================
 
 using namespace ::scl;
@@ -111,7 +111,7 @@ namespace
         value_type m_value;
     };
 
-    // -- executor with an operator_assign override (FR8). Marks value = rhs*3,
+    // -- executor with an operator_assign override. Marks value = rhs*3,
     //    returns long so the override path is distinguishable by return type. ---
     template <typename Value>
     class assign_override
@@ -191,17 +191,34 @@ namespace
 
     template <typename Lhs, typename Rhs>
     constexpr bool can_assign_v = requires { ::std::declval<Lhs>() = ::std::declval<Rhs>(); };
+
+    // A value type whose copy-assignment binds `const &` (the implicit one): its volatile-qualified
+    // assignment is ill-formed, which the self-assignment overloads must treat as SFINAE, not a
+    // hard error, when the wrapper is instantiated for all eight cv-ref source qualifications.
+    struct classy
+    {
+        int v;
+        constexpr bool operator==(int rhs) const noexcept { return v == rhs; }
+    };
+
+    // A value type that is not assignable at all.
+    struct non_assignable
+    {
+        int v;
+        non_assignable & operator=(non_assignable const &) = delete;
+        non_assignable & operator=(non_assignable &&) = delete;
+    };
 } // namespace
 
 // ============================================================================
-// AC16 — `w = x` reflects `v = x`
+// `w = x` reflects `v = x`
 // ============================================================================
 
 TEST(ReflectAssign, PlainValue_Assigns)
 {
     wrapper<int> w{1};
     w = 5;
-    EXPECT_EQ(w + 0, 5); // read back via forward-free +
+    EXPECT_EQ(w, 5);
 }
 
 TEST(ReflectAssign, PlainValue_Compiles)
@@ -211,14 +228,14 @@ TEST(ReflectAssign, PlainValue_Compiles)
 }
 
 // ============================================================================
-// AC20 — compound `w += x` reflects `v += x`
+// compound `w += x` reflects `v += x`
 // ============================================================================
 
 TEST(ReflectAssign, Compound_PlusAssign)
 {
     wrapper<int> w{10};
     w += 5;
-    EXPECT_EQ(w + 0, 15);
+    EXPECT_EQ(w, 15);
 }
 
 TEST(ReflectAssign, Compound_AllArithmeticBitwise)
@@ -234,7 +251,7 @@ TEST(ReflectAssign, Compound_AllArithmeticBitwise)
 }
 
 // ============================================================================
-// AC17 — same wrapper type uses the wrapper's own copy-assign, NOT reflection
+// same wrapper type uses the wrapper's own copy-assign, not reflection
 // ============================================================================
 
 TEST(ReflectAssign, SameType_UsesWrapperCopyAssign)
@@ -242,11 +259,11 @@ TEST(ReflectAssign, SameType_UsesWrapperCopyAssign)
     wrapper<int> a{1};
     wrapper<int> b{2};
     a = b; // wrapper copy-assign, no ambiguity with a reflected value-assign
-    EXPECT_EQ(a + 0, 2);
+    EXPECT_EQ(a, 2);
 }
 
 // ============================================================================
-// AC18 — `w = w2` different value type reflects `v = v2`
+// `w = w2` different value type reflects `v = v2`
 // ============================================================================
 
 TEST(ReflectAssign, DifferentValue_Assigns)
@@ -254,7 +271,7 @@ TEST(ReflectAssign, DifferentValue_Assigns)
     wrapper<long> a{0};
     wrapper<int> b{7};
     a = b; // long = int, reflected value-assign
-    EXPECT_EQ(a + 0L, 7L);
+    EXPECT_EQ(a, 7L);
 }
 
 TEST(ReflectAssign, DifferentValue_Compiles)
@@ -263,7 +280,7 @@ TEST(ReflectAssign, DifferentValue_Compiles)
 }
 
 // ============================================================================
-// AC19 — incompatible value assignment is ill-formed (SFINAE-friendly)
+// incompatible value assignment is ill-formed (SFINAE-friendly)
 // ============================================================================
 
 TEST(ReflectAssign, IncompatibleValue_StaysInvalid)
@@ -272,8 +289,25 @@ TEST(ReflectAssign, IncompatibleValue_StaysInvalid)
     STATIC_EXPECT_FALSE((can_assign_v<wrapper<int> &, wrapper<std::string> &>));
 }
 
+// A class value whose assignment binds `const &` instantiates without a hard error on the
+// volatile-qualified self-assignment overloads, and same-type assignment still works.
+TEST(ReflectAssign, ClassValue_SameTypeAssigns)
+{
+    wrapper<classy> a{classy{1}};
+    wrapper<classy> b{classy{2}};
+    a = b;
+    EXPECT_EQ(a, 2);
+}
+
+// A non-assignable value leaves assignment SFINAE-absent (the wrapper still instantiates).
+TEST(ReflectAssign, NonAssignableValue_StaysInvalid)
+{
+    STATIC_EXPECT_FALSE((can_assign_v<wrapper<non_assignable> &, wrapper<non_assignable> &>));
+    STATIC_EXPECT_FALSE((can_assign_v<wrapper<non_assignable> &, non_assignable>));
+}
+
 // ============================================================================
-// FR8 — executor override `operator_assign` takes priority
+// executor override `operator_assign` takes priority
 // ============================================================================
 
 TEST(ReflectAssign, ExecutorOverride_TakesPriority)
@@ -283,7 +317,7 @@ TEST(ReflectAssign, ExecutorOverride_TakesPriority)
     static_assert(::std::same_as<decltype(result), long>,
         "operator_assign override must return long — the override path");
     EXPECT_EQ(result, 21L); // 7 * 3
-    EXPECT_EQ(w + 0, 21);
+    EXPECT_EQ(w, 21);
 }
 
 // The override is honoured on the self-type path too: a same-type source is read to its
@@ -296,14 +330,14 @@ TEST(ReflectAssign, ExecutorOverride_SameTypeSource)
     static_assert(::std::same_as<decltype(result), long>,
         "operator_assign override must return long — the override path");
     EXPECT_EQ(result, 21L); // 7 * 3
-    EXPECT_EQ(a + 0, 21);
+    EXPECT_EQ(a, 21);
 }
 
 // ============================================================================
-// AC21 — guard()/unguard() fire once per wrapper operand
+// guard()/unguard() fire once per wrapper operand
 //
-// Counters are snapshotted immediately after the assignment: a later reflected
-// read (`+`) would guard the target again and pollute the count.
+// Counters are snapshotted immediately after the assignment: a later reflected read of the
+// wrapper would guard it again and pollute the count.
 // ============================================================================
 
 TEST(ReflectAssign, PlainValueAssign_GuardsTargetOnce)
@@ -313,7 +347,7 @@ TEST(ReflectAssign, PlainValueAssign_GuardsTargetOnce)
     w = 5; // target guarded once, plain source not a wrapper
     int const guard = g_guard_a;
     int const unguard = g_unguard_a;
-    EXPECT_EQ(w + 0, 5);
+    EXPECT_EQ(w, 5);
     EXPECT_EQ(guard, 1);
     EXPECT_EQ(unguard, 1);
 }
@@ -326,7 +360,7 @@ TEST(ReflectAssign, DifferentValueAssign_GuardsEachOperandOnce)
     a = b; // reflected value-assign: both operands read under guard
     int const guard_a = g_guard_a;
     int const unguard_a = g_unguard_a;
-    EXPECT_EQ(a + 0L, 7L);
+    EXPECT_EQ(a, 7L);
     EXPECT_EQ(guard_a, 1);
     EXPECT_EQ(unguard_a, 1);
     EXPECT_EQ(g_guard_b, 1);
@@ -344,7 +378,7 @@ TEST(ReflectAssign, SameTypeAssign_GuardsEachOperandOnce)
     a = b;
     int const guard = g_guard_a;
     int const unguard = g_unguard_a;
-    EXPECT_EQ(a + 0, 9);
+    EXPECT_EQ(a, 9);
     EXPECT_EQ(guard, 2);
     EXPECT_EQ(unguard, 2);
 }

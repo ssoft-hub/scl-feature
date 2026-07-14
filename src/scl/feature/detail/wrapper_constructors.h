@@ -74,63 +74,75 @@
 /// @c operator_assign override / free applier as the reflected operator, guarding the target and
 /// the source once each.
 ///
-/// The free path is a named performer (not a lambda) so its viability is a @c requires predicate:
-/// an executor whose @c execute takes no forwarded operands (e.g. the property holder) simply
-/// leaves the same-type assignment un-viable rather than hard-erroring.  The performer's trailing
-/// return type keeps a non-assignable value type SFINAE-friendly.
-#define SCL_WRAPPER_ASSIGNMENT_SELF_HELPER                                                                  \
-    struct operator_assign_scl_self_performer                                                               \
-    {                                                                                                       \
-        template <typename ScLTargetExec, typename ScLSourceExec>                                           \
-        constexpr auto operator()(ScLTargetExec && scl_t, ScLSourceExec && scl_s) const                     \
-            -> decltype(SCL_WRAPPER_ASSIGNMENT_SELF_BASE::operator_assign_scl_infix_applier::apply(         \
-                executor_type::access(::std::declval<ScLTargetExec>()),                                     \
-                executor_type::access(::std::declval<ScLSourceExec>())))                                    \
-        {                                                                                                   \
-            ::scl::feature::detail::executor_guard<ScLTargetExec &&> scl_target{                            \
-                ::std::forward<ScLTargetExec>(scl_t)};                                                      \
-            ::scl::feature::detail::executor_guard<ScLSourceExec &&> scl_source{                            \
-                ::std::forward<ScLSourceExec>(scl_s)};                                                      \
-            return SCL_WRAPPER_ASSIGNMENT_SELF_BASE::operator_assign_scl_infix_applier::apply(              \
-                scl_target.value(), scl_source.value());                                                    \
-        }                                                                                                   \
-    };                                                                                                      \
-    template <typename ScLSrcExec>                                                                          \
-    static constexpr bool operator_assign_scl_self_has_override =                                           \
-        SCL_WRAPPER_ASSIGNMENT_SELF_BASE::template operator_assign_scl_has_exec_override<                   \
-            executor_type &, decltype(executor_type::access(::std::declval<ScLSrcExec>()))>;                \
-    template <typename ScLSrcExec>                                                                          \
-    static constexpr bool operator_assign_scl_self_free =                                                   \
-        requires {                                                                                          \
-            executor_type::execute(::std::declval<executor_type &>(), operator_assign_scl_self_performer{}, \
-                ::std::declval<executor_type &>(), ::std::declval<ScLSrcExec>());                           \
-        };                                                                                                  \
-    template <typename ScLSrcExec>                                                                          \
-    static constexpr bool operator_assign_scl_self_viable =                                                 \
-        operator_assign_scl_self_has_override<ScLSrcExec> || operator_assign_scl_self_free<ScLSrcExec>;     \
-    template <typename ScLSrcExec>                                                                          \
-    static constexpr bool operator_assign_scl_self_noexcept = []() constexpr noexcept -> bool {             \
-        if constexpr (operator_assign_scl_self_has_override<ScLSrcExec>)                                    \
-            return noexcept(executor_type::operator_assign(::std::declval<executor_type &>(),               \
-                executor_type::access(::std::declval<ScLSrcExec>())));                                      \
-        else if constexpr (operator_assign_scl_self_free<ScLSrcExec>)                                       \
-            return noexcept(executor_type::execute(::std::declval<executor_type &>(),                       \
-                operator_assign_scl_self_performer{}, ::std::declval<executor_type &>(),                    \
-                ::std::declval<ScLSrcExec>()));                                                             \
-        else                                                                                                \
-            return false;                                                                                   \
-    }();                                                                                                    \
-    template <typename ScLSrcExec>                                                                          \
-    static constexpr decltype(auto)                                                                         \
-    operator_assign_scl_self(executor_type & scl_self_exec, ScLSrcExec && scl_src_exec) /**/                \
-        noexcept(operator_assign_scl_self_noexcept<ScLSrcExec>)                                             \
-    {                                                                                                       \
-        if constexpr (operator_assign_scl_self_has_override<ScLSrcExec>)                                    \
-            return executor_type::operator_assign(scl_self_exec,                                            \
-                executor_type::access(::std::forward<ScLSrcExec>(scl_src_exec)));                           \
-        else                                                                                                \
-            return executor_type::execute(scl_self_exec, operator_assign_scl_self_performer{},              \
-                scl_self_exec, ::std::forward<ScLSrcExec>(scl_src_exec));                                   \
+/// The free path is a named performer (not a lambda) whose viability is checked in two immediate
+/// contexts: @c execute must accept the forwarded operands — probed with a trivial callable, so the
+/// check never instantiates a failing performer body — and the performer itself must be callable
+/// (its trailing return type is the applied @c value @c = @c value expression).  So an executor
+/// whose @c execute takes no forwarded operands, or a value type whose assignment (or its volatile
+/// qualification) is ill-formed, leaves the same-type assignment un-viable instead of ill-formed.
+#define SCL_WRAPPER_ASSIGNMENT_SELF_HELPER                                                              \
+    struct operator_assign_scl_self_performer                                                           \
+    {                                                                                                   \
+        template <typename ScLTargetExec, typename ScLSourceExec>                                       \
+        constexpr auto operator()(ScLTargetExec && scl_t, ScLSourceExec && scl_s) const                 \
+            -> decltype(SCL_WRAPPER_ASSIGNMENT_SELF_BASE::operator_assign_scl_infix_applier::apply(     \
+                executor_type::access(::std::declval<ScLTargetExec>()),                                 \
+                executor_type::access(::std::declval<ScLSourceExec>())))                                \
+        {                                                                                               \
+            ::scl::feature::detail::executor_guard<ScLTargetExec &&> scl_target{                        \
+                ::std::forward<ScLTargetExec>(scl_t)};                                                  \
+            ::scl::feature::detail::executor_guard<ScLSourceExec &&> scl_source{                        \
+                ::std::forward<ScLSourceExec>(scl_s)};                                                  \
+            return SCL_WRAPPER_ASSIGNMENT_SELF_BASE::operator_assign_scl_infix_applier::apply(          \
+                scl_target.value(), scl_source.value());                                                \
+        }                                                                                               \
+    };                                                                                                  \
+    struct operator_assign_scl_self_probe                                                               \
+    {                                                                                                   \
+        template <typename... ScLAny>                                                                   \
+        constexpr void operator()(ScLAny &&...) const noexcept                                          \
+        {}                                                                                              \
+    };                                                                                                  \
+    template <typename ScLSrcExec>                                                                      \
+    static constexpr bool operator_assign_scl_self_has_override =                                       \
+        SCL_WRAPPER_ASSIGNMENT_SELF_BASE::template operator_assign_scl_has_exec_override<               \
+            executor_type &, decltype(executor_type::access(::std::declval<ScLSrcExec>()))>;            \
+    template <typename ScLSrcExec>                                                                      \
+    static constexpr bool operator_assign_scl_self_free =                                               \
+        requires {                                                                                      \
+            executor_type::execute(::std::declval<executor_type &>(), operator_assign_scl_self_probe{}, \
+                ::std::declval<executor_type &>(), ::std::declval<ScLSrcExec>());                       \
+        } &&                                                                                            \
+        requires {                                                                                      \
+            operator_assign_scl_self_performer{}(::std::declval<executor_type &>(),                     \
+                ::std::declval<ScLSrcExec>());                                                          \
+        };                                                                                              \
+    template <typename ScLSrcExec>                                                                      \
+    static constexpr bool operator_assign_scl_self_viable =                                             \
+        operator_assign_scl_self_has_override<ScLSrcExec> || operator_assign_scl_self_free<ScLSrcExec>; \
+    template <typename ScLSrcExec>                                                                      \
+    static constexpr bool operator_assign_scl_self_noexcept = []() constexpr noexcept -> bool {         \
+        if constexpr (operator_assign_scl_self_has_override<ScLSrcExec>)                                \
+            return noexcept(executor_type::operator_assign(::std::declval<executor_type &>(),           \
+                executor_type::access(::std::declval<ScLSrcExec>())));                                  \
+        else if constexpr (operator_assign_scl_self_free<ScLSrcExec>)                                   \
+            return noexcept(executor_type::execute(::std::declval<executor_type &>(),                   \
+                operator_assign_scl_self_performer{}, ::std::declval<executor_type &>(),                \
+                ::std::declval<ScLSrcExec>()));                                                         \
+        else                                                                                            \
+            return false;                                                                               \
+    }();                                                                                                \
+    template <typename ScLSrcExec>                                                                      \
+    static constexpr decltype(auto)                                                                     \
+    operator_assign_scl_self(executor_type & scl_self_exec, ScLSrcExec && scl_src_exec) /**/            \
+        noexcept(operator_assign_scl_self_noexcept<ScLSrcExec>)                                         \
+    {                                                                                                   \
+        if constexpr (operator_assign_scl_self_has_override<ScLSrcExec>)                                \
+            return executor_type::operator_assign(scl_self_exec,                                        \
+                executor_type::access(::std::forward<ScLSrcExec>(scl_src_exec)));                       \
+        else                                                                                            \
+            return executor_type::execute(scl_self_exec, operator_assign_scl_self_performer{},          \
+                scl_self_exec, ::std::forward<ScLSrcExec>(scl_src_exec));                               \
     }
 
 /// @internal
