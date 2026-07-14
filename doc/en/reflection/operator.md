@@ -16,9 +16,9 @@ object through the executor.
 | `SCL_REFLECT_PREFIX_UNARY_OPERATOR(op, name)` | `op w` | prefix unary operators (`-`, `~`, `++`, …) |
 | `SCL_REFLECT_POSTFIX_UNARY_OPERATOR(op, name)` | `w op` | postfix unary operators (`++`, `--`) |
 | `SCL_REFLECT_SUBSCRIPT_OPERATOR(op, name)` | `w[i]` | `operator[]`, including a pointer value |
-| `SCL_REFLECT_MEMBER_BINARY_OPERATOR(op, name)` | `w op x` | mandatory-member operators (`=`, `*=`, …) |
-| `SCL_REFLECT_MEMBER_PREFIX_UNARY_OPERATOR(op, name)` | `op w` | mandatory-member prefix unary (`->`, `&`, `*`) |
-| `SCL_REFLECT_MEMBER_POSTFIX_UNARY_OPERATOR(op, name)` | `w op` | mandatory-member postfix unary |
+| `SCL_REFLECT_MEMBER_BINARY_OPERATOR(op, name)` | `w op x` | operators required to be members (`=`, `*=`, …) |
+| `SCL_REFLECT_MEMBER_PREFIX_UNARY_OPERATOR(op, name)` | `op w` | prefix unary operators required to be members (`->`, `&`, `*`) |
+| `SCL_REFLECT_MEMBER_POSTFIX_UNARY_OPERATOR(op, name)` | `w op` | postfix unary operators required to be members |
 | `SCL_REFLECT_FRIEND_BINARY_OPERATOR(op, name)` | `w op x` via ADL only | ADL-only binary operators |
 | `SCL_REFLECT_FRIEND_PREFIX_UNARY_OPERATOR(op, name)` | `op w` via ADL only | ADL-only prefix unary |
 | `SCL_REFLECT_FRIEND_POSTFIX_UNARY_OPERATOR(op, name)` | `w op` via ADL only | ADL-only postfix unary |
@@ -148,7 +148,7 @@ scl::wrapper<int *> p{arr};
 int e = p[2];     // built-in pointer subscript
 ```
 
-### Mandatory-member compound assignment
+### Compound assignment (member-only)
 
 ```cpp
 scl::wrapper<int> c{0};
