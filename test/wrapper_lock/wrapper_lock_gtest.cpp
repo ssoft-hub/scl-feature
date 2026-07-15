@@ -1,3 +1,4 @@
+#include <counting_executor.h>
 #include <gtest_utils.h>
 
 #include <scl/feature/wrapper.h>
@@ -9,18 +10,17 @@ using namespace ::scl;
 // Helpers
 // ---------------------------------------------------------------------------
 
-struct guard_counters
-{
-    int guard_count = 0;
-    int unguard_count = 0;
-};
+struct guard_error
+{};
 
+// guard() throws after counting; unguard() only counts. Used to verify that a
+// failed guard() leaves the lock un-acquired.
 template <typename T>
-struct counting_executor
+struct throwing_guard_executor
 {
     using value_type = T;
 
-    explicit constexpr counting_executor(T v, guard_counters & counters)
+    explicit constexpr throwing_guard_executor(T v, guard_counters & counters)
         : m_value{v}
         , m_counters{counters}
     {}
@@ -33,21 +33,22 @@ struct counting_executor
 
     template <typename Self>
     static constexpr decltype(auto) access(Self && self)
-        requires std::same_as<std::remove_cvref_t<Self>, counting_executor>
+        requires std::same_as<std::remove_cvref_t<Self>, throwing_guard_executor>
     {
         return ::scl::forward_like<Self>(self.m_value);
     }
 
     template <typename Self>
-    static constexpr void guard(Self & self)
-        requires std::same_as<std::remove_cvref_t<Self>, counting_executor>
+    static void guard(Self & self)
+        requires std::same_as<std::remove_cvref_t<Self>, throwing_guard_executor>
     {
         ++self.m_counters.guard_count;
+        throw guard_error{};
     }
 
     template <typename Self>
-    static constexpr void unguard(Self & self)
-        requires std::same_as<std::remove_cvref_t<Self>, counting_executor>
+    static void unguard(Self & self) noexcept
+        requires std::same_as<std::remove_cvref_t<Self>, throwing_guard_executor>
     {
         ++self.m_counters.unguard_count;
     }
@@ -223,4 +224,22 @@ TEST(WrapperLockCounting, ConstWrapper)
     wrapper_lock<decltype(w) &> lk{w};
     lk.lock();
     EXPECT_EQ(lk.value(), 7);
+}
+
+// ---------------------------------------------------------------------------
+// Wrapper specialisation — throwing guard (exception safety)
+// ---------------------------------------------------------------------------
+
+TEST(WrapperLockThrowingGuard, ThrowingGuardLeavesLockUnacquired)
+{
+    guard_counters ctrs;
+    wrapper<int, throwing_guard_executor> w{42, ctrs};
+    {
+        wrapper_lock<decltype(w) &> lk{w};
+        EXPECT_THROW(lk.lock(), guard_error);
+    }
+    // guard() ran once and threw; the destructor's unlock() must not unguard a
+    // lock that was never acquired.
+    EXPECT_EQ(ctrs.guard_count, 1);
+    EXPECT_EQ(ctrs.unguard_count, 0);
 }
