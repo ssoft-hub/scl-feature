@@ -21,6 +21,12 @@ point of conversion (either a temporary returned directly from `wrapper_cast()`,
 or an explicit `std::move(proxy)`). An explicit named conversion is also available
 via `.to<T>()`.
 
+> **Lifetime.** The proxy borrows a reference to its argument and does not extend
+> the argument's lifetime. Consume the result within the same full-expression; do
+> not store the `wrapper_caster` in a variable, especially from a temporary —
+> `auto p = wrapper_cast(make_wrapper());` leaves `p` referring to a destroyed
+> wrapper once the initialising full-expression ends.
+
 The primary use case is generic code that must accept both plain values and
 wrappers uniformly — most notably the argument forwarding inside
 `SCL_REFLECT_METHOD`, which calls `wrapper_cast(arg)` on every argument so that
