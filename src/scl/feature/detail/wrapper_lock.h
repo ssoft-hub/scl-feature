@@ -7,6 +7,7 @@
 #include <scl/utility/concepts/reference.h>
 #include <scl/utility/type_traits/forward_like.h>
 
+#include <cassert>
 #include <type_traits>
 #include <utility>
 
@@ -97,6 +98,12 @@ namespace scl::feature::detail
         }
 
         [[nodiscard]]
+        constexpr bool locked() const noexcept
+        {
+            return m_locked;
+        }
+
+        [[nodiscard]]
         constexpr WrapperRefer wrapper_value() const noexcept
         {
             return ::std::forward<WrapperRefer>(m_ref);
@@ -109,6 +116,8 @@ namespace scl::feature::detail
                          executor_type::template access<executor_refer>(::std::declval<executor_refer>());
                      }
         {
+            assert((m_locked || !::scl::feature::has_guard_v<executor_type, executor_refer>) &&
+                "wrapper_lock::value() requires the lock to be held for a guarding executor");
             return executor_type::template access<executor_refer>(executor());
         }
 
@@ -119,6 +128,7 @@ namespace scl::feature::detail
             return executor_access::get(::std::forward<WrapperRefer>(m_ref));
         }
 
+    private:
         bool m_locked{false};
         WrapperRefer m_ref;
     };

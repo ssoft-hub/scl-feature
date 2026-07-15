@@ -12,6 +12,66 @@ using namespace ::scl;
 using inner_w = wrapper<int, counting_executor>;
 using outer_w = wrapper<inner_w, feature::inplace::plain>;
 
+// Copy-on-write stand-in: guard() flips access() from the shared to the private buffer.
+template <typename T>
+struct cow_executor
+{
+    using value_type = T;
+
+    struct state
+    {
+        T shared;
+        T detached_value;
+        bool detached = false;
+    };
+
+    explicit constexpr cow_executor(state & s)
+        : m_state{s}
+    {}
+
+    template <typename Self, typename Func, typename... Args>
+    static constexpr decltype(auto) execute(Self && self, Func && func, Args &&... args)
+    {
+        return ::std::invoke(::std::forward<Func>(func), ::std::forward<Args>(args)...);
+    }
+
+    template <typename Self>
+    static constexpr decltype(auto) access(Self && self)
+        requires ::std::same_as<::std::remove_cvref_t<Self>, cow_executor>
+    {
+        auto & st = self.m_state;
+        return ::scl::forward_like<Self>(st.detached ? st.detached_value : st.shared);
+    }
+
+    template <typename Self>
+    static constexpr void guard(Self & self)
+        requires ::std::same_as<::std::remove_cvref_t<Self>, cow_executor>
+    {
+        self.m_state.detached = true;
+    }
+
+    template <typename Self>
+    static constexpr void unguard(Self & self) noexcept
+        requires ::std::same_as<::std::remove_cvref_t<Self>, cow_executor>
+    {}
+
+    state & m_state;
+};
+
+// Proves value_lock stays usable in a constant expression.
+namespace
+{
+    constexpr int value_lock_constexpr_probe()
+    {
+        wrapper<int, feature::inplace::plain> w{42};
+        value_lock<decltype(w) &> vl{w};
+        vl.lock_for<int &>();
+        return vl.value_as<int &>();
+    }
+} // namespace
+
+static_assert(value_lock_constexpr_probe() == 42, "value_lock must work in a constant expression");
+
 // ---------------------------------------------------------------------------
 // Non-wrapper specialisation
 // ---------------------------------------------------------------------------
@@ -186,6 +246,7 @@ TEST(ValueLockNested, ValueAsInnerWrapperRef)
     guard_counters inner_ctrs;
     outer_w w{inner_w{42, inner_ctrs}};
     value_lock<outer_w &> vl{w};
+    vl.lock_for<inner_w &>(); // required before value_as; no guard acquired (outer is plain)
     inner_w & inner_ref = vl.value_as<inner_w &>();
     // Verify the inner wrapper holds the right value via wrapper_lock
     wrapper_lock<inner_w &> inner_lk{inner_ref};
@@ -212,4 +273,19 @@ TEST(ValueLockNested, DestructorReleasesInnerGuard)
         EXPECT_EQ(inner_ctrs.unguard_count, 0);
     }
     EXPECT_EQ(inner_ctrs.unguard_count, 1);
+}
+
+// ---------------------------------------------------------------------------
+// Copy-on-write executor: the inner reference must be resolved after the guard
+// ---------------------------------------------------------------------------
+
+TEST(ValueLockCow, ValueAsReadsPostGuardValue)
+{
+    cow_executor<int>::state st{.shared = 1, .detached_value = 2, .detached = false};
+    wrapper<int, cow_executor> w{st};
+    value_lock<decltype(w) &> vl{w};
+    vl.lock_for<int &>();
+    // guard() flipped to the private buffer; value_as must read post-guard (2), not the
+    // pre-guard shared buffer (1).
+    EXPECT_EQ(vl.value_as<int &>(), 2);
 }
