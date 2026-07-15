@@ -27,6 +27,12 @@ not limited to classes that are themselves `scl::wrapper` instantiations.
 The reflected field `prop` **must exist as a data member** on the wrapped type,
 even when an executor override is provided.
 
+> **The property member is a view.** Its inner executor recovers the parent wrapper
+> through a byte offset, so memberwise copy/move of the **whole** enclosing wrapper is
+> safe, but the property member must not be copied, moved, or returned on its own —
+> that re-bases the offset and corrupts the back-pointer (undefined behaviour). Use it
+> in place (`wrapper.prop`, `wrapper_cast(wrapper.prop)`).
+
 ## Access
 
 | Expression | Behaviour |
