@@ -40,6 +40,11 @@ namespace scl
      * The proxy must be used as an rvalue; all conversion operators are
      * @c &&-qualified.
      *
+     * @warning The proxy borrows a reference to its argument and does not extend the
+     *          argument's lifetime.  Consume it within the same full-expression; do not store
+     *          the proxy, especially from a temporary — @c auto @c p @c = @c wrapper_cast(makeW());
+     *          leaves @c p referring to a destroyed wrapper once that full-expression ends.
+     *
      * @tparam Refer  Reference type passed to @c wrapper_cast().
      *
      * @code{.cpp}

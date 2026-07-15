@@ -26,11 +26,12 @@
 /// analogous to the execute-path in @c SCL_REFLECT_METHOD.
 ///
 /// @par Copy / move safety
-/// The executor stores a @c ptrdiff_t byte-offset from @c &this to the outer
-/// executor, not a raw pointer.  Because the distance between two members of
-/// the same class is invariant across all instances, memberwise copy and move
-/// of the outer wrapper automatically fix up the pointer — no custom
-/// constructors are required.
+/// The executor stores a byte offset from @c &this to the outer executor, not a
+/// raw pointer, so memberwise copy/move of the **whole** enclosing wrapper keeps
+/// it valid (both ends translate together) — no custom constructors are required.
+/// The property member is a view, however: copying, moving, or returning it on its
+/// own re-bases the offset against an unrelated address and corrupts the
+/// back-pointer.  Do not detach it from its wrapper.
 ///
 /// @par Thread safety
 /// @c guard() / @c unguard() are forwarded to the outer executor when it

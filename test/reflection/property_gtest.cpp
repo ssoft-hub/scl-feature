@@ -107,6 +107,22 @@ TEST(ReflectProperty, WriteXMutatesWrapped)
     EXPECT_EQ(static_cast<int>(wrapper_cast(p.y)), 0); // y unaffected
 }
 
+// ── Copy safety ─────────────────────────────────────────────────────────────────
+
+TEST(ReflectProperty, WholeWrapperCopyPreservesPropertyAccess)
+{
+    ReflectedPoint original{3, 4};
+    ReflectedPoint copy = original; // memberwise copy: the container_of offset self-heals
+
+    EXPECT_EQ(static_cast<int>(wrapper_cast(copy.x)), 3);
+    EXPECT_EQ(static_cast<int>(wrapper_cast(copy.y)), 4);
+
+    // The copy owns independent storage: writing through it must not touch the original.
+    wrapper_cast(copy.x).to<int &>() = 30;
+    EXPECT_EQ(static_cast<int>(wrapper_cast(copy.x)), 30);
+    EXPECT_EQ(static_cast<int>(wrapper_cast(original.x)), 3);
+}
+
 TEST(ReflectProperty, WriteYMutatesWrapped)
 {
     ReflectedPoint p{1, 2};

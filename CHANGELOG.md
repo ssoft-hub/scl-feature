@@ -115,6 +115,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   cv-ref qualifiers were not stripped consistently from both sides before comparison
 - `inplace::uninitialized::access()` `const` overload: incorrect `const`-qualified
   `reinterpret_cast` prevented compilation in const contexts
+- `<scl/feature/type_traits.h>` now re-exports `SCL_HAS_QUALIFIED_METHOD` — the umbrella
+  header omitted the `type_traits/has_qualified_method.h` include, so the macro was reachable
+  only transitively through a reflection header
 
 ## [0.0.1] - 2026-03-25
 

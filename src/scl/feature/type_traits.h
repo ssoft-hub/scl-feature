@@ -14,6 +14,7 @@
  */
 
 #include <scl/feature/type_traits/executor.h>
+#include <scl/feature/type_traits/has_qualified_method.h>
 #include <scl/feature/type_traits/wrapper.h>
 
 /** @} */ // end of group scl_feature_type_traits
