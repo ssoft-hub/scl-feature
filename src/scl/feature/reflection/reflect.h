@@ -81,6 +81,15 @@ namespace scl::feature
     /// Inherit from this class to give a wrapper operator forwarding for every
     /// standard C++ operator, constrained by the wrapped type's actual overloads.
     ///
+    /// @warning @c operator&&, @c operator|| and @c operator, are reflected as
+    ///          ordinary overloaded operators, so they lose the built-in
+    ///          guarantees the language gives those tokens: short-circuit
+    ///          evaluation for @c && / @c || and the sequencing of @c ,.  For a
+    ///          wrapper operand @c p, the expression @c p @c && @c p->foo()
+    ///          evaluates @c p->foo() unconditionally — even when @c p is null.
+    ///          Do not rely on built-in short-circuit / sequencing semantics when
+    ///          an operand is a wrapper.
+    ///
     /// @tparam Wrapper   The outermost wrapper type (CRTP).
     /// @tparam Executor  The executor instantiation for @p Wrapper.
     // NOLINTBEGIN(readability-function-cognitive-complexity, readability-inconsistent-ifelse-braces, cppcoreguidelines-missing-std-forward, cppcoreguidelines-rvalue-reference-param-not-moved)
@@ -97,6 +106,7 @@ namespace scl::feature
         SCL_REFLECT_OPERATOR_WITH_ARGUMENTS(->*, arrow_to_pointer)
         SCL_REFLECT_MEMBER_PREFIX_UNARY_OPERATOR(->, arrow)
 
+        // Reflected operator, does NOT guarantee built-in sequencing (see class @warning).
         SCL_REFLECT_BINARY_OPERATOR(SCL_FORWARD(, ), comma)
         SCL_REFLECT_SUBSCRIPT_OPERATOR([], subscript)
         SCL_REFLECT_OPERATOR_WITH_ARGUMENTS((), call)
@@ -133,6 +143,7 @@ namespace scl::feature
         SCL_REFLECT_BINARY_OPERATOR(|, bitwise_or)
         SCL_REFLECT_BINARY_OPERATOR(^, bitwise_xor)
 
+        // Reflected as overloaded operators: `&&`/`||` do NOT short-circuit (see class @warning).
         SCL_REFLECT_BINARY_OPERATOR(&&, logical_and)
         SCL_REFLECT_BINARY_OPERATOR(||, logical_or)
 

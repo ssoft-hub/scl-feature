@@ -43,7 +43,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `concepts::compatible_with<Expected, T>`, `concepts::compatible_with_part_of<Expected, T>`,
   `concepts::part_compatible_with<Expected, T>` — three concepts for wrapper-chain compatibility
 - Executor method detection traits: `has_access_v`, `has_execute_v`, `has_guard_v`,
-  `has_unguard_v`, `is_guard_noexcept_v`, `is_unguard_noexcept_v`
+  `has_unguard_v`, `is_guard_noexcept_v`, `is_unguard_noexcept_v`. A guarding executor's
+  `guard()`/`unguard()` must support nested (reentrant) acquisition — a single expression may
+  guard the same executor several times (`w == w`, `a = a`, one wrapper passed as several
+  arguments), so use a counting or recursive lock; a bare non-recursive `std::mutex` self-deadlocks
 - `scl::feature::reflect<Wrapper, Executor, Type>` — CRTP mixin base for the reflection chain;
   `detail::wrapper` inherits from it automatically; user-provided partial specialisations for
   concrete value types inject proxy members into every wrapper holding that type
@@ -69,7 +72,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   operator of the value takes precedence over a free one. `==`/`!=` return `bool`, so the C++20
   reversed comparison `x == w` is formed from the member. Applies to `SCL_REFLECT_BINARY_OPERATOR`,
   `SCL_REFLECT_MEMBER_BINARY_OPERATOR`, the unary macros, and the operators `reflect_operators`
-  gives `scl::wrapper`
+  gives `scl::wrapper`. Note: reflected `&&`, `||` and `,` are ordinary overloaded operators and
+  do **not** short-circuit (`&&` / `||`) or guarantee the built-in sequencing (`,`) — for a
+  wrapper operand `p`, `p && p->foo()` evaluates `p->foo()` unconditionally
 - `reflect_operators` — `operator->` and address-of/indirection stay member-only (a free
   fallback for `&` would hijack the pointer-to-wrapper syntax)
 - `scl::feature::wrapper_guard` alias moved to `scl::wrapper_guard`

@@ -47,6 +47,13 @@ The argument of a binary/subscript operator is reached one level down under the 
 guard, so a wrapper argument (`w1 op w2`) is unwrapped once and `guard()`/`unguard()` fire
 around the read; a plain argument passes through unchanged.
 
+> **Warning — `&&`, `||`, `,`.** These are reflected as ordinary overloaded
+> operators, so they lose the built-in guarantees of those tokens: short-circuit
+> evaluation for `&&` / `||` and the sequencing of `,`. For a wrapper operand
+> `p`, `p && p->foo()` evaluates `p->foo()` unconditionally — even when `p` is
+> null. Do not rely on built-in short-circuit / sequencing semantics when an
+> operand is a wrapper.
+
 ---
 
 ## Direction (binary operators)

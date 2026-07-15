@@ -10,13 +10,22 @@
 
 ## Описание
 
-`inplace::uninitialized<T>` резервирует память для объекта `T`, не конструируя его.
-Конструирование возлагается на пользователя — как правило через placement-new
-в `m_storage`. После этого `access()` предоставляет доступ к объекту через
-`reinterpret_cast` сырого хранилища.
+`inplace::uninitialized<T>` резервирует корректно выровненное хранилище нужного
+размера под объект `T`, не конструируя его. `access()` возвращает ссылку на это
+хранилище через `reinterpret_cast`; поведение не определено до тех пор, пока в
+хранилище не начнётся время жизни объекта `T`.
 
-Исполнитель удобен для типов с дорогостоящим конструктором по умолчанию или
-для объектов, порядок инициализации которых строго задан.
+Хранилище **приватное**, и исполнитель **не** предоставляет публичных
+`construct()` / `destroy()` и конструктора, принимающего значение. Как следствие:
+
+- Для типа с неявным временем жизни (например, тривиально копируемого `int`)
+  значение помещается присваиванием через обёртку — это начинает время жизни
+  объекта.
+- Для нетривиального типа (например, `std::string`) публичного способа
+  сконструировать или разрушить хранимый объект сейчас **нет**, поэтому такая
+  специализация осмысленна только на уровне типов — вложенность обёрток и запросы
+  свойств, — но не для хранения живого значения. (Отсутствие API конструирования —
+  известное ограничение.)
 
 Как и `inplace::plain`, не предоставляет `guard()`/`unguard()` и не несёт
 накладных расходов на синхронизацию.
@@ -29,10 +38,20 @@ struct uninitialized
 {
     using value_type = T;
 
-    alignas(T) std::byte m_storage[sizeof(T)];
+    // Конструктор по умолчанию — хранилище остаётся неинициализированным.
+    constexpr uninitialized() noexcept = default;
+
+    // Побайтовый копирующий конструктор — 8 перегрузок на cv-ref квалификацию.
+    // Копирует байты через std::ranges::copy; ограничен std::is_trivially_copyable_v<T>.
+    // Конструктор T НЕ вызывается.
+    constexpr explicit uninitialized(uninitialized cv_ref other) noexcept;  // × 8
+
+    // Собственного присваивания у исполнителя нет — операторы присваивания удалены.
+    uninitialized & operator=(uninitialized const &) = delete;
+    uninitialized & operator=(uninitialized &&) = delete;
 
     // Возвращает ссылку на хранимый объект через reinterpret_cast.
-    // Поведение не определено, если объект не был сконструирован.
+    // Поведение не определено, если время жизни объекта ещё не началось.
     template <typename Self>
     static constexpr decltype(auto) access(Self && self);
 
@@ -40,41 +59,30 @@ struct uninitialized
     template <typename Self, typename Func, typename... Args>
     static constexpr decltype(auto) execute(Self && self, Func && func, Args &&... args);
 
-    // Побайтовое копирование хранилища — 8 перегрузок на cv-ref квалификацию.
-    // Копирует байты через std::ranges::copy вне зависимости от того,
-    // был ли T сконструирован. Оператор присваивания T не вызывается.
-    constexpr uninitialized & operator=(uninitialized cv_ref other);  // × 8
+private:
+    alignas(T) std::byte m_storage[sizeof(T)];  // приватное
 };
 ```
 
 ## Примеры
 
-### Отложенное конструирование
-
-```cpp
-#include <scl/feature/executor/inplace/uninitialized.h>
-#include <string>
-
-scl::feature::inplace::uninitialized<std::string> e;
-
-// Конструируем объект вручную, когда готово:
-new (&e.m_storage) std::string{"hello"};
-
-std::string & s = scl::feature::inplace::uninitialized<std::string>::access(e);
-// s == "hello"
-
-// Вручную уничтожаем, когда больше не нужно:
-s.~basic_string();
-```
-
-### В качестве исполнителя обёртки
+### Резервирование хранилища
 
 ```cpp
 #include <scl/feature/wrapper.h>
 #include <scl/feature/executor/inplace/uninitialized.h>
+#include <string>
 
-scl::wrapper<std::string, scl::feature::inplace::uninitialized> w{"world"};
+// Хранилище зарезервировано; значение не сконструировано.
+scl::wrapper<int, scl::feature::inplace::uninitialized> w_int{};
+scl::wrapper<std::string, scl::feature::inplace::uninitialized> w_string{};
 ```
+
+Для типа с неявным временем жизни (например, `int`) значение помещается
+присваиванием через обёртку, что начинает время жизни объекта; чтение до записи
+значения — неопределённое поведение. Для нетривиального типа (например,
+`std::string`) публичного способа конструирования нет, поэтому такая специализация
+осмысленна только на уровне типов (вложенность, запросы свойств).
 
 ## См. также
 

@@ -31,6 +31,15 @@ static_assert( concepts::executor<inplace::plain<int>>);
 static_assert(!concepts::executor<int>);
 ```
 
+**Guard reentrancy contract.** The optional `guard()` / `unguard()` methods must
+support nested (reentrant) acquisition. A single expression may guard the same
+executor more than once — `w == w`, `a = a`, or one wrapper passed as several
+arguments each guards its executor independently, and the reflected operators
+guard both operands. Implement the guard with a counting scheme or a recursive
+lock; a bare non-recursive `std::mutex` self-deadlocks. When no `unguard()`
+overload exists for a given cv-ref qualification, `guard()` must be
+self-contained (nothing to release).
+
 ---
 
 ## wrapper

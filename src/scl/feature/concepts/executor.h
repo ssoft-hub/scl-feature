@@ -22,6 +22,16 @@ namespace scl::feature::concepts
      * RAII locking; their presence is detected separately via
      * @c is_guard_noexcept_v / @c is_unguard_noexcept_v.
      *
+     * @par Guard reentrancy contract
+     * @c guard() / @c unguard() must support nested (reentrant) acquisition. A
+     * single expression may guard the same executor more than once — e.g.
+     * @c w==w, @c a=a, or passing one wrapper as several arguments of one call
+     * each guards its executor independently, and the reflected operators guard
+     * both operands. Implement the guard with a counting scheme or a recursive
+     * lock; a bare non-recursive @c std::mutex self-deadlocks. When no
+     * @c unguard() overload exists for a given cv-ref qualification, @c guard()
+     * must be self-contained (there is nothing to release).
+     *
      * cv-ref qualifiers on @p Type are stripped before the check (@c remove_cvref_t).
      *
      * @tparam Type  Type to check.

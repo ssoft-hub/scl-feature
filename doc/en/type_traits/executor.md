@@ -36,6 +36,13 @@ static_assert(!is_executor_v<int>);
 static_assert(!is_executor_v<void>);
 ```
 
+> **Guard reentrancy contract.** The optional `guard()` / `unguard()` methods
+> must allow nested (reentrant) acquisition: a single expression may guard the
+> same executor more than once (`w == w`, `a = a`, one wrapper passed as several
+> arguments), so a bare non-recursive `std::mutex` self-deadlocks — use a
+> counting or recursive lock. When no `unguard()` exists for a cv-ref
+> qualification, `guard()` must be self-contained.
+
 ---
 
 ## has_access_v

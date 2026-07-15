@@ -21,6 +21,13 @@
 /// | `static guard(Self&&)`   | Acquires any guard (e.g., mutex lock).       |
 /// | `static unguard(Self&&)` | Releases the guard acquired by @c guard().   |
 ///
+/// @c guard() / @c unguard() must support nested (reentrant) acquisition: a
+/// single expression may guard the same executor several times (e.g. @c w==w,
+/// @c a=a, or one wrapper passed as several arguments), so a bare non-recursive
+/// @c std::mutex self-deadlocks — use a counting or recursive lock.  When no
+/// @c unguard() exists for a given cv-ref qualification, @c guard() must be
+/// self-contained.
+///
 /// @c is_executor_v detects whether a type satisfies this interface.
 /// @c executor_trait is a separate reflection customization point used by
 /// @c SCL_REFLECT_METHOD to locate the executor at runtime.
@@ -45,7 +52,7 @@ namespace scl::feature
     ///        only) parameter type is exactly @p ExecutorRefer.
     ///
     /// Detection uses a function-pointer cast: the return type is deduced from a
-    /// trial call, then @c &ExecutorType::value is cast to that exact pointer type.
+    /// trial call, then @c &ExecutorType::access is cast to that exact pointer type.
     /// This rejects implicit conversions (e.g. binding an rvalue to @c const&)
     /// while correctly handling both template and non-template overloads.
     ///
