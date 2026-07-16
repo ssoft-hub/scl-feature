@@ -9,6 +9,7 @@
 #include <scl/feature/type_traits/executor.h>
 
 #include <type_traits>
+#include <utility>
 
 /// @internal
 /// @ingroup scl_feature_reflection
@@ -325,3 +326,34 @@
             ::std::forward<decltype(scl_e)>(scl_e)};                           \
         return ::std::forward<decltype(scl_l)>(scl_l) op scl_guard.value();    \
     }, ::std::declval<s_c_l_executor_type cv_ref>(), ::std::declval<ScLLhs>())
+
+/// @internal
+/// @brief Defines the executor-override detection predicates for a reflected member.
+///
+/// Emits, at class scope, two static variable templates shared by the method and
+/// operator reflection macros:
+/// - @c member##_scl_has_exec_override\<ScLExec, ScLArgs...\> — @c true iff the
+///   executor exposes a static @c member(ScLExec, ScLArgs...) whose first parameter
+///   type is exactly @c ScLExec, detected via the same function-pointer cast as
+///   @c has_execute_v (implicit conversions are rejected).  @c ScLExec is a
+///   template parameter so @c remove_cvref_t\<ScLExec\>::member is a dependent name.
+/// - @c member##_scl_exec_noexcept\<ScLExec, ScLArgs...\> — @c true iff that
+///   override exists and the call is @c noexcept.
+///
+/// @param member  The fully token-pasted override member name (e.g. @c method_foo,
+///                @c operator_add).
+#define SCL_REFLECT_EXEC_OVERRIDE_HELPERS(member)                                                  \
+    template <typename ScLExec, typename... ScLArgs>                                               \
+    static constexpr bool member##_scl_has_exec_override =                                         \
+        requires {                                                                                 \
+            static_cast<decltype(::std::remove_cvref_t<ScLExec>::member(::std::declval<ScLExec>(), \
+                ::std::declval<ScLArgs>()...)) (*)(ScLExec, ScLArgs...)>(                          \
+                &::std::remove_cvref_t<ScLExec>::member);                                          \
+        };                                                                                         \
+    template <typename ScLExec, typename... ScLArgs>                                               \
+    static constexpr bool member##_scl_exec_noexcept = []() constexpr noexcept -> bool {           \
+        if constexpr (member##_scl_has_exec_override<ScLExec, ScLArgs...>)                         \
+            return noexcept(::std::remove_cvref_t<ScLExec>::member(::std::declval<ScLExec>(),      \
+                ::std::declval<ScLArgs>()...));                                                    \
+        return false;                                                                              \
+    }();

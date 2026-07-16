@@ -56,21 +56,7 @@
 ///   @c true iff the above check passes and the call is @c noexcept.
 ///
 /// @param name  Short unique name identifying the operator (plain identifier, e.g. @c op_add).
-#define SCL_REFLECT_OPERATOR_EXEC_HELPERS(name)                                                      \
-    template <typename ScLExec, typename... ScLArgs>                                                 \
-    static constexpr bool operator_##name##_scl_has_exec_override =                                  \
-        requires {                                                                                   \
-            static_cast<decltype(::std::remove_cvref_t<ScLExec>::operator_##name(                    \
-                ::std::declval<ScLExec>(), ::std::declval<ScLArgs>()...)) (*)(ScLExec, ScLArgs...)>( \
-                &::std::remove_cvref_t<ScLExec>::operator_##name);                                   \
-        };                                                                                           \
-    template <typename ScLExec, typename... ScLArgs>                                                 \
-    static constexpr bool operator_##name##_scl_exec_noexcept = []() constexpr noexcept -> bool {    \
-        if constexpr (operator_##name##_scl_has_exec_override<ScLExec, ScLArgs...>)                  \
-            return noexcept(::std::remove_cvref_t<ScLExec>::operator_##name(                         \
-                ::std::declval<ScLExec>(), ::std::declval<ScLArgs>()...));                           \
-        return false;                                                                                \
-    }();
+#define SCL_REFLECT_OPERATOR_EXEC_HELPERS(name) SCL_REFLECT_EXEC_OVERRIDE_HELPERS(operator_##name)
 
 /// @internal
 /// @brief Generates the @c operator_##name##_scl_caller helper struct inside the enclosing class.
