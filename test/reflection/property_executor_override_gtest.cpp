@@ -42,6 +42,10 @@ struct OverridingExecutor
     int m_override_x = 0;   ///< Separate storage used by the property_x override.
     int m_call_count_x = 0; ///< Incremented each time property_x(Executor&) is invoked.
 
+    // An executor carries no assignment operator of its own (deleting copy
+    // assignment also blocks move assignment, leaving construction intact).
+    OverridingExecutor & operator=(OverridingExecutor const &) = delete;
+
     // Executor override: mutable lvalue only, NOT noexcept.
     static int & property_x(OverridingExecutor & self)
     {
@@ -180,6 +184,10 @@ namespace
     struct NoexceptOverrideExecutor
     {
         Point m_value;
+
+        // An executor carries no assignment operator of its own (deleting copy
+        // assignment also blocks move assignment, leaving construction intact).
+        NoexceptOverrideExecutor & operator=(NoexceptOverrideExecutor const &) = delete;
 
         // Noexcept override for mutable lvalue only.
         static int & property_x(NoexceptOverrideExecutor & self) noexcept { return self.m_value.x; }

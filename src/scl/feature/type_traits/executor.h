@@ -109,15 +109,22 @@ namespace scl::feature
 
     namespace detail
     {
-        /// @c true if @p Type is a class and has static @c access() and @c execute()
-        /// callable for the three primary value categories: @c Type&, @c Type&&,
-        /// @c Type const&.  Non-class types (e.g. @c void, scalars) yield @c false.
+        /// @c true if @p Type is a class, has static @c access() and @c execute()
+        /// callable for the three primary value categories (@c Type&, @c Type&&,
+        /// @c Type const&), and carries no assignment operator of its own
+        /// (neither copy- nor move-assignable).  Non-class types (e.g. @c void,
+        /// scalars) yield @c false.
+        ///
+        /// Forbidding executor assignment keeps the assignment strategy out of the
+        /// executor: a wrapper assigns its value through @c execute(), never by
+        /// assigning one executor to another.
         template <typename Type>
         inline constexpr bool has_executor_minimal_interface_v = []() constexpr -> bool {
             if constexpr (::std::is_class_v<Type>)
                 return has_access_v<Type, Type &> && has_access_v<Type, Type &&> &&
                     has_access_v<Type, Type const &> && has_execute_v<Type, Type &> &&
-                    has_execute_v<Type, Type &&> && has_execute_v<Type, Type const &>;
+                    has_execute_v<Type, Type &&> && has_execute_v<Type, Type const &> &&
+                    !::std::is_copy_assignable_v<Type> && !::std::is_move_assignable_v<Type>;
             return false;
         }();
     } // namespace detail
