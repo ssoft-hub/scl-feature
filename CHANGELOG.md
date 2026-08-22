@@ -83,6 +83,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### CI
 
+- The GitLab pipeline runs for a merge request, for `dev` and `main`, and for a version
+  tag. A plain branch push started one before: every check filtered itself out, but the
+  GitHub mirror took any branch, so pushing a topic branch spent runner minutes copying
+  the whole repository. The checks now answer for a merge request alone — the same
+  commits reach `dev` through one, and GitHub lints `dev` and `main` at no cost — while
+  the mirror waits for `dev` or `main` to move, or for a tag, and carries every branch
+  and tag across in that one run. `clang-tidy` and `clang-format` share one job and one
+  image pull, `clang-tidy` scans headers in parallel (`SCL_LINT_JOBS`, one per core by
+  default), `cppcheck` runs on `ubuntu:24.04` rather than whatever `latest` points at
+  that day, and the GitHub lint workflow no longer runs for a pull request — the
+  repository is a read-only mirror whose pull requests a workflow of its own closes.
 - `script/ci/deploy_versioned_docs.sh` — builds versioned Doxygen HTML for
   all version tags (immutable) and `dev` (latest); injects version-selector
   nav bar; manages `versions.json` and root `index.html` on the pages branch.
