@@ -20,7 +20,7 @@ jobs:
       - name: Install git
         run: pacman -Sy --noconfirm git ca-certificates
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 

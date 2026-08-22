@@ -11,7 +11,7 @@ jobs:
     env:
       SCL_UTILITY_SRC: /tmp/scl-utility/src
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Install git
         run: apt-get update && apt-get install -y git
@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     container: silkeh/clang:21
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Check formatting
         run: bash script/lint/clang_format.sh
@@ -36,7 +36,7 @@ jobs:
     env:
       SCL_UTILITY_SRC: /tmp/scl-utility/src
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Install cppcheck
         run: |

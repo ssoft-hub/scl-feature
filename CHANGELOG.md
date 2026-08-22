@@ -83,6 +83,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### CI
 
+- The GitHub workflows check out with `actions/checkout@v7`, the current major, instead of
+  `v6`.
 - The GitLab pipeline runs for a merge request, for `dev` and `main`, and for a version
   tag. A plain branch push started one before: every check filtered itself out, but the
   GitHub mirror took any branch, so pushing a topic branch spent runner minutes copying
